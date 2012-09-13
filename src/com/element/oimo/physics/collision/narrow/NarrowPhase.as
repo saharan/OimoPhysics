@@ -1,0 +1,49 @@
+/* Copyright (c) 2012 EL-EMENT saharan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation  * files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy,  * modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to
+ * whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.element.oimo.physics.collision.narrow {
+	import com.element.oimo.physics.collision.shape.Shape;
+	/**
+	 * 狭域衝突検出を行うクラスです。
+	 * @author saharan
+	 */
+	public class NarrowPhase {
+		/**
+		 * 新しく NarrowPhase オブジェクトを作成します。
+		 * <strong>このコンストラクタは外部から呼び出さないでください。</strong>
+		 */
+		public function NarrowPhase() {
+		}
+		
+		/**
+		 * 二つの形状の詳細な衝突検出を行います。
+		 * 形状の種類は指定された物である必要があります。
+		 * @param	shape1 形状1
+		 * @param	shape2 形状2
+		 * @param	contactInfos 接触点情報を格納する配列
+		 * @param	numContactInfos 現在の接触点情報の数
+		 * @return 新しい接触点情報の数
+		 */
+		public function collisionDetection(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint):uint {
+			throw new Error("collisionDetection 関数が継承されていません");
+			return -1;
+		}
+		
+	}
+
+}
