@@ -50,8 +50,11 @@ package com.element.oimo.physics.collision.shape {
 			type = SHAPE_SPHERE;
 		}
 		
-		override public function updateAABB():void {
-			aabb.init(
+		/**
+		 * @inheritDoc
+		 */
+		override public function updateProxy():void {
+			proxy.init(
 				position.x - radius, position.x + radius,
 				position.y - radius, position.y + radius,
 				position.z - radius, position.z + radius

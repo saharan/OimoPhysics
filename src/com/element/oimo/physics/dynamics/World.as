@@ -17,12 +17,19 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.dynamics {
+	import com.element.oimo.physics.collision.broad.BroadPhase;
+	import com.element.oimo.physics.collision.broad.BruteForceBroadPhase;
+	import com.element.oimo.physics.collision.broad.Pair;
+	import com.element.oimo.physics.collision.broad.SweepAndPruneBroadPhase;
 	import com.element.oimo.physics.collision.narrow.ContactInfo;
 	import com.element.oimo.physics.collision.narrow.NarrowPhase;
 	import com.element.oimo.physics.collision.narrow.SphereSphereCollisionDetector;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.constraint.contact.Contact;
+	import com.element.oimo.physics.test.OimoPhysicsTest;
+	import com.element.oimo.physics.util.Performance;
+	import flash.utils.getTimer;
 	/**
 	 * 物理演算ワールドのクラスです。
 	 * 全ての物理演算オブジェクトはワールドに追加する必要があります。
@@ -43,6 +50,11 @@ package com.element.oimo.physics.dynamics {
 		 * 検出できる接触点の最大数です。
 		 */
 		public static const MAX_CONTACTS:uint = 65536;
+		
+		/**
+		 * 検出できるプロキシが重なった形状のペアの最大数です。
+		 */
+		public static const MAX_PAIRS:uint = 65536;
 		
 		/**
 		 * 追加されている剛体の配列です。
@@ -69,6 +81,30 @@ package com.element.oimo.physics.dynamics {
 		public var numShapes:uint;
 		
 		/**
+		 * プロキシが重なった形状のペアの配列です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var pairs:Vector.<Pair>;
+		
+		/**
+		 * プロキシが重なった形状のペアの数です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var numPairs:uint;
+		
+		/**
+		 * 剛体の接触点の配列です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var contacts:Vector.<Contact>;
+		
+		/**
+		 * 剛体の接触点の数です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var numContacts:uint;
+		
+		/**
 		 * 1回のステップで進む時間の長さです。
 		 */
 		public var timeStep:Number;
@@ -84,13 +120,18 @@ package com.element.oimo.physics.dynamics {
 		 */
 		public var iteration:uint;
 		
+		/**
+		 * パフォーマンスの詳細情報です。
+		 * 計算に要した時間などが記録されています。
+		 */
+		public var performance:Performance;
+		
+		private var broadPhase:BroadPhase;
+		
 		private var sphereSphereDetector:NarrowPhase;
 		
 		private var contactInfos:Vector.<ContactInfo>;
 		private var numContactInfos:uint;
-		
-		private var contacts:Vector.<Contact>;
-		private var numContacts:uint;
 		
 		/**
 		 * 新しく World オブジェクトを作成します。
@@ -103,6 +144,10 @@ package com.element.oimo.physics.dynamics {
 			gravity = new Vec3(0, -9.80665, 0);
 			rigidBodies = new Vector.<RigidBody>(MAX_BODIES, true);
 			shapes = new Vector.<Shape>(MAX_SHAPES, true);
+			pairs = new Vector.<Pair>(MAX_PAIRS, true);
+			performance = new Performance();
+			broadPhase = new SweepAndPruneBroadPhase();
+			// broadPhase = new BruteForceBroadPhase();
 			sphereSphereDetector = new SphereSphereCollisionDetector();
 			contactInfos = new Vector.<ContactInfo>(MAX_CONTACTS, true);
 			contacts = new Vector.<Contact>(MAX_CONTACTS, true);
@@ -177,6 +222,7 @@ package com.element.oimo.physics.dynamics {
 			if (shape.parent.parent) {
 				throw new Error("一つの形状を複数ワールドに追加することはできません");
 			}
+			broadPhase.addProxy(shape.proxy);
 			shapes[numShapes++] = shape;
 		}
 		
@@ -203,6 +249,7 @@ package com.element.oimo.physics.dynamics {
 				throw new Error("削除する形状のインデックスが範囲外です");
 			}
 			var remove:Shape = shapes[index];
+			broadPhase.removeProxy(remove.proxy);
 			for (var j:int = index; j < numShapes - 1; j++) {
 				shapes[j] = shapes[j + 1];
 			}
@@ -213,11 +260,14 @@ package com.element.oimo.physics.dynamics {
 		 * ワールドの時間をタイムステップ秒だけ進めます。
 		 */
 		public function step():void {
+			var start:int = getTimer();
 			for (var i:int = 0; i < numRigidBodies; i++) {
 				rigidBodies[i].update(timeStep, gravity);
 			}
+			performance.updateTime = getTimer() - start;
 			collisionDetection();
 			collisionResponse();
+			performance.totalTime = getTimer() - start;
 		}
 		
 		private function collisionDetection():void {
@@ -226,46 +276,41 @@ package com.element.oimo.physics.dynamics {
 		}
 		
 		private function collectContactInfos():void {
-			// TODO 枝刈り: Sweep And Prune
+			// broad phase
+			var start:int = getTimer();
+			numPairs = broadPhase.detectPairs(pairs);
+			performance.broadPhaseTime = getTimer() - start;
+			// narrow phase
+			performance.narrowPhaseTime = getTimer();
 			numContactInfos = 0;
-			L1:for (var i:int = 0; i < numShapes; i++) {
-				var s1:Shape = shapes[i];
-				var p1:RigidBody = s1.parent;
-				for (var j:int = 0; j < i; j++) {
-					var s2:Shape = shapes[j];
-					var p2:RigidBody = s2.parent;
-					if (
-						p1 == p2 ||
-						p1.type == RigidBody.BODY_STATIC && p2.type == RigidBody.BODY_STATIC ||
-						!s1.aabb.intersect(s2.aabb)
-					) {
-						continue;
-					}
-					var detector:NarrowPhase = null;
-					switch(s1.type) {
+			for (var i:int = 0; i < numPairs; i++) {
+				var pair:Pair = pairs[i];
+				var s1:Shape = pair.shape1;
+				var s2:Shape = pair.shape2;
+				var detector:NarrowPhase = null;
+				switch(s1.type) {
+				case Shape.SHAPE_SPHERE:
+					switch(s2.type) {
 					case Shape.SHAPE_SPHERE:
-						switch(s2.type) {
-						case Shape.SHAPE_SPHERE:
-							detector = sphereSphereDetector;
-							break;
-						case Shape.SHAPE_BOX:
-							break;
-						}
+						detector = sphereSphereDetector;
 						break;
 					case Shape.SHAPE_BOX:
-						switch(s2.type) {
-						case Shape.SHAPE_SPHERE:
-							break;
-						case Shape.SHAPE_BOX:
-							break;
-						}
 						break;
 					}
-					if (detector) {
-						numContactInfos = detector.collisionDetection(s1, s2, contactInfos, numContactInfos);
-						if (numContactInfos == MAX_CONTACTS) {
-							return;
-						}
+					break;
+				case Shape.SHAPE_BOX:
+					switch(s2.type) {
+					case Shape.SHAPE_SPHERE:
+						break;
+					case Shape.SHAPE_BOX:
+						break;
+					}
+					break;
+				}
+				if (detector) {
+					numContactInfos = detector.collisionDetection(s1, s2, contactInfos, numContactInfos);
+					if (numContactInfos == MAX_CONTACTS) {
+						return;
 					}
 				}
 			}
@@ -307,9 +352,11 @@ package com.element.oimo.physics.dynamics {
 					}
 				}
 			}
+			performance.narrowPhaseTime = getTimer() - performance.narrowPhaseTime;
 		}
 		
 		private function collisionResponse():void {
+			var start:int = getTimer();
 			// reset contact counts
 			for (var i:int = 0; i < numShapes; i++) {
 				shapes[i].numContacts = 0;
@@ -326,6 +373,7 @@ package com.element.oimo.physics.dynamics {
 			for (var m:int = 0; m < numContacts; m++) {
 				contacts[m].postSolve();
 			}
+			performance.constraintsTime = getTimer() - start;
 		}
 		
 	}

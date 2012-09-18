@@ -21,7 +21,6 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Quat;
 	import com.element.oimo.math.Vec3;
-	
 	/**
 	 * 剛体のクラスです。
 	 * 剛体は衝突処理用に単数あるいは複数の形状を持ち、
@@ -294,7 +293,7 @@ package com.element.oimo.physics.dynamics {
 				var shape:Shape = shapes[i];
 				shape.position.add(position, shape.relativePosition.mulMat(rotation, shape.localRelativePosition));
 				shape.rotation.mul(rotation, shape.relativeRotation);
-				shape.updateAABB();
+				shape.updateProxy();
 			}
 		}
 		

@@ -26,10 +26,13 @@ package com.element.oimo.physics.test {
 	import com.element.oimo.math.Quat;
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.OimoPhysics;
-	import com.element.oimo.physics.util.SimpleWorldRenderer;
+	import com.element.oimo.physics.util.DebugDraw;
 	import flash.display.Sprite;
 	import flash.display.Stage3D;
 	import flash.events.Event;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
+	import net.hires.debug.Stats;
 	/**
 	 * 動作テスト
 	 * @author saharan
@@ -38,9 +41,10 @@ package com.element.oimo.physics.test {
 	public class OimoPhysicsTest extends Sprite {
 		private var s3d:Stage3D;
 		private var world:World;
-		private var renderer:SimpleWorldRenderer;
+		private var renderer:DebugDraw;
 		private var rigid:RigidBody;
 		private var count:uint;
+		private var tf:TextField;
 		
 		public function OimoPhysicsTest() {
 			if (stage) init();
@@ -50,17 +54,28 @@ package com.element.oimo.physics.test {
 		private function init(e:Event = null):void {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			
+			var debug:Stats = new Stats();
+			debug.x = 570;
+			addChild(debug);
+			tf = new TextField();
+			tf.selectable = false;
+			tf.defaultTextFormat = new TextFormat("_monospace", 12, 0xffffff);
+			tf.x = 0;
+			tf.y = 0;
+			tf.width = 400;
+			tf.height = 400;
+			addChild(tf);
 			trace(OimoPhysics.DESCRIPTION);
 			world = new World();
 			// world.gravity.init();
-			renderer = new SimpleWorldRenderer(640, 480);
+			renderer = new DebugDraw(640, 480);
 			renderer.setWorld(world);
 			var r:RigidBody;
 			var s:Shape;
 			var c:ShapeConfig = new ShapeConfig();
-			for (var i:int = 0; i < 5; i++) {
-				for (var j:int = 0; j < 5; j++) {
-					c.position.init((i - 2) * 1.4, -3, (j - 2) * 1.4);
+			for (var i:int = 0; i < 13; i++) {
+				for (var j:int = 0; j < 13; j++) {
+					c.position.init((i - 6) * 1.4, -3, (j - 6) * 1.4);
 					s = new SphereShape(0.25, c);
 					r = new RigidBody();
 					r.addShape(s);
@@ -68,8 +83,8 @@ package com.element.oimo.physics.test {
 					world.addRigidBody(r);
 				}
 			}
-			for (var k:int = 0; k < 24; k++) {
-				makeRigid(Math.random() * 2 - 2, 2 + k * 1.4, Math.random() * 2 - 2);
+			for (var k:int = 0; k < 512; k++) {
+				makeRigid(Math.random() * 8 - 4, 2 + k * 0.8, Math.random() * 8 - 4);
 			}
 			
 			s3d = stage.stage3Ds[0];
@@ -79,8 +94,8 @@ package com.element.oimo.physics.test {
 		}
 		
 		private function makeRigid(x:Number, y:Number, z:Number):void {
-			var r1:Number = 0.3 + Math.random() * 0.5;
-			var r2:Number = 0.3 + Math.random() * 0.5;
+			var r1:Number = 0.5 + Math.random() * 0.3;
+			var r2:Number = 0.5 + Math.random() * 0.3;
 			var cfg:ShapeConfig = new ShapeConfig();
 			cfg.position.x = x - r1;
 			cfg.position.y = y;
@@ -100,21 +115,31 @@ package com.element.oimo.physics.test {
 		
 		private function onContext3DCreated(e:Event = null):void {
 			renderer.setContext3D(s3d.context3D);
-			renderer.camera(0, 0, 6);
+			renderer.camera(0, 0, 10);
 		}
 		
 		private function frame(e:Event = null):void {
 			count++;
-			renderer.camera(Math.cos(count * 0.01) * 9, 4, Math.sin(count * 0.01) * 9);
+			renderer.camera(Math.cos(count * 0.01) * 18, 12, Math.sin(count * 0.01) * 18);
 			world.step();
+			tf.text =
+				"Rigid Body Count: " + world.numRigidBodies + "\n" +
+				"Shape Count: " + world.numShapes + "\n" +
+				"Contacts Count: " + world.numContacts + "\n\n" +
+				"Broad Phase Time: " + world.performance.broadPhaseTime + "ms\n" +
+				"Narrow Phase Time: " + world.performance.narrowPhaseTime + "ms\n" +
+				"Constraints Time: " + world.performance.constraintsTime + "ms\n" +
+				"Update Time: " + world.performance.updateTime + "ms\n" +
+				"Total Time: " + world.performance.totalTime + "ms\n"
+			;
 			renderer.render();
 			var len:uint = world.numRigidBodies;
 			var rbs:Vector.<RigidBody> = world.rigidBodies;
 			for (var i:int = 0; i < len; i++) {
 				var r:RigidBody = rbs[i];
-				if (r.position.y < -8) {
-					r.position.init(Math.random() * 4 - 2, Math.random() * 2 + 6, Math.random() * 4 - 2);
-					r.linearVelocity.init();
+				if (r.position.y < -16) {
+					r.position.init(Math.random() * 8 - 4, Math.random() * 8 + 8, Math.random() * 8 - 4);
+					//r.linearVelocity.init();
 				}
 			}
 		}

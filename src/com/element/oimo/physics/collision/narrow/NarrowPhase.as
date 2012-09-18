@@ -19,7 +19,7 @@
 package com.element.oimo.physics.collision.narrow {
 	import com.element.oimo.physics.collision.shape.Shape;
 	/**
-	 * 狭域衝突検出を行うクラスです。
+	 * より詳細な形状の衝突判定を行うクラスです。
 	 * @author saharan
 	 */
 	public class NarrowPhase {
@@ -31,7 +31,7 @@ package com.element.oimo.physics.collision.narrow {
 		}
 		
 		/**
-		 * 二つの形状の詳細な衝突検出を行います。
+		 * 二つの形状の詳細な衝突判定を行います。
 		 * 形状の種類は指定された物である必要があります。
 		 * @param	shape1 形状1
 		 * @param	shape2 形状2

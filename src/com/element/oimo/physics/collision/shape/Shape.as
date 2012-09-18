@@ -18,11 +18,11 @@
  */
 package com.element.oimo.physics.collision.shape {
 	import com.element.oimo.physics.collision.broad.AABB;
+	import com.element.oimo.physics.collision.broad.Proxy;
 	import com.element.oimo.physics.constraint.contact.Contact;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Vec3;
-	
 	/**
 	 * 剛体に含まれる衝突処理用の形状のクラスです。
 	 * @author saharan
@@ -95,11 +95,13 @@ package com.element.oimo.physics.collision.shape {
 		 */
 		public var localInertia:Mat33;
 		
+		// public var aabb:AABB;
+		
 		/**
-		 * この形状全体を包含する最小の軸並行境界ボックスです。
+		 * 広域衝突判定に用いられる単純化された形状です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var aabb:AABB;
+		public var proxy:Proxy;
 		
 		/**
 		 * 摩擦係数です。
@@ -112,7 +114,7 @@ package com.element.oimo.physics.collision.shape {
 		public var restitution:Number;
 		
 		/**
-		 * 親となる剛体です。
+		 * この形状の親となる剛体です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var parent:RigidBody;
@@ -140,15 +142,16 @@ package com.element.oimo.physics.collision.shape {
 			rotation = new Mat33();
 			relativeRotation = new Mat33();
 			localInertia = new Mat33();
-			aabb = new AABB();
+			proxy = new Proxy();
+			proxy.parent = this;
 			contacts = new Vector.<Contact>(MAX_CONTACTS, true);
 		}
 		
 		/**
-		 * この形状のAABBを再計算します。
+		 * この形状のプロキシを更新します。
 		 */
-		public function updateAABB():void {
-			throw new Error("updateAABB メソッドが継承されていません");
+		public function updateProxy():void {
+			throw new Error("updateProxy メソッドが継承されていません");
 		}
 		
 	}

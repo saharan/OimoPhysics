@@ -21,7 +21,7 @@ package com.element.oimo.physics.collision.narrow {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.SphereShape;
 	/**
-	 * 球体同士の詳細な衝突検出を行います。
+	 * 球体同士の詳細な衝突判定を行います。
 	 * @author saharan
 	 */
 	public class SphereSphereCollisionDetector extends NarrowPhase {
@@ -33,7 +33,7 @@ package com.element.oimo.physics.collision.narrow {
 		}
 		
 		/**
-		 * 球体同士の詳細な衝突検出を行います。
+		 * 球体同士の詳細な衝突判定を行います。
 		 * 形状の種類はどちらも球体である必要があります。
 		 * @param	shape1 球体1
 		 * @param	shape2 球体2
