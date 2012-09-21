@@ -76,6 +76,9 @@ package com.element.oimo.physics.collision.broad {
 			var sumY2:Number = 0;
 			var sumZ:Number = 0;
 			var sumZ2:Number = 0;
+			var invNum:Number = 1 / numProxies;
+			var bodyStatic:uint = RigidBody.BODY_STATIC;
+			var maxPairs:uint = World.MAX_PAIRS;
 			for (var i:int = 0; i < numProxies; i++) {
 				var p1:Proxy = proxyPool[i];
 				center = p1.minX + p1.maxX;
@@ -99,13 +102,13 @@ package com.element.oimo.physics.collision.broad {
 					var b2:RigidBody = s2.parent;
 					if (
 						b1 == b2 ||
-						b1.type == RigidBody.BODY_STATIC && b2.type == RigidBody.BODY_STATIC ||
 						p1.maxY < p2.minY || p1.minY > p2.maxY ||
-						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ
+						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ ||
+						b1.type == bodyStatic && b2.type == bodyStatic
 					) {
 						continue;
 					}
-					if (numPairs >= World.MAX_PAIRS) {
+					if (numPairs >= maxPairs) {
 						return numPairs;
 					}
 					var pair:Pair = pairs[numPairs];
@@ -118,9 +121,9 @@ package com.element.oimo.physics.collision.broad {
 					numPairs++;
 				}
 			}
-			sumX = sumX2 - sumX * sumX / numProxies;
-			sumY = sumY2 - sumY * sumY / numProxies;
-			sumZ = sumZ2 - sumZ * sumZ / numProxies;
+			sumX = sumX2 - sumX * sumX * invNum;
+			sumY = sumY2 - sumY * sumY * invNum;
+			sumZ = sumZ2 - sumZ * sumZ * invNum;
 			if (sumX > sumY) {
 				if (sumX > sumZ) {
 					sortAxis = 0;
@@ -144,6 +147,9 @@ package com.element.oimo.physics.collision.broad {
 			var sumY2:Number = 0;
 			var sumZ:Number = 0;
 			var sumZ2:Number = 0;
+			var invNum:Number = 1 / numProxies;
+			var bodyStatic:uint = RigidBody.BODY_STATIC;
+			var maxPairs:uint = World.MAX_PAIRS;
 			for (var i:int = 0; i < numProxies; i++) {
 				var p1:Proxy = proxyPool[i];
 				center = p1.minX + p1.maxX;
@@ -167,13 +173,13 @@ package com.element.oimo.physics.collision.broad {
 					var b2:RigidBody = s2.parent;
 					if (
 						b1 == b2 ||
-						b1.type == RigidBody.BODY_STATIC && b2.type == RigidBody.BODY_STATIC ||
 						p1.maxX < p2.minX || p1.minX > p2.maxX ||
-						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ
+						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ ||
+						b1.type == bodyStatic && b2.type == bodyStatic
 					) {
 						continue;
 					}
-					if (numPairs >= World.MAX_PAIRS) {
+					if (numPairs >= maxPairs) {
 						return numPairs;
 					}
 					var pair:Pair = pairs[numPairs];
@@ -186,9 +192,9 @@ package com.element.oimo.physics.collision.broad {
 					numPairs++;
 				}
 			}
-			sumX = sumX2 - sumX * sumX / numProxies;
-			sumY = sumY2 - sumY * sumY / numProxies;
-			sumZ = sumZ2 - sumZ * sumZ / numProxies;
+			sumX = sumX2 - sumX * sumX * invNum;
+			sumY = sumY2 - sumY * sumY * invNum;
+			sumZ = sumZ2 - sumZ * sumZ * invNum;
 			if (sumX > sumY) {
 				if (sumX > sumZ) {
 					sortAxis = 0;
@@ -212,6 +218,9 @@ package com.element.oimo.physics.collision.broad {
 			var sumY2:Number = 0;
 			var sumZ:Number = 0;
 			var sumZ2:Number = 0;
+			var invNum:Number = 1 / numProxies;
+			var bodyStatic:uint = RigidBody.BODY_STATIC;
+			var maxPairs:uint = World.MAX_PAIRS;
 			for (var i:int = 0; i < numProxies; i++) {
 				var p1:Proxy = proxyPool[i];
 				center = p1.minX + p1.maxX;
@@ -235,13 +244,13 @@ package com.element.oimo.physics.collision.broad {
 					var b2:RigidBody = s2.parent;
 					if (
 						b1 == b2 ||
-						b1.type == RigidBody.BODY_STATIC && b2.type == RigidBody.BODY_STATIC ||
 						p1.maxX < p2.minX || p1.minX > p2.maxX ||
-						p1.maxY < p2.minY || p1.minY > p2.maxY
+						p1.maxY < p2.minY || p1.minY > p2.maxY ||
+						b1.type == bodyStatic && b2.type == bodyStatic
 					) {
 						continue;
 					}
-					if (numPairs >= World.MAX_PAIRS) {
+					if (numPairs >= maxPairs) {
 						return numPairs;
 					}
 					var pair:Pair = pairs[numPairs];
@@ -254,9 +263,9 @@ package com.element.oimo.physics.collision.broad {
 					numPairs++;
 				}
 			}
-			sumX = sumX2 - sumX * sumX / numProxies;
-			sumY = sumY2 - sumY * sumY / numProxies;
-			sumZ = sumZ2 - sumZ * sumZ / numProxies;
+			sumX = sumX2 - sumX * sumX * invNum;
+			sumY = sumY2 - sumY * sumY * invNum;
+			sumZ = sumZ2 - sumZ * sumZ * invNum;
 			if (sumX > sumY) {
 				if (sumX > sumZ) {
 					sortAxis = 0;

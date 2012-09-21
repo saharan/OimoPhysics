@@ -45,6 +45,7 @@ package com.element.oimo.physics.test {
 		private var rigid:RigidBody;
 		private var count:uint;
 		private var tf:TextField;
+		private var fps:Number;
 		
 		public function OimoPhysicsTest() {
 			if (stage) init();
@@ -86,6 +87,7 @@ package com.element.oimo.physics.test {
 			for (var k:int = 0; k < 512; k++) {
 				makeRigid(Math.random() * 8 - 4, 2 + k * 0.8, Math.random() * 8 - 4);
 			}
+			fps = 0;
 			
 			s3d = stage.stage3Ds[0];
 			s3d.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
@@ -97,6 +99,7 @@ package com.element.oimo.physics.test {
 			var r1:Number = 0.5 + Math.random() * 0.3;
 			var r2:Number = 0.5 + Math.random() * 0.3;
 			var cfg:ShapeConfig = new ShapeConfig();
+			cfg.restitution = 0.75;
 			cfg.position.x = x - r1;
 			cfg.position.y = y;
 			cfg.position.z = z;
@@ -122,6 +125,7 @@ package com.element.oimo.physics.test {
 			count++;
 			renderer.camera(Math.cos(count * 0.01) * 18, 12, Math.sin(count * 0.01) * 18);
 			world.step();
+			fps += (1000 / world.performance.totalTime - fps) * 0.5;
 			tf.text =
 				"Rigid Body Count: " + world.numRigidBodies + "\n" +
 				"Shape Count: " + world.numShapes + "\n" +
@@ -130,14 +134,15 @@ package com.element.oimo.physics.test {
 				"Narrow Phase Time: " + world.performance.narrowPhaseTime + "ms\n" +
 				"Constraints Time: " + world.performance.constraintsTime + "ms\n" +
 				"Update Time: " + world.performance.updateTime + "ms\n" +
-				"Total Time: " + world.performance.totalTime + "ms\n"
+				"Total Time: " + world.performance.totalTime + "ms\n" +
+				"Physics FPS: " + fps.toFixed(2) + "\n"
 			;
 			renderer.render();
 			var len:uint = world.numRigidBodies;
 			var rbs:Vector.<RigidBody> = world.rigidBodies;
 			for (var i:int = 0; i < len; i++) {
 				var r:RigidBody = rbs[i];
-				if (r.position.y < -16) {
+				if (r.position.y < -24) {
 					r.position.init(Math.random() * 8 - 4, Math.random() * 8 + 8, Math.random() * 8 - 4);
 					//r.linearVelocity.init();
 				}

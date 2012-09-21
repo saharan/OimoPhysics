@@ -17,6 +17,7 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.constraint.contact {
+	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.collision.narrow.ContactID;
 	import com.element.oimo.physics.collision.narrow.ContactInfo;
@@ -24,7 +25,7 @@ package com.element.oimo.physics.constraint.contact {
 	import com.element.oimo.physics.constraint.Constraint;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * 二つの剛体間の接触を扱うクラスです。
+	 * 二つの剛体間の接触拘束を扱うクラスです。
 	 * @author saharan
 	 */
 	public class Contact extends Constraint {
@@ -140,12 +141,65 @@ package com.element.oimo.physics.constraint.contact {
 		 */
 		public var warmStarted:Boolean;
 		
+		private var lVel1:Vec3;
+		private var lVel2:Vec3;
+		
+		private var aVel1:Vec3;
+		private var aVel2:Vec3;
+		
+		private var relPos1X:Number;
+		private var relPos1Y:Number;
+		private var relPos1Z:Number;
+		private var relPos2X:Number;
+		private var relPos2Y:Number;
+		private var relPos2Z:Number;
+		
+		private var relVelX:Number;
+		private var relVelY:Number;
+		private var relVelZ:Number;
+		
+		private var norX:Number;
+		private var norY:Number;
+		private var norZ:Number;
+		
+		private var tanX:Number;
+		private var tanY:Number;
+		private var tanZ:Number;
+		
+		private var binX:Number;
+		private var binY:Number;
+		private var binZ:Number;
+		
+		private var invM1:Number;
+		private var invM2:Number;
+		
+		private var invI1e00:Number;
+		private var invI1e01:Number;
+		private var invI1e02:Number;
+		private var invI1e10:Number;
+		private var invI1e11:Number;
+		private var invI1e12:Number;
+		private var invI1e20:Number;
+		private var invI1e21:Number;
+		private var invI1e22:Number;
+		private var invI2e00:Number;
+		private var invI2e01:Number;
+		private var invI2e02:Number;
+		private var invI2e10:Number;
+		private var invI2e11:Number;
+		private var invI2e12:Number;
+		private var invI2e20:Number;
+		private var invI2e21:Number;
+		private var invI2e22:Number;
+		
 		private var normalDenominator:Number;
 		private var tangentDenominator:Number;
 		private var binormalDenominator:Number;
 		
 		private var targetNormalVelocity:Number;
 		private var targetSeparateVelocity:Number;
+		private var friction:Number;
+		private var restitution:Number;
 		
 		private var relativeVelocity:Vec3;
 		private var tmp1:Vec3;
@@ -171,27 +225,99 @@ package com.element.oimo.physics.constraint.contact {
 			tmp2 = new Vec3();
 		}
 		
+		//----------------------------------------------------------
+		//               HELL OF INLINE EXPANSION
+		//----------------------------------------------------------
+		
 		/**
 		 * この拘束を接触点情報から作成します。
 		 * @param	contactInfo
 		 */
 		public function setupFromContactInfo(contactInfo:ContactInfo):void {
-			position.copy(contactInfo.position);
-			normal.copy(contactInfo.normal);
-			tangent.x = -normal.y;
-			tangent.y = normal.z;
-			tangent.z = normal.x;
-			binormal.cross(normal, tangent).normalize(binormal);
+			position.x = contactInfo.position.x;
+			position.y = contactInfo.position.y;
+			position.z = contactInfo.position.z;
+			
+			norX = contactInfo.normal.x;
+			norY = contactInfo.normal.y;
+			norZ = contactInfo.normal.z;
+			normal.x = norX;
+			normal.y = norY;
+			normal.z = norZ;
+			tanX = -norY;
+			tanY = norZ;
+			tanZ = norX;
+			tangent.x = tanX;
+			tangent.y = tanY;
+			tangent.z = tanZ;
+			binX = norY * tanZ - norZ * tanY; // 濃淡
+			binY = norZ * tanX - norX * tanZ;
+			binZ = norX * tanY - norY * tanX;
+			var len:Number = 1 / Math.sqrt(binX * binX + binY * binY + binZ * binZ);
+			binX *= len;
+			binY *= len;
+			binZ *= len;
+			binormal.x = binX;
+			binormal.y = binY;
+			binormal.z = binZ;
+			
 			overlap = contactInfo.overlap;
 			shape1 = contactInfo.shape1;
 			shape2 = contactInfo.shape2;
 			rigid1 = shape1.parent;
 			rigid2 = shape2.parent;
-			relativePosition1.sub(position, rigid1.position);
-			relativePosition2.sub(position, rigid2.position);
+			
+			relPos1X = position.x - rigid1.position.x;
+			relPos1Y = position.y - rigid1.position.y;
+			relPos1Z = position.z - rigid1.position.z;
+			relativePosition1.x = relPos1X;
+			relativePosition1.y = relPos1Y;
+			relativePosition1.z = relPos1Z;
+			relPos2X = position.x - rigid2.position.x;
+			relPos2Y = position.y - rigid2.position.y;
+			relPos2Z = position.z - rigid2.position.z;
+			relativePosition2.x = relPos2X;
+			relativePosition2.y = relPos2Y;
+			relativePosition2.z = relPos2Z;
+			
+			lVel1 = rigid1.linearVelocity;
+			lVel2 = rigid2.linearVelocity;
+			aVel1 = rigid1.angularVelocity;
+			aVel2 = rigid2.angularVelocity;
+			
+			invM1 = rigid1.invertMass;
+			invM2 = rigid2.invertMass;
+			
+			var tmpI:Mat33;
+			tmpI = rigid1.invertInertia;
+			invI1e00 = tmpI.e00;
+			invI1e01 = tmpI.e01;
+			invI1e02 = tmpI.e02;
+			invI1e10 = tmpI.e10;
+			invI1e11 = tmpI.e11;
+			invI1e12 = tmpI.e12;
+			invI1e20 = tmpI.e20;
+			invI1e21 = tmpI.e21;
+			invI1e22 = tmpI.e22;
+			tmpI = rigid2.invertInertia;
+			invI2e00 = tmpI.e00;
+			invI2e01 = tmpI.e01;
+			invI2e02 = tmpI.e02;
+			invI2e10 = tmpI.e10;
+			invI2e11 = tmpI.e11;
+			invI2e12 = tmpI.e12;
+			invI2e20 = tmpI.e20;
+			invI2e21 = tmpI.e21;
+			invI2e22 = tmpI.e22;
+			
 			id.data1 = contactInfo.id.data1;
 			id.data2 = contactInfo.id.data2;
 			id.flip = contactInfo.id.flip;
+			friction = shape1.friction * shape2.friction;
+			restitution = shape1.restitution * shape2.restitution;
+			// 相乗平均 Geometric mean
+			// friction = Math.sqrt(shape1.friction * shape2.friction);
+			// restitution = Math.sqrt(shape1.restitution * shape2.restitution);
 			normalImpulse = 0;
 			tangentImpulse = 0;
 			binormalImpulse = 0;
@@ -202,21 +328,105 @@ package com.element.oimo.physics.constraint.contact {
 		 * @inheritDoc
 		 */
 		override public function preSolve():void {
-			normalDenominator = calcDenominator(normal);
-			tangentDenominator = calcDenominator(tangent);
-			binormalDenominator = calcDenominator(binormal);
-			relativeVelocity.sub(
-				tmp2.cross(rigid2.angularVelocity, relativePosition2).add(tmp2, rigid2.linearVelocity),
-				tmp1.cross(rigid1.angularVelocity, relativePosition1).add(tmp1, rigid1.linearVelocity)
-			);
-			var rvn:Number = normal.dot(relativeVelocity);
-			targetNormalVelocity = -(shape1.restitution * shape2.restitution) * rvn;
+			var tmp1X:Number;
+			var tmp1Y:Number;
+			var tmp1Z:Number;
+			var tmp2X:Number;
+			var tmp2Y:Number;
+			var tmp2Z:Number;
+			var tmp3X:Number;
+			var tmp3Y:Number;
+			var tmp3Z:Number;
+			
+			tmp1X = relPos1Y * norZ - relPos1Z * norY;
+			tmp1Y = relPos1Z * norX - relPos1X * norZ;
+			tmp1Z = relPos1X * norY - relPos1Y * norX;
+			tmp2X = tmp1X * invI1e00 + tmp1Y * invI1e01 + tmp1Z * invI1e02;
+			tmp2Y = tmp1X * invI1e10 + tmp1Y * invI1e11 + tmp1Z * invI1e12;
+			tmp2Z = tmp1X * invI1e20 + tmp1Y * invI1e21 + tmp1Z * invI1e22;
+			tmp3X = tmp2Y * relPos1Z - tmp2Z * relPos1Y;
+			tmp3Y = tmp2Z * relPos1X - tmp2X * relPos1Z;
+			tmp3Z = tmp2X * relPos1Y - tmp2Y * relPos1X;
+			tmp1X = relPos2Y * norZ - relPos2Z * norY;
+			tmp1Y = relPos2Z * norX - relPos2X * norZ;
+			tmp1Z = relPos2X * norY - relPos2Y * norX;
+			tmp2X = tmp1X * invI2e00 + tmp1Y * invI2e01 + tmp1Z * invI2e02;
+			tmp2Y = tmp1X * invI2e10 + tmp1Y * invI2e11 + tmp1Z * invI2e12;
+			tmp2Z = tmp1X * invI2e20 + tmp1Y * invI2e21 + tmp1Z * invI2e22;
+			tmp3X += tmp2Y * relPos2Z - tmp2Z * relPos2Y;
+			tmp3Y += tmp2Z * relPos2X - tmp2X * relPos2Z;
+			tmp3Z += tmp2X * relPos2Y - tmp2Y * relPos2X;
+			normalDenominator = 1 / (invM1 + invM2 + norX * tmp3X + norY * tmp3Y + norZ * tmp3Z);
+			
+			tmp1X = relPos1Y * tanZ - relPos1Z * tanY;
+			tmp1Y = relPos1Z * tanX - relPos1X * tanZ;
+			tmp1Z = relPos1X * tanY - relPos1Y * tanX;
+			tmp2X = tmp1X * invI1e00 + tmp1Y * invI1e01 + tmp1Z * invI1e02;
+			tmp2Y = tmp1X * invI1e10 + tmp1Y * invI1e11 + tmp1Z * invI1e12;
+			tmp2Z = tmp1X * invI1e20 + tmp1Y * invI1e21 + tmp1Z * invI1e22;
+			tmp3X = tmp2Y * relPos1Z - tmp2Z * relPos1Y;
+			tmp3Y = tmp2Z * relPos1X - tmp2X * relPos1Z;
+			tmp3Z = tmp2X * relPos1Y - tmp2Y * relPos1X;
+			tmp1X = relPos2Y * tanZ - relPos2Z * tanY;
+			tmp1Y = relPos2Z * tanX - relPos2X * tanZ;
+			tmp1Z = relPos2X * tanY - relPos2Y * tanX;
+			tmp2X = tmp1X * invI2e00 + tmp1Y * invI2e01 + tmp1Z * invI2e02;
+			tmp2Y = tmp1X * invI2e10 + tmp1Y * invI2e11 + tmp1Z * invI2e12;
+			tmp2Z = tmp1X * invI2e20 + tmp1Y * invI2e21 + tmp1Z * invI2e22;
+			tmp3X += tmp2Y * relPos2Z - tmp2Z * relPos2Y;
+			tmp3Y += tmp2Z * relPos2X - tmp2X * relPos2Z;
+			tmp3Z += tmp2X * relPos2Y - tmp2Y * relPos2X;
+			tangentDenominator = 1 / (invM1 + invM2 + tanX * tmp3X + tanY * tmp3Y + tanZ * tmp3Z);
+			
+			tmp1X = relPos1Y * binZ - relPos1Z * binY;
+			tmp1Y = relPos1Z * binX - relPos1X * binZ;
+			tmp1Z = relPos1X * binY - relPos1Y * binX;
+			tmp2X = tmp1X * invI1e00 + tmp1Y * invI1e01 + tmp1Z * invI1e02;
+			tmp2Y = tmp1X * invI1e10 + tmp1Y * invI1e11 + tmp1Z * invI1e12;
+			tmp2Z = tmp1X * invI1e20 + tmp1Y * invI1e21 + tmp1Z * invI1e22;
+			tmp3X = tmp2Y * relPos1Z - tmp2Z * relPos1Y;
+			tmp3Y = tmp2Z * relPos1X - tmp2X * relPos1Z;
+			tmp3Z = tmp2X * relPos1Y - tmp2Y * relPos1X;
+			tmp1X = relPos2Y * binZ - relPos2Z * binY;
+			tmp1Y = relPos2Z * binX - relPos2X * binZ;
+			tmp1Z = relPos2X * binY - relPos2Y * binX;
+			tmp2X = tmp1X * invI2e00 + tmp1Y * invI2e01 + tmp1Z * invI2e02;
+			tmp2Y = tmp1X * invI2e10 + tmp1Y * invI2e11 + tmp1Z * invI2e12;
+			tmp2Z = tmp1X * invI2e20 + tmp1Y * invI2e21 + tmp1Z * invI2e22;
+			tmp3X += tmp2Y * relPos2Z - tmp2Z * relPos2Y;
+			tmp3Y += tmp2Z * relPos2X - tmp2X * relPos2Z;
+			tmp3Z += tmp2X * relPos2Y - tmp2Y * relPos2X;
+			binormalDenominator = 1 / (invM1 + invM2 + binX * tmp3X + binY * tmp3Y + binZ * tmp3Z);
+			
+			relVelX = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
+			relVelY = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
+			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
+			
+			var rvn:Number = norX * relVelX + norY * relVelY + norZ * relVelZ;
+			targetNormalVelocity = -restitution * rvn;
+			
 			if (warmStarted) {
-				tmp1.scale(normal, normalImpulse);
-				tmp1.add(tmp1, tmp2.scale(tangent, tangentImpulse));
-				tmp1.add(tmp1, tmp2.scale(binormal, binormalImpulse));
-				rigid1.applyImpulse(position, tmp1);
-				rigid2.applyImpulse(position, tmp1.invert(tmp1));
+				tmp1X = norX * normalImpulse + tanX * tangentImpulse + binX * binormalImpulse;
+				tmp1Y = norY * normalImpulse + tanY * tangentImpulse + binY * binormalImpulse;
+				tmp1Z = norZ * normalImpulse + tanZ * tangentImpulse + binZ * binormalImpulse;
+				tmp2X = relPos1Y * tmp1Z - relPos1Z * tmp1Y;
+				tmp2Y = relPos1Z * tmp1X - relPos1X * tmp1Z;
+				tmp2Z = relPos1X * tmp1Y - relPos1Y * tmp1X;
+				lVel1.x += tmp1X * invM1;
+				lVel1.y += tmp1Y * invM1;
+				lVel1.z += tmp1Z * invM1;
+				aVel1.x += tmp2X * invI1e00 + tmp2Y * invI1e01 + tmp2Z * invI1e02;
+				aVel1.y += tmp2X * invI1e10 + tmp2Y * invI1e11 + tmp2Z * invI1e12;
+				aVel1.z += tmp2X * invI1e20 + tmp2Y * invI1e21 + tmp2Z * invI1e22;
+				tmp2X = relPos2Y * tmp1Z - relPos2Z * tmp1Y;
+				tmp2Y = relPos2Z * tmp1X - relPos2X * tmp1Z;
+				tmp2Z = relPos2X * tmp1Y - relPos2Y * tmp1X;
+				lVel2.x -= tmp1X * invM2;
+				lVel2.y -= tmp1Y * invM2;
+				lVel2.z -= tmp1Z * invM2;
+				aVel2.x -= tmp2X * invI2e00 + tmp2Y * invI2e01 + tmp2Z * invI2e02;
+				aVel2.y -= tmp2X * invI2e10 + tmp2Y * invI2e11 + tmp2Z * invI2e12;
+				aVel2.z -= tmp2X * invI2e20 + tmp2Y * invI2e21 + tmp2Z * invI2e22;
 			}
 		}
 		
@@ -224,21 +434,100 @@ package com.element.oimo.physics.constraint.contact {
 		 * @inheritDoc
 		 */
 		override public function solve():void {
-			var oldImpulse:Number;
-			var newImpulse:Number;
-			relativeVelocity.sub(
-				tmp2.add(tmp2.cross(rigid2.angularVelocity, relativePosition2), rigid2.linearVelocity),
-				tmp1.add(tmp1.cross(rigid1.angularVelocity, relativePosition1), rigid1.linearVelocity)
-			);
-			var rvn:Number = normal.dot(relativeVelocity);
-			oldImpulse = normalImpulse;
-			newImpulse = (rvn - targetNormalVelocity) * normalDenominator;
-			normalImpulse += newImpulse;
+			var oldImpulse1:Number;
+			var newImpulse1:Number;
+			var oldImpulse2:Number;
+			var newImpulse2:Number;
+			var rvn:Number;
+			var forceX:Number;
+			var forceY:Number;
+			var forceZ:Number;
+			var tmpX:Number;
+			var tmpY:Number;
+			var tmpZ:Number;
+			
+			// restitution part
+			
+			relVelX = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
+			relVelY = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
+			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
+			
+			rvn = norX * relVelX + norY * relVelY + norZ * relVelZ;
+			oldImpulse1 = normalImpulse;
+			newImpulse1 = (rvn - targetNormalVelocity) * normalDenominator;
+			normalImpulse += newImpulse1;
 			if (normalImpulse > 0) normalImpulse = 0;
-			newImpulse = normalImpulse - oldImpulse;
-			tmp1.scale(normal, newImpulse);
-			rigid1.applyImpulse(position, tmp1);
-			rigid2.applyImpulse(position, tmp1.invert(tmp1));
+			newImpulse1 = normalImpulse - oldImpulse1;
+			forceX = norX * newImpulse1;
+			forceY = norY * newImpulse1;
+			forceZ = norZ * newImpulse1;
+			tmpX = relPos1Y * forceZ - relPos1Z * forceY;
+			tmpY = relPos1Z * forceX - relPos1X * forceZ;
+			tmpZ = relPos1X * forceY - relPos1Y * forceX;
+			lVel1.x += forceX * invM1;
+			lVel1.y += forceY * invM1;
+			lVel1.z += forceZ * invM1;
+			aVel1.x += tmpX * invI1e00 + tmpY * invI1e01 + tmpZ * invI1e02;
+			aVel1.y += tmpX * invI1e10 + tmpY * invI1e11 + tmpZ * invI1e12;
+			aVel1.z += tmpX * invI1e20 + tmpY * invI1e21 + tmpZ * invI1e22;
+			tmpX = relPos2Y * forceZ - relPos2Z * forceY;
+			tmpY = relPos2Z * forceX - relPos2X * forceZ;
+			tmpZ = relPos2X * forceY - relPos2Y * forceX;
+			lVel2.x -= forceX * invM2;
+			lVel2.y -= forceY * invM2;
+			lVel2.z -= forceZ * invM2;
+			aVel2.x -= tmpX * invI2e00 + tmpY * invI2e01 + tmpZ * invI2e02;
+			aVel2.y -= tmpX * invI2e10 + tmpY * invI2e11 + tmpZ * invI2e12;
+			aVel2.z -= tmpX * invI2e20 + tmpY * invI2e21 + tmpZ * invI2e22;
+			
+			// friction part
+			
+			var max:Number = -normalImpulse * friction;
+			relVelX = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
+			relVelY = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
+			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
+			
+			rvn = tanX * relVelX + tanY * relVelY + tanZ * relVelZ;
+			oldImpulse1 = tangentImpulse;
+			newImpulse1 = rvn * tangentDenominator;
+			tangentImpulse += newImpulse1;
+			
+			rvn = binX * relVelX + binY * relVelY + binZ * relVelZ;
+			oldImpulse2 = binormalImpulse;
+			newImpulse2 = rvn * binormalDenominator;
+			binormalImpulse += newImpulse2;
+			
+			var len:Number = tangentImpulse * tangentImpulse + binormalImpulse * binormalImpulse;
+			if (len > max * max) { // maximum friction
+				len = max / Math.sqrt(len);
+				tangentImpulse *= len;
+				binormalImpulse *= len;
+			}
+			
+			newImpulse1 = tangentImpulse - oldImpulse1;
+			newImpulse2 = binormalImpulse - oldImpulse2;
+			
+			forceX = tanX * newImpulse1 + binX * newImpulse2;
+			forceY = tanY * newImpulse1 + binY * newImpulse2;
+			forceZ = tanZ * newImpulse1 + binZ * newImpulse2;
+			tmpX = relPos1Y * forceZ - relPos1Z * forceY;
+			tmpY = relPos1Z * forceX - relPos1X * forceZ;
+			tmpZ = relPos1X * forceY - relPos1Y * forceX;
+			lVel1.x += forceX * invM1;
+			lVel1.y += forceY * invM1;
+			lVel1.z += forceZ * invM1;
+			aVel1.x += tmpX * invI1e00 + tmpY * invI1e01 + tmpZ * invI1e02;
+			aVel1.y += tmpX * invI1e10 + tmpY * invI1e11 + tmpZ * invI1e12;
+			aVel1.z += tmpX * invI1e20 + tmpY * invI1e21 + tmpZ * invI1e22;
+			tmpX = relPos2Y * forceZ - relPos2Z * forceY;
+			tmpY = relPos2Z * forceX - relPos2X * forceZ;
+			tmpZ = relPos2X * forceY - relPos2Y * forceX;
+			lVel2.x -= forceX * invM2;
+			lVel2.y -= forceY * invM2;
+			lVel2.z -= forceZ * invM2;
+			aVel2.x -= tmpX * invI2e00 + tmpY * invI2e01 + tmpZ * invI2e02;
+			aVel2.y -= tmpX * invI2e10 + tmpY * invI2e11 + tmpZ * invI2e12;
+			aVel2.z -= tmpX * invI2e20 + tmpY * invI2e21 + tmpZ * invI2e22;
 		}
 		
 		/**
@@ -251,13 +540,9 @@ package com.element.oimo.physics.constraint.contact {
 			if (shape2.numContacts < Shape.MAX_CONTACTS) {
 				shape2.contacts[shape2.numContacts++] = this;
 			}
-		}
-		
-		private function calcDenominator(normal:Vec3):Number {
-			// 1/m1 + 1/m2 + n・([r1×n/I1]×r1 + [r2×n/I2]×r2)
-			tmp1.cross(relativePosition1, normal).mulMat(rigid1.invertInertia, tmp1).cross(tmp1, relativePosition1);
-			tmp2.cross(relativePosition2, normal).mulMat(rigid2.invertInertia, tmp2).cross(tmp2, relativePosition2);
-			return 1 / (rigid1.invertMass + rigid2.invertMass + normal.dot(tmp1.add(tmp1, tmp2)));
+			relativeVelocity.x = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
+			relativeVelocity.y = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
+			relativeVelocity.z = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
 		}
 		
 	}

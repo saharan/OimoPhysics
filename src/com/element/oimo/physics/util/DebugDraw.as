@@ -56,7 +56,7 @@ package com.element.oimo.physics.util {
 			c3d = context3D;
 			gl = new OimoGLMini(c3d, w, h);
 			gl.material(1, 1, 0, 0.4, 16);
-			gl.registerSphere(0, 1, 8, 4);
+			gl.registerSphere(0, 1, 10, 5);
 			gl.camera(0, 5, 10, 0, 0, 0, 0, 1, 0);
 		}
 		

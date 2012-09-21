@@ -17,7 +17,6 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.collision.shape {
-	import com.element.oimo.physics.collision.broad.AABB;
 	import com.element.oimo.physics.collision.broad.Proxy;
 	import com.element.oimo.physics.constraint.contact.Contact;
 	import com.element.oimo.physics.dynamics.RigidBody;
