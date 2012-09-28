@@ -19,8 +19,10 @@
 package com.element.oimo.physics.util {
 	import com.element.oimo.glmini.OimoGLMini;
 	import com.element.oimo.math.Mat44;
+	import com.element.oimo.physics.collision.shape.BoxShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.SphereShape;
+	import com.element.oimo.physics.constraint.contact.Contact;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	import flash.display3D.*;
@@ -57,6 +59,7 @@ package com.element.oimo.physics.util {
 			gl = new OimoGLMini(c3d, w, h);
 			gl.material(1, 1, 0, 0.4, 16);
 			gl.registerSphere(0, 1, 10, 5);
+			gl.registerBox(1, 1, 1, 1);
 			gl.camera(0, 5, 10, 0, 0, 0, 0, 1, 0);
 		}
 		
@@ -103,8 +106,19 @@ package com.element.oimo.physics.util {
 				return;
 			}
 			gl.beginScene(0.1, 0.1, 0.1);
+			var cs:Vector.<Contact> = wld.contacts;
+			var num:uint = wld.numContacts;
+			/*gl.color(1, 0, 0);
+			for (var j:int = 0; j < num; j++) {
+				var c:Contact = cs[j];
+				gl.push();
+				gl.translate(c.position.x, c.position.y, c.position.z);
+				gl.scale(0.1, 0.1, 0.1);
+				gl.drawTriangles(0);
+				gl.pop();
+			}*/
 			var ss:Vector.<Shape> = wld.shapes;
-			var num:uint = wld.numShapes;
+			num = wld.numShapes;
 			for (var i:int = 0; i < num; i++) {
 				var s:Shape = ss[i];
 				gl.push();
@@ -115,10 +129,10 @@ package com.element.oimo.physics.util {
 				gl.transform(m44);
 				switch(s.parent.type) {
 				case RigidBody.BODY_DYNAMIC:
-					gl.color(1, 0.8, 0.4);
+					gl.color(1, 0.8, 0.4/*, 0.75*/);
 					break;
 				case RigidBody.BODY_STATIC:
-					gl.color(0.6, 1, 0.4);
+					gl.color(0.6, 1, 0.4/*, 0.75*/);
 					break;
 				}
 				switch(s.type) {
@@ -126,6 +140,11 @@ package com.element.oimo.physics.util {
 					var sph:SphereShape = s as SphereShape;
 					gl.scale(sph.radius, sph.radius, sph.radius);
 					gl.drawTriangles(0);
+					break;
+				case Shape.SHAPE_BOX:
+					var box:BoxShape = s as BoxShape;
+					gl.scale(box.width, box.height, box.depth);
+					gl.drawTriangles(1);
 					break;
 				}
 				gl.pop();

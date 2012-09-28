@@ -17,9 +17,8 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.collision.shape {
-	import com.element.oimo.math.Mat33;
 	/**
-	 * 球体を表すクラスです。
+	 * 球体を表す形状です。
 	 * @author saharan
 	 */
 	public class SphereShape extends Shape {
@@ -30,7 +29,7 @@ package com.element.oimo.physics.collision.shape {
 		public var radius:Number;
 		
 		/**
-		 * 新しく CircleShape オブジェクトを作成します。
+		 * 新しく SphereShape オブジェクトを作成します。
 		 * @param	radius 球体の半径
 		 * @param	config 形状の設定
 		 */

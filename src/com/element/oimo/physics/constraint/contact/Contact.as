@@ -403,6 +403,7 @@ package com.element.oimo.physics.constraint.contact {
 			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
 			
 			var rvn:Number = norX * relVelX + norY * relVelY + norZ * relVelZ;
+			if (rvn > -0.5) rvn = 0;
 			targetNormalVelocity = -restitution * rvn;
 			
 			if (warmStarted) {

@@ -145,11 +145,25 @@ package com.element.oimo.physics.dynamics {
 		
 		/**
 		 * 新しく RigidBody オブジェクトを作成します。
+		 * 回転成分を指定することもできます。
+		 * @param	rad ラジアンでの回転角度
+		 * @param	ax 回転軸の x 成分
+		 * @param	ay 回転軸の y 成分
+		 * @param	az 回転軸の z 成分
 		 */
-		public function RigidBody() {
+		public function RigidBody(rad:Number = 0, ax:Number = 0, ay:Number = 0, az:Number = 0) {
 			position = new Vec3();
 			linearVelocity = new Vec3();
-			orientation = new Quat();
+			var len:Number = ax * ax + ay * ay + az * az;
+			if (len > 0) {
+				len = 1 / Math.sqrt(len);
+				ax *= len;
+				ay *= len;
+				az *= len;
+			}
+			var sin:Number = Math.sin(rad * 0.5);
+			var cos:Number = Math.cos(rad * 0.5);
+			orientation = new Quat(cos, sin * ax, sin * ay, sin * az);
 			rotation = new Mat33();
 			angularVelocity = new Vec3();
 			invertInertia = new Mat33();

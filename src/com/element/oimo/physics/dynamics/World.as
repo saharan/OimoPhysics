@@ -22,7 +22,8 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.physics.collision.broad.Pair;
 	import com.element.oimo.physics.collision.broad.SweepAndPruneBroadPhase;
 	import com.element.oimo.physics.collision.narrow.ContactInfo;
-	import com.element.oimo.physics.collision.narrow.NarrowPhase;
+	import com.element.oimo.physics.collision.narrow.CollisionDetector;
+	import com.element.oimo.physics.collision.narrow.SphereBoxCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.SphereSphereCollisionDetector;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.math.Vec3;
@@ -128,7 +129,8 @@ package com.element.oimo.physics.dynamics {
 		
 		private var broadPhase:BroadPhase;
 		
-		private var sphereSphereDetector:NarrowPhase;
+		private var sphereSphereDetector:CollisionDetector;
+		private var sphereBoxDetector:CollisionDetector;
 		
 		private var contactInfos:Vector.<ContactInfo>;
 		private var numContactInfos:uint;
@@ -149,6 +151,7 @@ package com.element.oimo.physics.dynamics {
 			broadPhase = new SweepAndPruneBroadPhase();
 			// broadPhase = new BruteForceBroadPhase();
 			sphereSphereDetector = new SphereSphereCollisionDetector();
+			sphereBoxDetector = new SphereBoxCollisionDetector();
 			contactInfos = new Vector.<ContactInfo>(MAX_CONTACTS, true);
 			contacts = new Vector.<Contact>(MAX_CONTACTS, true);
 		}
@@ -287,7 +290,8 @@ package com.element.oimo.physics.dynamics {
 				var pair:Pair = pairs[i];
 				var s1:Shape = pair.shape1;
 				var s2:Shape = pair.shape2;
-				var detector:NarrowPhase = null;
+				var detector:CollisionDetector = null;
+				var flip:Boolean = false;
 				switch(s1.type) {
 				case Shape.SHAPE_SPHERE:
 					switch(s2.type) {
@@ -295,12 +299,15 @@ package com.element.oimo.physics.dynamics {
 						detector = sphereSphereDetector;
 						break;
 					case Shape.SHAPE_BOX:
+						detector = sphereBoxDetector;
 						break;
 					}
 					break;
 				case Shape.SHAPE_BOX:
 					switch(s2.type) {
 					case Shape.SHAPE_SPHERE:
+						detector = sphereBoxDetector;
+						flip = true;
 						break;
 					case Shape.SHAPE_BOX:
 						break;
@@ -308,7 +315,7 @@ package com.element.oimo.physics.dynamics {
 					break;
 				}
 				if (detector) {
-					numContactInfos = detector.collisionDetection(s1, s2, contactInfos, numContactInfos);
+					numContactInfos = detector.detectCollision(s1, s2, contactInfos, numContactInfos, flip);
 					if (numContactInfos == MAX_CONTACTS) {
 						return;
 					}

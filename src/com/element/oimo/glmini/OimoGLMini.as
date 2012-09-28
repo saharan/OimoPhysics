@@ -55,6 +55,7 @@ package com.element.oimo.glmini {
 		public function OimoGLMini(c3d:Context3D, w:uint, h:uint, antiAlias:uint = 0) {
 			this.c3d = c3d;
 			c3d.configureBackBuffer(w, h, antiAlias, true);
+			c3d.setBlendFactors("sourceAlpha", "oneMinusSourceAlpha");
 			c3d.setCulling("front"); // ClockWise
 			this.w = w;
 			this.h = h;
@@ -101,8 +102,8 @@ package com.element.oimo.glmini {
 			setProgramConstantsNumber("fragment", FRAGMENT_SPC_SHN_INDEX, specular, shininess, 0, 1);
 		}
 		
-		public function color(r:Number, g:Number, b:Number):void {
-			setProgramConstantsNumber("fragment", FRAGMENT_COLOR_INDEX, r, g, b, 1);
+		public function color(r:Number, g:Number, b:Number, a:Number = 1):void {
+			setProgramConstantsNumber("fragment", FRAGMENT_COLOR_INDEX, r, g, b, a);
 		}
 		
 		public function ambientLightColor(r:Number, g:Number, b:Number):void {
@@ -458,6 +459,7 @@ package com.element.oimo.glmini {
 				"slt ft3.w, ft3.w, ft0.w \n" +				// zer = zer < dot ? 1 : 0
 				"mul ft3, ft3, ft3.www \n" +				// rfc = rfc * zer
 				"add ft0, ft0, ft3 \n" +					// ft0 = ft0 + rfc
+				"mov ft0.w, ft2.w \n" +						// ft0 = alp
 				"mov oc, ft0 \n"							// col = ft0
 			;
 			return code;

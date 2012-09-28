@@ -17,6 +17,7 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.test {
+	import com.element.oimo.physics.collision.shape.BoxShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
 	import com.element.oimo.physics.collision.shape.SphereShape;
@@ -74,7 +75,7 @@ package com.element.oimo.physics.test {
 			var r:RigidBody;
 			var s:Shape;
 			var c:ShapeConfig = new ShapeConfig();
-			for (var i:int = 0; i < 13; i++) {
+			/*for (var i:int = 0; i < 13; i++) {
 				for (var j:int = 0; j < 13; j++) {
 					c.position.init((i - 6) * 1.4, -3, (j - 6) * 1.4);
 					s = new SphereShape(0.25, c);
@@ -83,9 +84,33 @@ package com.element.oimo.physics.test {
 					r.setupMass(RigidBody.BODY_STATIC);
 					world.addRigidBody(r);
 				}
-			}
+			}*/
+			c.position.init(0, 0, -6);
+			s = new BoxShape(24, 1, 15, c);
+			r = new RigidBody(35 * Math.PI / 180, 1, 0, 0);
+			r.addShape(s);
+			r.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(r);
+			c.position.init(0, -10, 6);
+			s = new BoxShape(24, 1, 15, c);
+			r = new RigidBody(-35 * Math.PI / 180, 1, 0, 0);
+			r.addShape(s);
+			r.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(r);
+			c.position.init(-12, -5, 0);
+			s = new BoxShape(1, 20, 25, c);
+			r = new RigidBody();
+			r.addShape(s);
+			r.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(r);
+			c.position.init(12, -5, 0);
+			s = new BoxShape(1, 20, 25, c);
+			r = new RigidBody();
+			r.addShape(s);
+			r.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(r);
 			for (var k:int = 0; k < 512; k++) {
-				makeRigid(Math.random() * 8 - 4, 2 + k * 0.8, Math.random() * 8 - 4);
+				makeRigid(Math.random() * 8 - 4, 2 + k * 0.5, Math.random() * 8 - 4);
 			}
 			fps = 0;
 			
@@ -96,10 +121,9 @@ package com.element.oimo.physics.test {
 		}
 		
 		private function makeRigid(x:Number, y:Number, z:Number):void {
-			var r1:Number = 0.5 + Math.random() * 0.3;
-			var r2:Number = 0.5 + Math.random() * 0.3;
+			var r1:Number = 0.3 + Math.random() * 0.5;
+			var r2:Number = 0.3 + Math.random() * 0.5;
 			var cfg:ShapeConfig = new ShapeConfig();
-			cfg.restitution = 0.75;
 			cfg.position.x = x - r1;
 			cfg.position.y = y;
 			cfg.position.z = z;
@@ -123,9 +147,16 @@ package com.element.oimo.physics.test {
 		
 		private function frame(e:Event = null):void {
 			count++;
-			renderer.camera(Math.cos(count * 0.01) * 18, 12, Math.sin(count * 0.01) * 18);
+			renderer.camera(
+				Math.cos((320 - mouseX) * 0.01) * 18,
+				(240 - mouseY) * 0.2,
+				Math.sin((320 - mouseX) * 0.01) * 18
+			);
 			world.step();
 			fps += (1000 / world.performance.totalTime - fps) * 0.5;
+			if (fps > 1000 || fps != fps) {
+				fps = 1000;
+			}
 			tf.text =
 				"Rigid Body Count: " + world.numRigidBodies + "\n" +
 				"Shape Count: " + world.numShapes + "\n" +
@@ -144,7 +175,7 @@ package com.element.oimo.physics.test {
 				var r:RigidBody = rbs[i];
 				if (r.position.y < -24) {
 					r.position.init(Math.random() * 8 - 4, Math.random() * 8 + 8, Math.random() * 8 - 4);
-					//r.linearVelocity.init();
+					// r.linearVelocity.init();
 				}
 			}
 		}

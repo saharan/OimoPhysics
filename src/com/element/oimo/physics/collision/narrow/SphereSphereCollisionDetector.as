@@ -22,9 +22,11 @@ package com.element.oimo.physics.collision.narrow {
 	import com.element.oimo.physics.collision.shape.SphereShape;
 	/**
 	 * 球体同士の詳細な衝突判定を行います。
+	 * detectCollision 関数の引数に指定する形状は、
+	 * どちらも球体である必要があります。
 	 * @author saharan
 	 */
-	public class SphereSphereCollisionDetector extends NarrowPhase {
+	public class SphereSphereCollisionDetector extends CollisionDetector {
 		
 		/**
 		 * 新しく SphereSphereCollisionDetector オブジェクトを作成します。
@@ -33,15 +35,9 @@ package com.element.oimo.physics.collision.narrow {
 		}
 		
 		/**
-		 * 球体同士の詳細な衝突判定を行います。
-		 * 形状の種類はどちらも球体である必要があります。
-		 * @param	shape1 球体1
-		 * @param	shape2 球体2
-		 * @param	contactInfos 接触点情報を格納する配列
-		 * @param	numContactInfos 現在の接触点情報の数
-		 * @return 新しい接触点情報の数
+		 * @inheritDoc
 		 */
-		override public function collisionDetection(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint):uint {
+		override public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint, flip:Boolean):uint {
 			var s1:SphereShape = shape1 as SphereShape;
 			var s2:SphereShape = shape2 as SphereShape;
 			var p1:Vec3 = s1.position;
@@ -50,7 +46,9 @@ package com.element.oimo.physics.collision.narrow {
 			var dy:Number = p2.y - p1.y;
 			var dz:Number = p2.z - p1.z;
 			var len:Number = dx * dx + dy * dy + dz * dz;
-			var rad:Number = s1.radius + s2.radius;
+			var r1:Number = s1.radius;
+			var r2:Number = s2.radius;
+			var rad:Number = r1 + r2;
 			if (len > 0 && len < rad * rad && contactInfos.length > numContactInfos) {
 				len = Math.sqrt(len);
 				var invLen:Number = 1 / len;
@@ -64,9 +62,9 @@ package com.element.oimo.physics.collision.narrow {
 				c.normal.x = dx;
 				c.normal.y = dy;
 				c.normal.z = dz;
-				c.position.x = p1.x + dx * s1.radius;
-				c.position.y = p1.y + dy * s1.radius;
-				c.position.z = p1.z + dz * s1.radius;
+				c.position.x = p1.x + dx * r1;
+				c.position.y = p1.y + dy * r1;
+				c.position.z = p1.z + dz * r1;
 				c.overlap = len - rad;
 				c.shape1 = s1;
 				c.shape2 = s2;
