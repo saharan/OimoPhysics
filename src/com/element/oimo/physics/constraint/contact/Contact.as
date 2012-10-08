@@ -244,19 +244,19 @@ package com.element.oimo.physics.constraint.contact {
 			normal.x = norX;
 			normal.y = norY;
 			normal.z = norZ;
-			tanX = -norY;
-			tanY = norZ;
-			tanZ = norX;
+			tanX = norY * norX - norZ * norZ;
+			tanY = norZ * -norY - norX * norX;
+			tanZ = norX * norZ + norY * norY;
+			var len:Number = 1 / Math.sqrt(tanX * tanX + tanY * tanY + tanZ * tanZ);
+			tanX *= len;
+			tanY *= len;
+			tanZ *= len;
 			tangent.x = tanX;
 			tangent.y = tanY;
 			tangent.z = tanZ;
-			binX = norY * tanZ - norZ * tanY; // 濃淡
+			binX = norY * tanZ - norZ * tanY;
 			binY = norZ * tanX - norX * tanZ;
 			binZ = norX * tanY - norY * tanX;
-			var len:Number = 1 / Math.sqrt(binX * binX + binY * binY + binZ * binZ);
-			binX *= len;
-			binY *= len;
-			binZ *= len;
 			binormal.x = binX;
 			binormal.y = binY;
 			binormal.z = binZ;
@@ -315,6 +315,8 @@ package com.element.oimo.physics.constraint.contact {
 			id.flip = contactInfo.id.flip;
 			friction = shape1.friction * shape2.friction;
 			restitution = shape1.restitution * shape2.restitution;
+			overlap = contactInfo.overlap + 0.05; // 5cm
+			if (overlap > 0) overlap = 0;
 			// 相乗平均 Geometric mean
 			// friction = Math.sqrt(shape1.friction * shape2.friction);
 			// restitution = Math.sqrt(shape1.restitution * shape2.restitution);
@@ -403,8 +405,9 @@ package com.element.oimo.physics.constraint.contact {
 			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
 			
 			var rvn:Number = norX * relVelX + norY * relVelY + norZ * relVelZ;
-			if (rvn > -0.5) rvn = 0;
-			targetNormalVelocity = -restitution * rvn;
+			if (rvn > -1) rvn = 0;
+			targetNormalVelocity = restitution * -rvn;
+			if (targetNormalVelocity < -overlap * 2) targetNormalVelocity -= overlap * 2;
 			
 			if (warmStarted) {
 				tmp1X = norX * normalImpulse + tanX * tangentImpulse + binX * binormalImpulse;

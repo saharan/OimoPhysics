@@ -28,6 +28,12 @@ package com.element.oimo.physics.collision.shape {
 	 */
 	public class Shape {
 		/**
+		 * 次に生成される形状の ID の作成に使われます。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public static var nextID:uint = 0;
+		
+		/**
 		 * 定義されていないことを表す形状の種類です。
 		 */
 		public static const SHAPE_NULL:uint = 0x0;
@@ -46,6 +52,13 @@ package com.element.oimo.physics.collision.shape {
 		 * 一つの形状に保持できる接触点の最大数です。
 		 */
 		public static const MAX_CONTACTS:uint = 1024;
+		
+		/**
+		 * この形状の固有数値です。
+		 * 通常この値は他の形状とかぶることはありません。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var id:uint;
 		
 		/**
 		 * 形状の種類を表します。
@@ -135,6 +148,7 @@ package com.element.oimo.physics.collision.shape {
 		 * <strong>このコンストラクタは外部から呼び出さないでください。</strong>
 		 */
 		public function Shape() {
+			id = ++nextID;
 			position = new Vec3();
 			relativePosition = new Vec3();
 			localRelativePosition = new Vec3();

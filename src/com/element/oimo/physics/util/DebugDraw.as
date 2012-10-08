@@ -106,17 +106,48 @@ package com.element.oimo.physics.util {
 				return;
 			}
 			gl.beginScene(0.1, 0.1, 0.1);
+			var alpha:Number = 1;
+			var drawContacts:Boolean = false;
+			var drawNormals:Boolean = false;
 			var cs:Vector.<Contact> = wld.contacts;
 			var num:uint = wld.numContacts;
-			/*gl.color(1, 0, 0);
-			for (var j:int = 0; j < num; j++) {
-				var c:Contact = cs[j];
-				gl.push();
-				gl.translate(c.position.x, c.position.y, c.position.z);
-				gl.scale(0.1, 0.1, 0.1);
-				gl.drawTriangles(0);
-				gl.pop();
-			}*/
+			if (drawContacts) {
+				for (var j:int = 0; j < num; j++) {
+					var c:Contact = cs[j];
+					gl.push();
+					gl.translate(c.position.x, c.position.y, c.position.z);
+					if (drawNormals) gl.push();
+					gl.scale(0.1, 0.1, 0.1);
+					if (c.warmStarted) {
+						gl.color(0.5, 0.5, 0.5);
+					} else {
+						gl.color(1, 1, 0);
+					}
+					gl.drawTriangles(0);
+					if (drawNormals) {
+						gl.pop();
+						gl.push();
+						gl.translate(c.normal.x * 0.3, c.normal.y * 0.3, c.normal.z * 0.3);
+						gl.scale(0.1, 0.1, 0.1);
+						gl.color(1, 0, 0);
+						gl.drawTriangles(0);
+						gl.pop();
+						gl.push();
+						gl.translate(c.tangent.x * 0.3, c.tangent.y * 0.3, c.tangent.z * 0.3);
+						gl.scale(0.1, 0.1, 0.1);
+						gl.color(0, 0.6, 0);
+						gl.drawTriangles(0);
+						gl.pop();
+						gl.push();
+						gl.translate(c.binormal.x * 0.3, c.binormal.y * 0.3, c.binormal.z * 0.3);
+						gl.scale(0.1, 0.1, 0.1);
+						gl.color(0, 0, 1);
+						gl.drawTriangles(0);
+						gl.pop();
+					}
+					gl.pop();
+				}
+			}
 			var ss:Vector.<Shape> = wld.shapes;
 			num = wld.numShapes;
 			for (var i:int = 0; i < num; i++) {
@@ -129,10 +160,10 @@ package com.element.oimo.physics.util {
 				gl.transform(m44);
 				switch(s.parent.type) {
 				case RigidBody.BODY_DYNAMIC:
-					gl.color(1, 0.8, 0.4/*, 0.75*/);
+					gl.color(1, 0.8, 0.4, alpha);
 					break;
 				case RigidBody.BODY_STATIC:
-					gl.color(0.6, 1, 0.4/*, 0.75*/);
+					gl.color(0.6, 1, 0.4, alpha);
 					break;
 				}
 				switch(s.type) {

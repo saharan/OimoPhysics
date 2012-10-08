@@ -39,7 +39,7 @@ package com.element.oimo.physics.test {
 	 * @author saharan
 	 */
 	[SWF(width = "640", height = "480", frameRate = "60")]
-	public class OimoPhysicsTest extends Sprite {
+	public class SphereStackTest extends Sprite {
 		private var s3d:Stage3D;
 		private var world:World;
 		private var renderer:DebugDraw;
@@ -48,7 +48,7 @@ package com.element.oimo.physics.test {
 		private var tf:TextField;
 		private var fps:Number;
 		
-		public function OimoPhysicsTest() {
+		public function SphereStackTest() {
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -69,22 +69,11 @@ package com.element.oimo.physics.test {
 			addChild(tf);
 			trace(OimoPhysics.DESCRIPTION);
 			world = new World();
-			// world.gravity.init();
 			renderer = new DebugDraw(640, 480);
 			renderer.setWorld(world);
 			var r:RigidBody;
 			var s:Shape;
 			var c:ShapeConfig = new ShapeConfig();
-			/*for (var i:int = 0; i < 13; i++) {
-				for (var j:int = 0; j < 13; j++) {
-					c.position.init((i - 6) * 1.4, -3, (j - 6) * 1.4);
-					s = new SphereShape(0.25, c);
-					r = new RigidBody();
-					r.addShape(s);
-					r.setupMass(RigidBody.BODY_STATIC);
-					world.addRigidBody(r);
-				}
-			}*/
 			c.position.init(0, 0, -6);
 			s = new BoxShape(24, 1, 15, c);
 			r = new RigidBody(35 * Math.PI / 180, 1, 0, 0);
@@ -175,7 +164,6 @@ package com.element.oimo.physics.test {
 				var r:RigidBody = rbs[i];
 				if (r.position.y < -24) {
 					r.position.init(Math.random() * 8 - 4, Math.random() * 8 + 8, Math.random() * 8 - 4);
-					// r.linearVelocity.init();
 				}
 			}
 		}

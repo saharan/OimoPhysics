@@ -31,14 +31,16 @@ package com.element.oimo.physics.collision.narrow {
 		
 		/**
 		 * 新しく SphereBoxCollisionDetector オブジェクトを作成します。
+		 * @param	flip detectCollision 関数の引数に指定する形状の順序を、反転して受け取る場合は true
 		 */
-		public function SphereBoxCollisionDetector() {
+		public function SphereBoxCollisionDetector(flip:Boolean) {
+			this.flip = flip;
 		}
 		
 		/**
 		 * @inheritDoc
 		 */
-		override public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint, flip:Boolean):uint {
+		override public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint):uint {
 			if (numContactInfos == contactInfos.length) return numContactInfos;
 			var s:SphereShape;
 			var b:BoxShape;
@@ -50,7 +52,13 @@ package com.element.oimo.physics.collision.narrow {
 				b = shape2 as BoxShape;
 			}
 			var ps:Vec3 = s.position;
+			var psx:Number = ps.x;
+			var psy:Number = ps.y;
+			var psz:Number = ps.z;
 			var pb:Vec3 = b.position;
+			var pbx:Number = pb.x;
+			var pby:Number = pb.y;
+			var pbz:Number = pb.z;
 			var rad:Number = s.radius;
 			// normal
 			var nw:Vec3 = b.normalDirectionWidth;
@@ -61,9 +69,9 @@ package com.element.oimo.physics.collision.narrow {
 			var hh:Number = b.halfHeight;
 			var hd:Number = b.halfDepth;
 			// diff
-			var dx:Number = ps.x - pb.x;
-			var dy:Number = ps.y - pb.y;
-			var dz:Number = ps.z - pb.z;
+			var dx:Number = psx - pbx;
+			var dy:Number = psy - pby;
+			var dz:Number = psz - pbz;
 			// shadow
 			var sx:Number = nw.x * dx + nw.y * dy + nw.z * dz;
 			var sy:Number = nh.x * dx + nh.y * dy + nh.z * dz;
@@ -117,7 +125,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dx < dy) {
 					if (dx < dz) {
 						// x
-						len = dx;
+						len = dx - hw;
 						if (sx < 0) {
 							sx = -hw;
 							dx = nw.x;
@@ -131,7 +139,7 @@ package com.element.oimo.physics.collision.narrow {
 						}
 					} else {
 						// z
-						len = dz;
+						len = dz - hd;
 						if (sz < 0) {
 							sz = -hd;
 							dx = nd.x;
@@ -147,7 +155,7 @@ package com.element.oimo.physics.collision.narrow {
 				} else {
 					if (dy < dz) {
 						// y
-						len = dy;
+						len = dy - hh;
 						if (sy < 0) {
 							sy = -hh;
 							dx = nh.x;
@@ -161,7 +169,7 @@ package com.element.oimo.physics.collision.narrow {
 						}
 					} else {
 						// z
-						len = dz;
+						len = dz - hd;
 						if (sz < 0) {
 							sz = -hd;
 							dx = nd.x;
@@ -175,9 +183,9 @@ package com.element.oimo.physics.collision.narrow {
 						}
 					}
 				}
-				cx = pb.x + sx * nw.x + sy * nh.x + sz * nd.x;
-				cy = pb.y + sx * nw.y + sy * nh.y + sz * nd.y;
-				cz = pb.z + sx * nw.z + sy * nh.z + sz * nd.z;
+				cx = pbx + sx * nw.x + sy * nh.x + sz * nd.x;
+				cy = pby + sx * nw.y + sy * nh.y + sz * nd.y;
+				cz = pbz + sx * nw.z + sy * nh.z + sz * nd.z;
 				if (!contactInfos[numContactInfos]) {
 					contactInfos[numContactInfos] = new ContactInfo();
 				}
@@ -185,9 +193,9 @@ package com.element.oimo.physics.collision.narrow {
 				c.normal.x = dx;
 				c.normal.y = dy;
 				c.normal.z = dz;
-				c.position.x = cx;
-				c.position.y = cy;
-				c.position.z = cz;
+				c.position.x = psx + rad * dx;
+				c.position.y = psy + rad * dy;
+				c.position.z = psz + rad * dz;
 				c.overlap = len;
 				c.shape1 = s;
 				c.shape2 = b;
@@ -196,9 +204,9 @@ package com.element.oimo.physics.collision.narrow {
 				c.id.flip = false;
 			} else {
 				// closest
-				cx = pb.x + sx * nw.x + sy * nh.x + sz * nd.x;
-				cy = pb.y + sx * nw.y + sy * nh.y + sz * nd.y;
-				cz = pb.z + sx * nw.z + sy * nh.z + sz * nd.z;
+				cx = pbx + sx * nw.x + sy * nh.x + sz * nd.x;
+				cy = pby + sx * nw.y + sy * nh.y + sz * nd.y;
+				cz = pbz + sx * nw.z + sy * nh.z + sz * nd.z;
 				dx = cx - ps.x;
 				dy = cy - ps.y;
 				dz = cz - ps.z;
@@ -216,9 +224,9 @@ package com.element.oimo.physics.collision.narrow {
 					c.normal.x = dx;
 					c.normal.y = dy;
 					c.normal.z = dz;
-					c.position.x = cx;
-					c.position.y = cy;
-					c.position.z = cz;
+					c.position.x = psx + rad * dx;
+					c.position.y = psy + rad * dy;
+					c.position.z = psz + rad * dz;
 					c.overlap = len - rad;
 					c.shape1 = s;
 					c.shape2 = b;

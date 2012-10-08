@@ -245,8 +245,8 @@ package com.element.oimo.physics.dynamics {
 				position.add(position, tmpV.scale(shape.position, shape.mass));
 				denom += shape.mass;
 				mass += shape.mass;
-				// inertia = (rotation ^ -1) * localInertia * rotation
-				tmpM.mul(tmpM.mul(tmpM.transpose(shape.relativeRotation), shape.localInertia), shape.relativeRotation);
+				// inertia = rotation * localInertia * (rotation ^ -1)
+				tmpM.mul(shape.relativeRotation, tmpM.mul(shape.localInertia, tmpM.transpose(shape.relativeRotation)));
 				localInertia.add(localInertia, tmpM);
 			}
 			position.scale(position, 1 / denom);
@@ -258,6 +258,7 @@ package com.element.oimo.physics.dynamics {
 				shape = shapes[j];
 				var relPos:Vec3 = shape.localRelativePosition;
 				relPos.sub(shape.position, position).mulMat(invRot, relPos);
+				shape.updateProxy();
 				localInertia.e00 += shape.mass * (relPos.y * relPos.y + relPos.z * relPos.z);
 				localInertia.e11 += shape.mass * (relPos.x * relPos.x + relPos.z * relPos.z);
 				localInertia.e22 += shape.mass * (relPos.x * relPos.x + relPos.y * relPos.y);
@@ -276,51 +277,6 @@ package com.element.oimo.physics.dynamics {
 				invertMass = 0;
 				invertLocalInertia.init(0, 0, 0, 0, 0, 0, 0, 0, 0);
 			}
-		}
-		
-		/**
-		 * 剛体の運動を時間積分し、形状などの情報を更新します。
-		 * このメソッドはワールドのステップを呼ぶと自動で呼び出されるので、
-		 * 通常は外部から呼ぶ必要はありません。
-		 * @param	timeStep
-		 * @param	gravity
-		 */
-		public function update(timeStep:Number, gravity:Vec3):void {
-			if (type == BODY_STATIC) {
-				linearVelocity.init();
-				angularVelocity.init();
-			} else if (type == BODY_DYNAMIC) {
-				position.x += linearVelocity.x * timeStep;
-				position.y += linearVelocity.y * timeStep;
-				position.z += linearVelocity.z * timeStep;
-				linearVelocity.x += gravity.x * timeStep;
-				linearVelocity.y += gravity.y * timeStep;
-				linearVelocity.z += gravity.z * timeStep;
-				var ax:Number = angularVelocity.x;
-				var ay:Number = angularVelocity.y;
-				var az:Number = angularVelocity.z;
-				var os:Number = orientation.s;
-				var ox:Number = orientation.x;
-				var oy:Number = orientation.y;
-				var oz:Number = orientation.z;
-				timeStep *= 0.5;
-				var s:Number = (-ax * ox - ay * oy - az * oz) * timeStep;
-				var x:Number = (ax * os + ay * oz - az * oy) * timeStep;
-				var y:Number = (-ax * oz + ay * os + az * ox) * timeStep;
-				var z:Number = (ax * oy - ay * ox + az * os) * timeStep;
-				os += s;
-				ox += x;
-				oy += y;
-				oz += z;
-				s = 1 / Math.sqrt(os * os + ox * ox + oy * oy + oz * oz);
-				orientation.s = os * s;
-				orientation.x = ox * s;
-				orientation.y = oy * s;
-				orientation.z = oz * s;
-			} else {
-				throw new Error("未定義の剛体の種類です");
-			}
-			rotation.setQuat(orientation);
 			var r00:Number = rotation.e00;
 			var r01:Number = rotation.e01;
 			var r02:Number = rotation.e02;
@@ -339,24 +295,148 @@ package com.element.oimo.physics.dynamics {
 			var i20:Number = invertLocalInertia.e20;
 			var i21:Number = invertLocalInertia.e21;
 			var i22:Number = invertLocalInertia.e22;
-			var e00:Number = r00 * i00 + r10 * i10 + r20 * i20;
-			var e01:Number = r00 * i01 + r10 * i11 + r20 * i21;
-			var e02:Number = r00 * i02 + r10 * i12 + r20 * i22;
-			var e10:Number = r01 * i00 + r11 * i10 + r21 * i20;
-			var e11:Number = r01 * i01 + r11 * i11 + r21 * i21;
-			var e12:Number = r01 * i02 + r11 * i12 + r21 * i22;
-			var e20:Number = r02 * i00 + r12 * i10 + r22 * i20;
-			var e21:Number = r02 * i01 + r12 * i11 + r22 * i21;
-			var e22:Number = r02 * i02 + r12 * i12 + r22 * i22;
-			invertInertia.e00 = e00 * r00 + e01 * r10 + e02 * r20;
-			invertInertia.e01 = e00 * r01 + e01 * r11 + e02 * r21;
-			invertInertia.e02 = e00 * r02 + e01 * r12 + e02 * r22;
-			invertInertia.e10 = e10 * r00 + e11 * r10 + e12 * r20;
-			invertInertia.e11 = e10 * r01 + e11 * r11 + e12 * r21;
-			invertInertia.e12 = e10 * r02 + e11 * r12 + e12 * r22;
-			invertInertia.e20 = e20 * r00 + e21 * r10 + e22 * r20;
-			invertInertia.e21 = e20 * r01 + e21 * r11 + e22 * r21;
-			invertInertia.e22 = e20 * r02 + e21 * r12 + e22 * r22;
+			var e00:Number = r00 * i00 + r01 * i10 + r02 * i20;
+			var e01:Number = r00 * i01 + r01 * i11 + r02 * i21;
+			var e02:Number = r00 * i02 + r01 * i12 + r02 * i22;
+			var e10:Number = r10 * i00 + r11 * i10 + r12 * i20;
+			var e11:Number = r10 * i01 + r11 * i11 + r12 * i21;
+			var e12:Number = r10 * i02 + r11 * i12 + r12 * i22;
+			var e20:Number = r20 * i00 + r21 * i10 + r22 * i20;
+			var e21:Number = r20 * i01 + r21 * i11 + r22 * i21;
+			var e22:Number = r20 * i02 + r21 * i12 + r22 * i22;
+			invertInertia.e00 = e00 * r00 + e01 * r01 + e02 * r02;
+			invertInertia.e01 = e00 * r10 + e01 * r11 + e02 * r12;
+			invertInertia.e02 = e00 * r20 + e01 * r21 + e02 * r22;
+			invertInertia.e10 = e10 * r00 + e11 * r01 + e12 * r02;
+			invertInertia.e11 = e10 * r10 + e11 * r11 + e12 * r12;
+			invertInertia.e12 = e10 * r20 + e11 * r21 + e12 * r22;
+			invertInertia.e20 = e20 * r00 + e21 * r01 + e22 * r02;
+			invertInertia.e21 = e20 * r10 + e21 * r11 + e22 * r12;
+			invertInertia.e22 = e20 * r20 + e21 * r21 + e22 * r22;
+		}
+		
+		/**
+		 * 剛体の外力による速度変化を計算します。
+		 * このメソッドはワールドのステップを呼ぶと自動で呼び出されるので、
+		 * 通常は外部から呼ぶ必要はありません。
+		 * @param	timeStep 時間刻み幅
+		 * @param	gravity 重力
+		 */
+		public function updateVelocity(timeStep:Number, gravity:Vec3):void {
+			if (type == BODY_DYNAMIC) {
+				linearVelocity.x += gravity.x * timeStep;
+				linearVelocity.y += gravity.y * timeStep;
+				linearVelocity.z += gravity.z * timeStep;
+			}
+		}
+		
+		/**
+		 * 剛体の運動を時間積分し、形状などの情報を更新します。
+		 * このメソッドはワールドのステップを呼ぶと自動で呼び出されるので、
+		 * 通常は外部から呼ぶ必要はありません。
+		 * @param	timeStep 時間刻み幅
+		 */
+		public function updatePosition(timeStep:Number):void {
+			var s:Number;
+			var x:Number;
+			var y:Number;
+			var z:Number;
+			if (type == BODY_STATIC) {
+				linearVelocity.x = 0;
+				linearVelocity.y = 0;
+				linearVelocity.z = 0;
+				angularVelocity.x = 0;
+				angularVelocity.y = 0;
+				angularVelocity.z = 0;
+			} else if (type == BODY_DYNAMIC) {
+				position.x += linearVelocity.x * timeStep;
+				position.y += linearVelocity.y * timeStep;
+				position.z += linearVelocity.z * timeStep;
+				var ax:Number = angularVelocity.x;
+				var ay:Number = angularVelocity.y;
+				var az:Number = angularVelocity.z;
+				var os:Number = orientation.s;
+				var ox:Number = orientation.x;
+				var oy:Number = orientation.y;
+				var oz:Number = orientation.z;
+				timeStep *= 0.5;
+				s = (-ax * ox - ay * oy - az * oz) * timeStep;
+				x = (ax * os + ay * oz - az * oy) * timeStep;
+				y = (-ax * oz + ay * os + az * ox) * timeStep;
+				z = (ax * oy - ay * ox + az * os) * timeStep;
+				os += s;
+				ox += x;
+				oy += y;
+				oz += z;
+				s = 1 / Math.sqrt(os * os + ox * ox + oy * oy + oz * oz);
+				orientation.s = os * s;
+				orientation.x = ox * s;
+				orientation.y = oy * s;
+				orientation.z = oz * s;
+			} else {
+				throw new Error("未定義の剛体の種類です");
+			}
+			s = orientation.s;
+			x = orientation.x;
+			y = orientation.y;
+			z = orientation.z;
+			var x2:Number = 2 * x;
+			var y2:Number = 2 * y;
+			var z2:Number = 2 * z;
+			var xx:Number = x * x2;
+			var yy:Number = y * y2;
+			var zz:Number = z * z2;
+			var xy:Number = x * y2;
+			var yz:Number = y * z2;
+			var xz:Number = x * z2;
+			var sx:Number = s * x2;
+			var sy:Number = s * y2;
+			var sz:Number = s * z2;
+			rotation.e00 = 1 - yy - zz;
+			rotation.e01 = xy - sz;
+			rotation.e02 = xz + sy;
+			rotation.e10 = xy + sz;
+			rotation.e11 = 1 - xx - zz;
+			rotation.e12 = yz - sx;
+			rotation.e20 = xz - sy;
+			rotation.e21 = yz + sx;
+			rotation.e22 = 1 - xx - yy;
+			var r00:Number = rotation.e00;
+			var r01:Number = rotation.e01;
+			var r02:Number = rotation.e02;
+			var r10:Number = rotation.e10;
+			var r11:Number = rotation.e11;
+			var r12:Number = rotation.e12;
+			var r20:Number = rotation.e20;
+			var r21:Number = rotation.e21;
+			var r22:Number = rotation.e22;
+			var i00:Number = invertLocalInertia.e00;
+			var i01:Number = invertLocalInertia.e01;
+			var i02:Number = invertLocalInertia.e02;
+			var i10:Number = invertLocalInertia.e10;
+			var i11:Number = invertLocalInertia.e11;
+			var i12:Number = invertLocalInertia.e12;
+			var i20:Number = invertLocalInertia.e20;
+			var i21:Number = invertLocalInertia.e21;
+			var i22:Number = invertLocalInertia.e22;
+			var e00:Number = r00 * i00 + r01 * i10 + r02 * i20;
+			var e01:Number = r00 * i01 + r01 * i11 + r02 * i21;
+			var e02:Number = r00 * i02 + r01 * i12 + r02 * i22;
+			var e10:Number = r10 * i00 + r11 * i10 + r12 * i20;
+			var e11:Number = r10 * i01 + r11 * i11 + r12 * i21;
+			var e12:Number = r10 * i02 + r11 * i12 + r12 * i22;
+			var e20:Number = r20 * i00 + r21 * i10 + r22 * i20;
+			var e21:Number = r20 * i01 + r21 * i11 + r22 * i21;
+			var e22:Number = r20 * i02 + r21 * i12 + r22 * i22;
+			invertInertia.e00 = e00 * r00 + e01 * r01 + e02 * r02;
+			invertInertia.e01 = e00 * r10 + e01 * r11 + e02 * r12;
+			invertInertia.e02 = e00 * r20 + e01 * r21 + e02 * r22;
+			invertInertia.e10 = e10 * r00 + e11 * r01 + e12 * r02;
+			invertInertia.e11 = e10 * r10 + e11 * r11 + e12 * r12;
+			invertInertia.e12 = e10 * r20 + e11 * r21 + e12 * r22;
+			invertInertia.e20 = e20 * r00 + e21 * r01 + e22 * r02;
+			invertInertia.e21 = e20 * r10 + e21 * r11 + e22 * r12;
+			invertInertia.e22 = e20 * r20 + e21 * r21 + e22 * r22;
 			for (var i:int = 0; i < numShapes; i++) {
 				var shape:Shape = shapes[i];
 				var relPos:Vec3 = shape.relativePosition;

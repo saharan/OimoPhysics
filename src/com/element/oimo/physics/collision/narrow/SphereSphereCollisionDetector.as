@@ -37,7 +37,7 @@ package com.element.oimo.physics.collision.narrow {
 		/**
 		 * @inheritDoc
 		 */
-		override public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint, flip:Boolean):uint {
+		override public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint):uint {
 			var s1:SphereShape = shape1 as SphereShape;
 			var s2:SphereShape = shape2 as SphereShape;
 			var p1:Vec3 = s1.position;

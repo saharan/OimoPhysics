@@ -96,6 +96,54 @@ package com.element.oimo.physics.collision.shape {
 		public var halfDirectionDepth:Vec3;
 		
 		/**
+		 * ワールド座標系での頂点の一つの位置ベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var vertex1:Vec3;
+		
+		/**
+		 * ワールド座標系での頂点の一つの位置ベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var vertex2:Vec3;
+		
+		/**
+		 * ワールド座標系での頂点の一つの位置ベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var vertex3:Vec3;
+		
+		/**
+		 * ワールド座標系での頂点の一つの位置ベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var vertex4:Vec3;
+		
+		/**
+		 * ワールド座標系での頂点の一つの位置ベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var vertex5:Vec3;
+		
+		/**
+		 * ワールド座標系での頂点の一つの位置ベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var vertex6:Vec3;
+		
+		/**
+		 * ワールド座標系での頂点の一つの位置ベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var vertex7:Vec3;
+		
+		/**
+		 * ワールド座標系での頂点の一つの位置ベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var vertex8:Vec3;
+		
+		/**
 		 * 新しく BoxShape オブジェクトを作成します。
 		 * @param	width 箱の幅
 		 * @param	height 箱の高さ
@@ -114,7 +162,7 @@ package com.element.oimo.physics.collision.shape {
 			friction = config.friction;
 			restitution = config.restitution;
 			mass = width * height * depth * config.density;
-			var inertia:Number = 1 / 12 * mass;
+			var inertia:Number = mass / 12;
 			localInertia.init(
 				inertia * (height * height + depth * depth), 0, 0,
 				0, inertia * (width * width + depth * depth), 0,
@@ -126,6 +174,14 @@ package com.element.oimo.physics.collision.shape {
 			halfDirectionWidth = new Vec3();
 			halfDirectionHeight = new Vec3();
 			halfDirectionDepth = new Vec3();
+			vertex1 = new Vec3();
+			vertex2 = new Vec3();
+			vertex3 = new Vec3();
+			vertex4 = new Vec3();
+			vertex5 = new Vec3();
+			vertex6 = new Vec3();
+			vertex7 = new Vec3();
+			vertex8 = new Vec3();
 			type = SHAPE_BOX;
 		}
 		
@@ -151,6 +207,42 @@ package com.element.oimo.physics.collision.shape {
 			halfDirectionDepth.x = rotation.e02 * halfDepth;
 			halfDirectionDepth.y = rotation.e12 * halfDepth;
 			halfDirectionDepth.z = rotation.e22 * halfDepth;
+			var wx:Number = halfDirectionWidth.x;
+			var wy:Number = halfDirectionWidth.y;
+			var wz:Number = halfDirectionWidth.z;
+			var hx:Number = halfDirectionHeight.x;
+			var hy:Number = halfDirectionHeight.y;
+			var hz:Number = halfDirectionHeight.z;
+			var dx:Number = halfDirectionDepth.x;
+			var dy:Number = halfDirectionDepth.y;
+			var dz:Number = halfDirectionDepth.z;
+			var x:Number = position.x;
+			var y:Number = position.y;
+			var z:Number = position.z;
+			vertex1.x = x + wx + hx + dx;
+			vertex1.y = y + wy + hy + dy;
+			vertex1.z = z + wz + hz + dz;
+			vertex2.x = x + wx + hx - dx;
+			vertex2.y = y + wy + hy - dy;
+			vertex2.z = z + wz + hz - dz;
+			vertex3.x = x + wx - hx + dx;
+			vertex3.y = y + wy - hy + dy;
+			vertex3.z = z + wz - hz + dz;
+			vertex4.x = x + wx - hx - dx;
+			vertex4.y = y + wy - hy - dy;
+			vertex4.z = z + wz - hz - dz;
+			vertex5.x = x - wx + hx + dx;
+			vertex5.y = y - wy + hy + dy;
+			vertex5.z = z - wz + hz + dz;
+			vertex6.x = x - wx + hx - dx;
+			vertex6.y = y - wy + hy - dy;
+			vertex6.z = z - wz + hz - dz;
+			vertex7.x = x - wx - hx + dx;
+			vertex7.y = y - wy - hy + dy;
+			vertex7.z = z - wz - hz + dz;
+			vertex8.x = x - wx - hx - dx;
+			vertex8.y = y - wy - hy - dy;
+			vertex8.z = z - wz - hz - dz;
 			var w:Number;
 			var h:Number;
 			var d:Number;

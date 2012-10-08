@@ -24,6 +24,12 @@ package com.element.oimo.physics.collision.narrow {
 	 */
 	public class CollisionDetector {
 		/**
+		 * detectCollision 関数の引数に指定する形状の順序を、
+		 * 反転して受け取るかどうかを表します。
+		 */
+		public var flip:Boolean;
+		
+		/**
 		 * 新しく CollisionDetector オブジェクトを作成します。
 		 * <strong>このコンストラクタは外部から呼び出さないでください。</strong>
 		 */
@@ -37,10 +43,9 @@ package com.element.oimo.physics.collision.narrow {
 		 * @param	shape2 形状2
 		 * @param	contactInfos 接触点情報を格納する配列
 		 * @param	numContactInfos 現在の接触点情報の数
-		 * @param	flip 引数の形状の順番および法線ベクトルを反転させる場合は true
 		 * @return 新しい接触点情報の数
 		 */
-		public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint, flip:Boolean):uint {
+		public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint):uint {
 			throw new Error("detectCollision 関数が継承されていません");
 			return -1;
 		}

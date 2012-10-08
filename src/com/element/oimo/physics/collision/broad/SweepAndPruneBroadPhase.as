@@ -2,7 +2,6 @@ package com.element.oimo.physics.collision.broad {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
-	import com.element.oimo.physics.test.OimoPhysicsTest;
 	import flash.utils.getTimer;
 	/**
 	 * Sweep And Prune アルゴリズムを使用して広域衝突判定を行うクラスです。

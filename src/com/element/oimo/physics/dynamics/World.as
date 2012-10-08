@@ -21,6 +21,7 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.physics.collision.broad.BruteForceBroadPhase;
 	import com.element.oimo.physics.collision.broad.Pair;
 	import com.element.oimo.physics.collision.broad.SweepAndPruneBroadPhase;
+	import com.element.oimo.physics.collision.narrow.BoxBoxCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.ContactInfo;
 	import com.element.oimo.physics.collision.narrow.CollisionDetector;
 	import com.element.oimo.physics.collision.narrow.SphereBoxCollisionDetector;
@@ -28,7 +29,6 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.constraint.contact.Contact;
-	import com.element.oimo.physics.test.OimoPhysicsTest;
 	import com.element.oimo.physics.util.Performance;
 	import flash.utils.getTimer;
 	/**
@@ -98,6 +98,7 @@ package com.element.oimo.physics.dynamics {
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var contacts:Vector.<Contact>;
+		private var contactsBuffer:Vector.<Contact>;
 		
 		/**
 		 * 剛体の接触点の数です。
@@ -129,8 +130,7 @@ package com.element.oimo.physics.dynamics {
 		
 		private var broadPhase:BroadPhase;
 		
-		private var sphereSphereDetector:CollisionDetector;
-		private var sphereBoxDetector:CollisionDetector;
+		private var detectors:Vector.<Vector.<CollisionDetector>>;
 		
 		private var contactInfos:Vector.<ContactInfo>;
 		private var numContactInfos:uint;
@@ -150,10 +150,18 @@ package com.element.oimo.physics.dynamics {
 			performance = new Performance();
 			broadPhase = new SweepAndPruneBroadPhase();
 			// broadPhase = new BruteForceBroadPhase();
-			sphereSphereDetector = new SphereSphereCollisionDetector();
-			sphereBoxDetector = new SphereBoxCollisionDetector();
+			var numShapeTypes:uint = 3;
+			detectors = new Vector.<Vector.<CollisionDetector>>(numShapeTypes, true);
+			for (var i:int = 0; i < numShapeTypes; i++) {
+				detectors[i] = new Vector.<CollisionDetector>(numShapeTypes, true);
+			}
+			detectors[Shape.SHAPE_SPHERE][Shape.SHAPE_SPHERE] = new SphereSphereCollisionDetector();
+			detectors[Shape.SHAPE_SPHERE][Shape.SHAPE_BOX] = new SphereBoxCollisionDetector(false);
+			detectors[Shape.SHAPE_BOX][Shape.SHAPE_SPHERE] = new SphereBoxCollisionDetector(true);
+			detectors[Shape.SHAPE_BOX][Shape.SHAPE_BOX] = new BoxBoxCollisionDetector();
 			contactInfos = new Vector.<ContactInfo>(MAX_CONTACTS, true);
 			contacts = new Vector.<Contact>(MAX_CONTACTS, true);
+			contactsBuffer = new Vector.<Contact>(MAX_CONTACTS, true);
 		}
 		
 		/**
@@ -263,14 +271,22 @@ package com.element.oimo.physics.dynamics {
 		 * ワールドの時間をタイムステップ秒だけ進めます。
 		 */
 		public function step():void {
-			var start:int = getTimer();
+			var start1:int = getTimer();
+			var tmp:Vector.<Contact> = contacts; // swap contacts
+			contacts = contactsBuffer;
+			contactsBuffer = tmp;
 			for (var i:int = 0; i < numRigidBodies; i++) {
-				rigidBodies[i].update(timeStep, gravity);
+				rigidBodies[i].updateVelocity(timeStep, gravity);
 			}
-			performance.updateTime = getTimer() - start;
+			performance.updateTime = getTimer() - start1;
 			collisionDetection();
 			collisionResponse();
-			performance.totalTime = getTimer() - start;
+			var start2:int = getTimer();
+			for (var j:int = 0; j < numRigidBodies; j++) {
+				rigidBodies[j].updatePosition(timeStep);
+			}
+			performance.updateTime += getTimer() - start2;
+			performance.totalTime = getTimer() - start1;
 		}
 		
 		private function collisionDetection():void {
@@ -290,32 +306,9 @@ package com.element.oimo.physics.dynamics {
 				var pair:Pair = pairs[i];
 				var s1:Shape = pair.shape1;
 				var s2:Shape = pair.shape2;
-				var detector:CollisionDetector = null;
-				var flip:Boolean = false;
-				switch(s1.type) {
-				case Shape.SHAPE_SPHERE:
-					switch(s2.type) {
-					case Shape.SHAPE_SPHERE:
-						detector = sphereSphereDetector;
-						break;
-					case Shape.SHAPE_BOX:
-						detector = sphereBoxDetector;
-						break;
-					}
-					break;
-				case Shape.SHAPE_BOX:
-					switch(s2.type) {
-					case Shape.SHAPE_SPHERE:
-						detector = sphereBoxDetector;
-						flip = true;
-						break;
-					case Shape.SHAPE_BOX:
-						break;
-					}
-					break;
-				}
+				var detector:CollisionDetector = detectors[s1.type][s2.type];
 				if (detector) {
-					numContactInfos = detector.detectCollision(s1, s2, contactInfos, numContactInfos, flip);
+					numContactInfos = detector.detectCollision(s1, s2, contactInfos, numContactInfos);
 					if (numContactInfos == MAX_CONTACTS) {
 						return;
 					}

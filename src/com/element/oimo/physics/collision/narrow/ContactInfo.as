@@ -36,7 +36,9 @@ package com.element.oimo.physics.collision.narrow {
 		public var normal:Vec3;
 		
 		/**
-		 * 剛体間に発生した重なりの大きさです。
+		 * 形状間に発生した重なりの大きさです。
+		 * 正確には形状間の距離を表すので、
+		 * 重なりが発生した場合は、この変数は負の値を取ります。
 		 */
 		public var overlap:Number;
 		
