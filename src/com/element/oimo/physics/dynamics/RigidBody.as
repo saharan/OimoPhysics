@@ -21,6 +21,7 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Quat;
 	import com.element.oimo.math.Vec3;
+	import com.element.oimo.physics.constraint.joint.Joint;
 	/**
 	 * 剛体のクラスです。
 	 * 剛体は衝突処理用に単数あるいは複数の形状を持ち、
@@ -42,6 +43,11 @@ package com.element.oimo.physics.dynamics {
 		 * 一つの剛体に追加できる形状の最大数です。
 		 */
 		public static const MAX_SHAPES:uint = 64;
+		
+		/**
+		 * 一つの剛体に接続できるジョイントの最大数です。
+		 */
+		public static const MAX_JOINTS:uint = 512;
 		
 		/**
 		 * 剛体の種類を表します。
@@ -138,6 +144,18 @@ package com.element.oimo.physics.dynamics {
 		public var numShapes:uint;
 		
 		/**
+		 * 剛体に繋がれているジョイントの配列です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var joints:Vector.<Joint>;
+		
+		/**
+		 * 剛体に繋がれているジョイントの数です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var numJoints:uint;
+		
+		/**
 		 * この剛体が追加されているワールドです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
@@ -170,6 +188,7 @@ package com.element.oimo.physics.dynamics {
 			localInertia = new Mat33();
 			invertLocalInertia = new Mat33();
 			shapes = new Vector.<Shape>(MAX_SHAPES, true);
+			joints = new Vector.<Joint>(MAX_JOINTS, true);
 		}
 		
 		/**
@@ -217,10 +236,11 @@ package com.element.oimo.physics.dynamics {
 			if (parent) {
 				parent.removeShape(remove);
 			}
-			for (var j:int = index; j < numShapes - 1; j++) {
+			numShapes--;
+			for (var j:int = index; j < numShapes; j++) {
 				shapes[j] = shapes[j + 1];
 			}
-			shapes[--numShapes] = null;
+			shapes[numShapes] = null;
 		}
 		
 		/**
@@ -352,6 +372,19 @@ package com.element.oimo.physics.dynamics {
 				position.x += linearVelocity.x * timeStep;
 				position.y += linearVelocity.y * timeStep;
 				position.z += linearVelocity.z * timeStep;
+				/*var ax:Number = angularVelocity.x;
+				var ay:Number = angularVelocity.y;
+				var az:Number = angularVelocity.z;
+				var len:Number = Math.sqrt(ax * ax + ay * ay + az * az);
+				var theta:Number = len * timeStep;
+				if (len > 0) len = 1 / len;
+				ax *= len;
+				ay *= len;
+				az *= len;
+				var sin:Number = Math.sin(theta * 0.5);
+				var cos:Number = Math.cos(theta * 0.5);
+				var q:Quat = new Quat(cos, ax * sin, ay * sin, az * sin);
+				orientation.mul(q, orientation);*/
 				var ax:Number = angularVelocity.x;
 				var ay:Number = angularVelocity.y;
 				var az:Number = angularVelocity.z;

@@ -21,6 +21,9 @@ package com.element.oimo.physics.test {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
 	import com.element.oimo.physics.collision.shape.SphereShape;
+	import com.element.oimo.physics.constraint.joint.DistanceJoint;
+	import com.element.oimo.physics.constraint.joint.Joint;
+	import com.element.oimo.physics.constraint.joint.JointConfig;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	import com.element.oimo.math.Mat33;
@@ -124,7 +127,8 @@ package com.element.oimo.physics.test {
 			var rb:RigidBody;
 			var s:Shape;
 			var c:ShapeConfig = new ShapeConfig();
-			c.restitution = 0;
+			// c.restitution = 0;
+			// c.friction = 0;
 			rb = new RigidBody();
 			c.position.init(0, -0.5, 0);
 			c.rotation.init();
@@ -137,9 +141,9 @@ package com.element.oimo.physics.test {
 			var width:uint = 6;
 			var height:uint = 6;
 			var depth:uint = 6;
-			var bw:Number = 0.7;
-			var bh:Number = 0.7;
-			var bd:Number = 0.7;
+			var bw:Number = 0.75;
+			var bh:Number = 0.75;
+			var bd:Number = 0.75;
 			for (var i:int = 0; i < width; i++) {
 				for (var j:int = 0; j < height; j++) {
 					for (var k:int = 0; k < depth; k++) {
@@ -149,13 +153,44 @@ package com.element.oimo.physics.test {
 							j * (bh * 1.1) + bh * 0.5 + 0.05,
 							(k - (depth - 1) * 0.5) * bd
 						);
+						//if (Math.random() > 0.5) s = new SphereShape((bw + bh + bd) / 6, c);
+						//else
 						s = new BoxShape(bw, bh, bd, c);
 						rb.addShape(s);
 						rb.setupMass(RigidBody.BODY_DYNAMIC);
 						world.addRigidBody(rb);
 					}
+					Shape.nextID++; // little trick for shape color :)
 				}
+				Shape.nextID++;
 			}
+			/*for (var j:int = 0; j < height; j++) {
+				for (var i:int = 0; i < 3; i++) {
+						var rot:Boolean = (j & 1) == 0;
+						rb = new RigidBody();
+						c.position.init(
+							rot ? 0 : (i - 1) * 0.75,
+							j * (0.75 * 1.1) + 0.75 * 0.5 + 0.05,
+							rot ? (i - 1) * 0.75 : 0
+						);
+						s = new BoxShape(rot ? 2.25 : 0.75, 0.75, rot ? 0.75 : 2.25, c);
+						rb.addShape(s);
+						rb.setupMass(RigidBody.BODY_DYNAMIC);
+						world.addRigidBody(rb);
+				}
+			}*/
+			/*for (var i:int = 0; i < height; i++) {
+				rb = new RigidBody();
+				c.position.init(
+					0,
+					i * (bh * 1.1) + bh * 0.5 + 0.05,
+					0
+				);
+				s = new SphereShape(bh * 0.5, c);
+				rb.addShape(s);
+				rb.setupMass(RigidBody.BODY_DYNAMIC);
+				world.addRigidBody(rb);
+			}*/
 			
 			c.friction = 2;
 			c.position.init(0, 1, 8);

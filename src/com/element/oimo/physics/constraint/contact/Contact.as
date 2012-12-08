@@ -100,12 +100,6 @@ package com.element.oimo.physics.constraint.contact {
 		public var binormalImpulse:Number;
 		
 		/**
-		 * 法線方向に働いた重なり解消力の大きさです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var separateImpulse:Number;
-		
-		/**
 		 * 接触を起こした形状1です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
@@ -170,6 +164,48 @@ package com.element.oimo.physics.constraint.contact {
 		private var binY:Number;
 		private var binZ:Number;
 		
+		private var norTorque1X:Number;
+		private var norTorque1Y:Number;
+		private var norTorque1Z:Number;
+		private var norTorque2X:Number;
+		private var norTorque2Y:Number;
+		private var norTorque2Z:Number;
+		
+		private var tanTorque1X:Number;
+		private var tanTorque1Y:Number;
+		private var tanTorque1Z:Number;
+		private var tanTorque2X:Number;
+		private var tanTorque2Y:Number;
+		private var tanTorque2Z:Number;
+		
+		private var binTorque1X:Number;
+		private var binTorque1Y:Number;
+		private var binTorque1Z:Number;
+		private var binTorque2X:Number;
+		private var binTorque2Y:Number;
+		private var binTorque2Z:Number;
+		
+		private var norTorqueUnit1X:Number;
+		private var norTorqueUnit1Y:Number;
+		private var norTorqueUnit1Z:Number;
+		private var norTorqueUnit2X:Number;
+		private var norTorqueUnit2Y:Number;
+		private var norTorqueUnit2Z:Number;
+		
+		private var tanTorqueUnit1X:Number;
+		private var tanTorqueUnit1Y:Number;
+		private var tanTorqueUnit1Z:Number;
+		private var tanTorqueUnit2X:Number;
+		private var tanTorqueUnit2Y:Number;
+		private var tanTorqueUnit2Z:Number;
+		
+		private var binTorqueUnit1X:Number;
+		private var binTorqueUnit1Y:Number;
+		private var binTorqueUnit1Z:Number;
+		private var binTorqueUnit2X:Number;
+		private var binTorqueUnit2Y:Number;
+		private var binTorqueUnit2Z:Number;
+		
 		private var invM1:Number;
 		private var invM2:Number;
 		
@@ -201,10 +237,6 @@ package com.element.oimo.physics.constraint.contact {
 		private var friction:Number;
 		private var restitution:Number;
 		
-		private var relativeVelocity:Vec3;
-		private var tmp1:Vec3;
-		private var tmp2:Vec3;
-		
 		/**
 		 * 新しく Contact オブジェクトを作成します。
 		 */
@@ -219,15 +251,7 @@ package com.element.oimo.physics.constraint.contact {
 			normalImpulse = 0;
 			tangentImpulse = 0;
 			binormalImpulse = 0;
-			separateImpulse = 0;
-			relativeVelocity = new Vec3();
-			tmp1 = new Vec3();
-			tmp2 = new Vec3();
 		}
-		
-		//----------------------------------------------------------
-		//               HELL OF INLINE EXPANSION
-		//----------------------------------------------------------
 		
 		/**
 		 * この拘束を接触点情報から作成します。
@@ -241,25 +265,6 @@ package com.element.oimo.physics.constraint.contact {
 			norX = contactInfo.normal.x;
 			norY = contactInfo.normal.y;
 			norZ = contactInfo.normal.z;
-			normal.x = norX;
-			normal.y = norY;
-			normal.z = norZ;
-			tanX = norY * norX - norZ * norZ;
-			tanY = norZ * -norY - norX * norX;
-			tanZ = norX * norZ + norY * norY;
-			var len:Number = 1 / Math.sqrt(tanX * tanX + tanY * tanY + tanZ * tanZ);
-			tanX *= len;
-			tanY *= len;
-			tanZ *= len;
-			tangent.x = tanX;
-			tangent.y = tanY;
-			tangent.z = tanZ;
-			binX = norY * tanZ - norZ * tanY;
-			binY = norZ * tanX - norX * tanZ;
-			binZ = norX * tanY - norY * tanX;
-			binormal.x = binX;
-			binormal.y = binY;
-			binormal.z = binZ;
 			
 			overlap = contactInfo.overlap;
 			shape1 = contactInfo.shape1;
@@ -270,15 +275,9 @@ package com.element.oimo.physics.constraint.contact {
 			relPos1X = position.x - rigid1.position.x;
 			relPos1Y = position.y - rigid1.position.y;
 			relPos1Z = position.z - rigid1.position.z;
-			relativePosition1.x = relPos1X;
-			relativePosition1.y = relPos1Y;
-			relativePosition1.z = relPos1Z;
 			relPos2X = position.x - rigid2.position.x;
 			relPos2Y = position.y - rigid2.position.y;
 			relPos2Z = position.z - rigid2.position.z;
-			relativePosition2.x = relPos2X;
-			relativePosition2.y = relPos2Y;
-			relativePosition2.z = relPos2Z;
 			
 			lVel1 = rigid1.linearVelocity;
 			lVel2 = rigid2.linearVelocity;
@@ -315,11 +314,7 @@ package com.element.oimo.physics.constraint.contact {
 			id.flip = contactInfo.id.flip;
 			friction = shape1.friction * shape2.friction;
 			restitution = shape1.restitution * shape2.restitution;
-			overlap = contactInfo.overlap + 0.05; // 5cm
-			if (overlap > 0) overlap = 0;
-			// 相乗平均 Geometric mean
-			// friction = Math.sqrt(shape1.friction * shape2.friction);
-			// restitution = Math.sqrt(shape1.restitution * shape2.restitution);
+			overlap = contactInfo.overlap;
 			normalImpulse = 0;
 			tangentImpulse = 0;
 			binormalImpulse = 0;
@@ -329,108 +324,175 @@ package com.element.oimo.physics.constraint.contact {
 		/**
 		 * @inheritDoc
 		 */
-		override public function preSolve():void {
+		override public function preSolve(timeStep:Number, invTimeStep:Number):void {
+			
+			// ----------------------------------------------
+			//         calculate relative velocity
+			// ----------------------------------------------
+			
+			relVelX = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
+			relVelY = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
+			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
+			var rvn:Number = norX * relVelX + norY * relVelY + norZ * relVelZ;
+			
+			// ----------------------------------------------
+			//        calculate tangent and binormal
+			// ----------------------------------------------
+			
+			tanX = relVelX - rvn * norX;
+			tanY = relVelY - rvn * norY;
+			tanZ = relVelZ - rvn * norZ;
+			var len:Number = tanX * tanX + tanY * tanY + tanZ * tanZ;
+			if (len > 1e-2) {
+				len = 1 / Math.sqrt(len);
+			} else {
+				tanX = norY * norX - norZ * norZ;
+				tanY = norZ * -norY - norX * norX;
+				tanZ = norX * norZ + norY * norY;
+				len = 1 / Math.sqrt(tanX * tanX + tanY * tanY + tanZ * tanZ);
+			}
+			tanX *= len;
+			tanY *= len;
+			tanZ *= len;
+			binX = norY * tanZ - norZ * tanY;
+			binY = norZ * tanX - norX * tanZ;
+			binZ = norX * tanY - norY * tanX;
+			
+			// ----------------------------------------------
+			// calculate torque axes and angular accelerations
+			// ----------------------------------------------
+			
+			norTorque1X = relPos1Y * norZ - relPos1Z * norY;
+			norTorque1Y = relPos1Z * norX - relPos1X * norZ;
+			norTorque1Z = relPos1X * norY - relPos1Y * norX;
+			norTorque2X = relPos2Y * norZ - relPos2Z * norY;
+			norTorque2Y = relPos2Z * norX - relPos2X * norZ;
+			norTorque2Z = relPos2X * norY - relPos2Y * norX;
+			
+			tanTorque1X = relPos1Y * tanZ - relPos1Z * tanY;
+			tanTorque1Y = relPos1Z * tanX - relPos1X * tanZ;
+			tanTorque1Z = relPos1X * tanY - relPos1Y * tanX;
+			tanTorque2X = relPos2Y * tanZ - relPos2Z * tanY;
+			tanTorque2Y = relPos2Z * tanX - relPos2X * tanZ;
+			tanTorque2Z = relPos2X * tanY - relPos2Y * tanX;
+			
+			binTorque1X = relPos1Y * binZ - relPos1Z * binY;
+			binTorque1Y = relPos1Z * binX - relPos1X * binZ;
+			binTorque1Z = relPos1X * binY - relPos1Y * binX;
+			binTorque2X = relPos2Y * binZ - relPos2Z * binY;
+			binTorque2Y = relPos2Z * binX - relPos2X * binZ;
+			binTorque2Z = relPos2X * binY - relPos2Y * binX;
+			
+			norTorqueUnit1X = norTorque1X * invI1e00 + norTorque1Y * invI1e01 + norTorque1Z * invI1e02;
+			norTorqueUnit1Y = norTorque1X * invI1e10 + norTorque1Y * invI1e11 + norTorque1Z * invI1e12;
+			norTorqueUnit1Z = norTorque1X * invI1e20 + norTorque1Y * invI1e21 + norTorque1Z * invI1e22;
+			norTorqueUnit2X = norTorque2X * invI2e00 + norTorque2Y * invI2e01 + norTorque2Z * invI2e02;
+			norTorqueUnit2Y = norTorque2X * invI2e10 + norTorque2Y * invI2e11 + norTorque2Z * invI2e12;
+			norTorqueUnit2Z = norTorque2X * invI2e20 + norTorque2Y * invI2e21 + norTorque2Z * invI2e22;
+			
+			tanTorqueUnit1X = tanTorque1X * invI1e00 + tanTorque1Y * invI1e01 + tanTorque1Z * invI1e02;
+			tanTorqueUnit1Y = tanTorque1X * invI1e10 + tanTorque1Y * invI1e11 + tanTorque1Z * invI1e12;
+			tanTorqueUnit1Z = tanTorque1X * invI1e20 + tanTorque1Y * invI1e21 + tanTorque1Z * invI1e22;
+			tanTorqueUnit2X = tanTorque2X * invI2e00 + tanTorque2Y * invI2e01 + tanTorque2Z * invI2e02;
+			tanTorqueUnit2Y = tanTorque2X * invI2e10 + tanTorque2Y * invI2e11 + tanTorque2Z * invI2e12;
+			tanTorqueUnit2Z = tanTorque2X * invI2e20 + tanTorque2Y * invI2e21 + tanTorque2Z * invI2e22;
+			
+			binTorqueUnit1X = binTorque1X * invI1e00 + binTorque1Y * invI1e01 + binTorque1Z * invI1e02;
+			binTorqueUnit1Y = binTorque1X * invI1e10 + binTorque1Y * invI1e11 + binTorque1Z * invI1e12;
+			binTorqueUnit1Z = binTorque1X * invI1e20 + binTorque1Y * invI1e21 + binTorque1Z * invI1e22;
+			binTorqueUnit2X = binTorque2X * invI2e00 + binTorque2Y * invI2e01 + binTorque2Z * invI2e02;
+			binTorqueUnit2Y = binTorque2X * invI2e10 + binTorque2Y * invI2e11 + binTorque2Z * invI2e12;
+			binTorqueUnit2Z = binTorque2X * invI2e20 + binTorque2Y * invI2e21 + binTorque2Z * invI2e22;
+			
+			// ----------------------------------------------
+			//         calculate impulse denominators
+			// ----------------------------------------------
+			
 			var tmp1X:Number;
 			var tmp1Y:Number;
 			var tmp1Z:Number;
 			var tmp2X:Number;
 			var tmp2Y:Number;
 			var tmp2Z:Number;
-			var tmp3X:Number;
-			var tmp3Y:Number;
-			var tmp3Z:Number;
+			tmp1X = norTorque1X * invI1e00 + norTorque1Y * invI1e01 + norTorque1Z * invI1e02;
+			tmp1Y = norTorque1X * invI1e10 + norTorque1Y * invI1e11 + norTorque1Z * invI1e12;
+			tmp1Z = norTorque1X * invI1e20 + norTorque1Y * invI1e21 + norTorque1Z * invI1e22;
+			tmp2X = tmp1Y * relPos1Z - tmp1Z * relPos1Y;
+			tmp2Y = tmp1Z * relPos1X - tmp1X * relPos1Z;
+			tmp2Z = tmp1X * relPos1Y - tmp1Y * relPos1X;
+			tmp1X = norTorque2X * invI2e00 + norTorque2Y * invI2e01 + norTorque2Z * invI2e02;
+			tmp1Y = norTorque2X * invI2e10 + norTorque2Y * invI2e11 + norTorque2Z * invI2e12;
+			tmp1Z = norTorque2X * invI2e20 + norTorque2Y * invI2e21 + norTorque2Z * invI2e22;
+			tmp2X += tmp1Y * relPos2Z - tmp1Z * relPos2Y;
+			tmp2Y += tmp1Z * relPos2X - tmp1X * relPos2Z;
+			tmp2Z += tmp1X * relPos2Y - tmp1Y * relPos2X;
+			normalDenominator = 1 / (invM1 + invM2 + norX * tmp2X + norY * tmp2Y + norZ * tmp2Z);
 			
-			tmp1X = relPos1Y * norZ - relPos1Z * norY;
-			tmp1Y = relPos1Z * norX - relPos1X * norZ;
-			tmp1Z = relPos1X * norY - relPos1Y * norX;
-			tmp2X = tmp1X * invI1e00 + tmp1Y * invI1e01 + tmp1Z * invI1e02;
-			tmp2Y = tmp1X * invI1e10 + tmp1Y * invI1e11 + tmp1Z * invI1e12;
-			tmp2Z = tmp1X * invI1e20 + tmp1Y * invI1e21 + tmp1Z * invI1e22;
-			tmp3X = tmp2Y * relPos1Z - tmp2Z * relPos1Y;
-			tmp3Y = tmp2Z * relPos1X - tmp2X * relPos1Z;
-			tmp3Z = tmp2X * relPos1Y - tmp2Y * relPos1X;
-			tmp1X = relPos2Y * norZ - relPos2Z * norY;
-			tmp1Y = relPos2Z * norX - relPos2X * norZ;
-			tmp1Z = relPos2X * norY - relPos2Y * norX;
-			tmp2X = tmp1X * invI2e00 + tmp1Y * invI2e01 + tmp1Z * invI2e02;
-			tmp2Y = tmp1X * invI2e10 + tmp1Y * invI2e11 + tmp1Z * invI2e12;
-			tmp2Z = tmp1X * invI2e20 + tmp1Y * invI2e21 + tmp1Z * invI2e22;
-			tmp3X += tmp2Y * relPos2Z - tmp2Z * relPos2Y;
-			tmp3Y += tmp2Z * relPos2X - tmp2X * relPos2Z;
-			tmp3Z += tmp2X * relPos2Y - tmp2Y * relPos2X;
-			normalDenominator = 1 / (invM1 + invM2 + norX * tmp3X + norY * tmp3Y + norZ * tmp3Z);
+			tmp1X = tanTorque1X * invI1e00 + tanTorque1Y * invI1e01 + tanTorque1Z * invI1e02;
+			tmp1Y = tanTorque1X * invI1e10 + tanTorque1Y * invI1e11 + tanTorque1Z * invI1e12;
+			tmp1Z = tanTorque1X * invI1e20 + tanTorque1Y * invI1e21 + tanTorque1Z * invI1e22;
+			tmp2X = tmp1Y * relPos1Z - tmp1Z * relPos1Y;
+			tmp2Y = tmp1Z * relPos1X - tmp1X * relPos1Z;
+			tmp2Z = tmp1X * relPos1Y - tmp1Y * relPos1X;
+			tmp1X = tanTorque2X * invI2e00 + tanTorque2Y * invI2e01 + tanTorque2Z * invI2e02;
+			tmp1Y = tanTorque2X * invI2e10 + tanTorque2Y * invI2e11 + tanTorque2Z * invI2e12;
+			tmp1Z = tanTorque2X * invI2e20 + tanTorque2Y * invI2e21 + tanTorque2Z * invI2e22;
+			tmp2X += tmp1Y * relPos2Z - tmp1Z * relPos2Y;
+			tmp2Y += tmp1Z * relPos2X - tmp1X * relPos2Z;
+			tmp2Z += tmp1X * relPos2Y - tmp1Y * relPos2X;
+			tangentDenominator = 1 / (invM1 + invM2 + tanX * tmp2X + tanY * tmp2Y + tanZ * tmp2Z);
 			
-			tmp1X = relPos1Y * tanZ - relPos1Z * tanY;
-			tmp1Y = relPos1Z * tanX - relPos1X * tanZ;
-			tmp1Z = relPos1X * tanY - relPos1Y * tanX;
-			tmp2X = tmp1X * invI1e00 + tmp1Y * invI1e01 + tmp1Z * invI1e02;
-			tmp2Y = tmp1X * invI1e10 + tmp1Y * invI1e11 + tmp1Z * invI1e12;
-			tmp2Z = tmp1X * invI1e20 + tmp1Y * invI1e21 + tmp1Z * invI1e22;
-			tmp3X = tmp2Y * relPos1Z - tmp2Z * relPos1Y;
-			tmp3Y = tmp2Z * relPos1X - tmp2X * relPos1Z;
-			tmp3Z = tmp2X * relPos1Y - tmp2Y * relPos1X;
-			tmp1X = relPos2Y * tanZ - relPos2Z * tanY;
-			tmp1Y = relPos2Z * tanX - relPos2X * tanZ;
-			tmp1Z = relPos2X * tanY - relPos2Y * tanX;
-			tmp2X = tmp1X * invI2e00 + tmp1Y * invI2e01 + tmp1Z * invI2e02;
-			tmp2Y = tmp1X * invI2e10 + tmp1Y * invI2e11 + tmp1Z * invI2e12;
-			tmp2Z = tmp1X * invI2e20 + tmp1Y * invI2e21 + tmp1Z * invI2e22;
-			tmp3X += tmp2Y * relPos2Z - tmp2Z * relPos2Y;
-			tmp3Y += tmp2Z * relPos2X - tmp2X * relPos2Z;
-			tmp3Z += tmp2X * relPos2Y - tmp2Y * relPos2X;
-			tangentDenominator = 1 / (invM1 + invM2 + tanX * tmp3X + tanY * tmp3Y + tanZ * tmp3Z);
+			tmp1X = binTorque1X * invI1e00 + binTorque1Y * invI1e01 + binTorque1Z * invI1e02;
+			tmp1Y = binTorque1X * invI1e10 + binTorque1Y * invI1e11 + binTorque1Z * invI1e12;
+			tmp1Z = binTorque1X * invI1e20 + binTorque1Y * invI1e21 + binTorque1Z * invI1e22;
+			tmp2X = tmp1Y * relPos1Z - tmp1Z * relPos1Y;
+			tmp2Y = tmp1Z * relPos1X - tmp1X * relPos1Z;
+			tmp2Z = tmp1X * relPos1Y - tmp1Y * relPos1X;
+			tmp1X = binTorque2X * invI2e00 + binTorque2Y * invI2e01 + binTorque2Z * invI2e02;
+			tmp1Y = binTorque2X * invI2e10 + binTorque2Y * invI2e11 + binTorque2Z * invI2e12;
+			tmp1Z = binTorque2X * invI2e20 + binTorque2Y * invI2e21 + binTorque2Z * invI2e22;
+			tmp2X += tmp1Y * relPos2Z - tmp1Z * relPos2Y;
+			tmp2Y += tmp1Z * relPos2X - tmp1X * relPos2Z;
+			tmp2Z += tmp1X * relPos2Y - tmp1Y * relPos2X;
+			binormalDenominator = 1 / (invM1 + invM2 + binX * tmp2X + binY * tmp2Y + binZ * tmp2Z);
 			
-			tmp1X = relPos1Y * binZ - relPos1Z * binY;
-			tmp1Y = relPos1Z * binX - relPos1X * binZ;
-			tmp1Z = relPos1X * binY - relPos1Y * binX;
-			tmp2X = tmp1X * invI1e00 + tmp1Y * invI1e01 + tmp1Z * invI1e02;
-			tmp2Y = tmp1X * invI1e10 + tmp1Y * invI1e11 + tmp1Z * invI1e12;
-			tmp2Z = tmp1X * invI1e20 + tmp1Y * invI1e21 + tmp1Z * invI1e22;
-			tmp3X = tmp2Y * relPos1Z - tmp2Z * relPos1Y;
-			tmp3Y = tmp2Z * relPos1X - tmp2X * relPos1Z;
-			tmp3Z = tmp2X * relPos1Y - tmp2Y * relPos1X;
-			tmp1X = relPos2Y * binZ - relPos2Z * binY;
-			tmp1Y = relPos2Z * binX - relPos2X * binZ;
-			tmp1Z = relPos2X * binY - relPos2Y * binX;
-			tmp2X = tmp1X * invI2e00 + tmp1Y * invI2e01 + tmp1Z * invI2e02;
-			tmp2Y = tmp1X * invI2e10 + tmp1Y * invI2e11 + tmp1Z * invI2e12;
-			tmp2Z = tmp1X * invI2e20 + tmp1Y * invI2e21 + tmp1Z * invI2e22;
-			tmp3X += tmp2Y * relPos2Z - tmp2Z * relPos2Y;
-			tmp3Y += tmp2Z * relPos2X - tmp2X * relPos2Z;
-			tmp3Z += tmp2X * relPos2Y - tmp2Y * relPos2X;
-			binormalDenominator = 1 / (invM1 + invM2 + binX * tmp3X + binY * tmp3Y + binZ * tmp3Z);
-			
-			relVelX = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
-			relVelY = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
-			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
-			
-			var rvn:Number = norX * relVelX + norY * relVelY + norZ * relVelZ;
-			if (rvn > -1) rvn = 0;
-			targetNormalVelocity = restitution * -rvn;
-			if (targetNormalVelocity < -overlap * 2) targetNormalVelocity -= overlap * 2;
+			// ----------------------------------------------
+			//           calculate initial forces
+			// ----------------------------------------------
 			
 			if (warmStarted) {
 				tmp1X = norX * normalImpulse + tanX * tangentImpulse + binX * binormalImpulse;
 				tmp1Y = norY * normalImpulse + tanY * tangentImpulse + binY * binormalImpulse;
 				tmp1Z = norZ * normalImpulse + tanZ * tangentImpulse + binZ * binormalImpulse;
-				tmp2X = relPos1Y * tmp1Z - relPos1Z * tmp1Y;
-				tmp2Y = relPos1Z * tmp1X - relPos1X * tmp1Z;
-				tmp2Z = relPos1X * tmp1Y - relPos1Y * tmp1X;
 				lVel1.x += tmp1X * invM1;
 				lVel1.y += tmp1Y * invM1;
 				lVel1.z += tmp1Z * invM1;
-				aVel1.x += tmp2X * invI1e00 + tmp2Y * invI1e01 + tmp2Z * invI1e02;
-				aVel1.y += tmp2X * invI1e10 + tmp2Y * invI1e11 + tmp2Z * invI1e12;
-				aVel1.z += tmp2X * invI1e20 + tmp2Y * invI1e21 + tmp2Z * invI1e22;
-				tmp2X = relPos2Y * tmp1Z - relPos2Z * tmp1Y;
-				tmp2Y = relPos2Z * tmp1X - relPos2X * tmp1Z;
-				tmp2Z = relPos2X * tmp1Y - relPos2Y * tmp1X;
+				aVel1.x += norTorqueUnit1X * normalImpulse + tanTorqueUnit1X * tangentImpulse + binTorqueUnit1X * binormalImpulse;
+				aVel1.y += norTorqueUnit1Y * normalImpulse + tanTorqueUnit1Y * tangentImpulse + binTorqueUnit1Y * binormalImpulse;
+				aVel1.z += norTorqueUnit1Z * normalImpulse + tanTorqueUnit1Z * tangentImpulse + binTorqueUnit1Z * binormalImpulse;
 				lVel2.x -= tmp1X * invM2;
 				lVel2.y -= tmp1Y * invM2;
 				lVel2.z -= tmp1Z * invM2;
-				aVel2.x -= tmp2X * invI2e00 + tmp2Y * invI2e01 + tmp2Z * invI2e02;
-				aVel2.y -= tmp2X * invI2e10 + tmp2Y * invI2e11 + tmp2Z * invI2e12;
-				aVel2.z -= tmp2X * invI2e20 + tmp2Y * invI2e21 + tmp2Z * invI2e22;
+				aVel2.x -= norTorqueUnit2X * normalImpulse + tanTorqueUnit2X * tangentImpulse + binTorqueUnit2X * binormalImpulse;
+				aVel2.y -= norTorqueUnit2Y * normalImpulse + tanTorqueUnit2Y * tangentImpulse + binTorqueUnit2Y * binormalImpulse;
+				aVel2.z -= norTorqueUnit2Z * normalImpulse + tanTorqueUnit2Z * tangentImpulse + binTorqueUnit2Z * binormalImpulse;
+				rvn = 0; // disabling bounce
+			}
+			
+			// ----------------------------------------------
+			//           calculate target velocity
+			// ----------------------------------------------
+			
+			if (rvn > -1) {
+				rvn = 0; // disabling bounce
+			}
+			targetNormalVelocity = restitution * -rvn;
+			var separationalVelocity:Number = -overlap - 0.05; // allow 5cm overlap
+			if (separationalVelocity > 0) {
+				separationalVelocity *= invTimeStep * 0.05;
+				if (targetNormalVelocity < separationalVelocity) {
+					targetNormalVelocity = separationalVelocity;
+				}
 			}
 		}
 		
@@ -452,11 +514,11 @@ package com.element.oimo.physics.constraint.contact {
 			
 			// restitution part
 			
-			relVelX = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
-			relVelY = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
-			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
-			
-			rvn = norX * relVelX + norY * relVelY + norZ * relVelZ;
+			rvn = 
+				(lVel2.x - lVel1.x) * norX + (lVel2.y - lVel1.y) * norY + (lVel2.z - lVel1.z) * norZ +
+				aVel2.x * norTorque2X + aVel2.y * norTorque2Y + aVel2.z * norTorque2Z -
+				aVel1.x * norTorque1X - aVel1.y * norTorque1Y - aVel1.z * norTorque1Z
+			;
 			oldImpulse1 = normalImpulse;
 			newImpulse1 = (rvn - targetNormalVelocity) * normalDenominator;
 			normalImpulse += newImpulse1;
@@ -465,44 +527,46 @@ package com.element.oimo.physics.constraint.contact {
 			forceX = norX * newImpulse1;
 			forceY = norY * newImpulse1;
 			forceZ = norZ * newImpulse1;
-			tmpX = relPos1Y * forceZ - relPos1Z * forceY;
-			tmpY = relPos1Z * forceX - relPos1X * forceZ;
-			tmpZ = relPos1X * forceY - relPos1Y * forceX;
 			lVel1.x += forceX * invM1;
 			lVel1.y += forceY * invM1;
 			lVel1.z += forceZ * invM1;
-			aVel1.x += tmpX * invI1e00 + tmpY * invI1e01 + tmpZ * invI1e02;
-			aVel1.y += tmpX * invI1e10 + tmpY * invI1e11 + tmpZ * invI1e12;
-			aVel1.z += tmpX * invI1e20 + tmpY * invI1e21 + tmpZ * invI1e22;
-			tmpX = relPos2Y * forceZ - relPos2Z * forceY;
-			tmpY = relPos2Z * forceX - relPos2X * forceZ;
-			tmpZ = relPos2X * forceY - relPos2Y * forceX;
+			aVel1.x += norTorqueUnit1X * newImpulse1;
+			aVel1.y += norTorqueUnit1Y * newImpulse1;
+			aVel1.z += norTorqueUnit1Z * newImpulse1;
 			lVel2.x -= forceX * invM2;
 			lVel2.y -= forceY * invM2;
 			lVel2.z -= forceZ * invM2;
-			aVel2.x -= tmpX * invI2e00 + tmpY * invI2e01 + tmpZ * invI2e02;
-			aVel2.y -= tmpX * invI2e10 + tmpY * invI2e11 + tmpZ * invI2e12;
-			aVel2.z -= tmpX * invI2e20 + tmpY * invI2e21 + tmpZ * invI2e22;
+			aVel2.x -= norTorqueUnit2X * newImpulse1;
+			aVel2.y -= norTorqueUnit2Y * newImpulse1;
+			aVel2.z -= norTorqueUnit2Z * newImpulse1;
 			
 			// friction part
 			
 			var max:Number = -normalImpulse * friction;
-			relVelX = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
-			relVelY = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
-			relVelZ = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
-			
-			rvn = tanX * relVelX + tanY * relVelY + tanZ * relVelZ;
+			relVelX = lVel2.x - lVel1.x;
+			relVelY = lVel2.y - lVel1.y;
+			relVelZ = lVel2.z - lVel1.z;
+			rvn =
+				relVelX * tanX + relVelY * tanY + relVelZ * tanZ +
+				aVel2.x * tanTorque2X + aVel2.y * tanTorque2Y + aVel2.z * tanTorque2Z -
+				aVel1.x * tanTorque1X - aVel1.y * tanTorque1Y - aVel1.z * tanTorque1Z
+			;
 			oldImpulse1 = tangentImpulse;
 			newImpulse1 = rvn * tangentDenominator;
 			tangentImpulse += newImpulse1;
 			
-			rvn = binX * relVelX + binY * relVelY + binZ * relVelZ;
+			rvn =
+				relVelX * binX + relVelY * binY + relVelZ * binZ +
+				aVel2.x * binTorque2X + aVel2.y * binTorque2Y + aVel2.z * binTorque2Z -
+				aVel1.x * binTorque1X - aVel1.y * binTorque1Y - aVel1.z * binTorque1Z
+			;
 			oldImpulse2 = binormalImpulse;
 			newImpulse2 = rvn * binormalDenominator;
 			binormalImpulse += newImpulse2;
 			
+			// cone friction clamp
 			var len:Number = tangentImpulse * tangentImpulse + binormalImpulse * binormalImpulse;
-			if (len > max * max) { // maximum friction
+			if (len > max * max) {
 				len = max / Math.sqrt(len);
 				tangentImpulse *= len;
 				binormalImpulse *= len;
@@ -514,24 +578,18 @@ package com.element.oimo.physics.constraint.contact {
 			forceX = tanX * newImpulse1 + binX * newImpulse2;
 			forceY = tanY * newImpulse1 + binY * newImpulse2;
 			forceZ = tanZ * newImpulse1 + binZ * newImpulse2;
-			tmpX = relPos1Y * forceZ - relPos1Z * forceY;
-			tmpY = relPos1Z * forceX - relPos1X * forceZ;
-			tmpZ = relPos1X * forceY - relPos1Y * forceX;
 			lVel1.x += forceX * invM1;
 			lVel1.y += forceY * invM1;
 			lVel1.z += forceZ * invM1;
-			aVel1.x += tmpX * invI1e00 + tmpY * invI1e01 + tmpZ * invI1e02;
-			aVel1.y += tmpX * invI1e10 + tmpY * invI1e11 + tmpZ * invI1e12;
-			aVel1.z += tmpX * invI1e20 + tmpY * invI1e21 + tmpZ * invI1e22;
-			tmpX = relPos2Y * forceZ - relPos2Z * forceY;
-			tmpY = relPos2Z * forceX - relPos2X * forceZ;
-			tmpZ = relPos2X * forceY - relPos2Y * forceX;
+			aVel1.x += tanTorqueUnit1X * newImpulse1 + binTorqueUnit1X * newImpulse2;
+			aVel1.y += tanTorqueUnit1Y * newImpulse1 + binTorqueUnit1Y * newImpulse2;
+			aVel1.z += tanTorqueUnit1Z * newImpulse1 + binTorqueUnit1Z * newImpulse2;
 			lVel2.x -= forceX * invM2;
 			lVel2.y -= forceY * invM2;
 			lVel2.z -= forceZ * invM2;
-			aVel2.x -= tmpX * invI2e00 + tmpY * invI2e01 + tmpZ * invI2e02;
-			aVel2.y -= tmpX * invI2e10 + tmpY * invI2e11 + tmpZ * invI2e12;
-			aVel2.z -= tmpX * invI2e20 + tmpY * invI2e21 + tmpZ * invI2e22;
+			aVel2.x -= tanTorqueUnit2X * newImpulse1 + binTorqueUnit2X * newImpulse2;
+			aVel2.y -= tanTorqueUnit2Y * newImpulse1 + binTorqueUnit2Y * newImpulse2;
+			aVel2.z -= tanTorqueUnit2Z * newImpulse1 + binTorqueUnit2Z * newImpulse2;
 		}
 		
 		/**
@@ -544,9 +602,21 @@ package com.element.oimo.physics.constraint.contact {
 			if (shape2.numContacts < Shape.MAX_CONTACTS) {
 				shape2.contacts[shape2.numContacts++] = this;
 			}
-			relativeVelocity.x = (lVel2.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y) - (lVel1.x + aVel1.y * relPos1Z - aVel1.z * relPos1Y);
-			relativeVelocity.y = (lVel2.y + aVel2.z * relPos2X - aVel2.x * relPos2Z) - (lVel1.y + aVel1.z * relPos1X - aVel1.x * relPos1Z);
-			relativeVelocity.z = (lVel2.z + aVel2.x * relPos2Y - aVel2.y * relPos2X) - (lVel1.z + aVel1.x * relPos1Y - aVel1.y * relPos1X);
+			relativePosition1.x = relPos1X;
+			relativePosition1.y = relPos1Y;
+			relativePosition1.z = relPos1Z;
+			relativePosition2.x = relPos2X;
+			relativePosition2.y = relPos2Y;
+			relativePosition2.z = relPos2Z;
+			normal.x = norX;
+			normal.y = norY;
+			normal.z = norZ;
+			tangent.x = tanX;
+			tangent.y = tanY;
+			tangent.z = tanZ;
+			binormal.x = binX;
+			binormal.y = binY;
+			binormal.z = binZ;
 		}
 		
 	}

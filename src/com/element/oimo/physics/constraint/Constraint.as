@@ -39,8 +39,10 @@ package com.element.oimo.physics.constraint {
 		
 		/**
 		 * 拘束処理の前に一度だけ呼び出すべきメソッドです。
+		 * @param	timeStep 時間刻み幅
+		 * @param	invTimeStep 時間刻み幅の逆数
 		 */
-		public function preSolve():void {
+		public function preSolve(timeStep:Number, invTimeStep:Number):void {
 			throw new Error("preSolve メソッドが継承されていません");
 		}
 		

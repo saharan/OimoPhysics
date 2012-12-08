@@ -23,6 +23,7 @@ package com.element.oimo.physics.util {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.SphereShape;
 	import com.element.oimo.physics.constraint.contact.Contact;
+	import com.element.oimo.physics.constraint.joint.Joint;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	import flash.display3D.*;
@@ -38,6 +39,8 @@ package com.element.oimo.physics.util {
 		private var c3d:Context3D;
 		private var gl:OimoGLMini;
 		private var m44:Mat44;
+		private var ignores:Vector.<Shape>;
+		private var numIgnores:uint;
 		
 		/**
 		 * 新しい DebugDraw オブジェクトを生成します。
@@ -48,6 +51,8 @@ package com.element.oimo.physics.util {
 			w = width;
 			h = height;
 			m44 = new Mat44();
+			ignores = new Vector.<Shape>(1024, true);
+			numIgnores = 0;
 		}
 		
 		/**
@@ -57,8 +62,8 @@ package com.element.oimo.physics.util {
 		public function setContext3D(context3D:Context3D):void {
 			c3d = context3D;
 			gl = new OimoGLMini(c3d, w, h);
-			gl.material(1, 1, 0, 0.4, 16);
-			gl.registerSphere(0, 1, 10, 5);
+			gl.material(1, 1, 0, 0.6, 32);
+			gl.registerSphere(0, 1, 8, 4);
 			gl.registerBox(1, 1, 1, 1);
 			gl.camera(0, 5, 10, 0, 0, 0, 0, 1, 0);
 		}
@@ -99,6 +104,23 @@ package com.element.oimo.physics.util {
 		}
 		
 		/**
+		 * 描画から除外する形状を追加します。
+		 * @param	shape 描画から除外する形状
+		 */
+		public function addIgnore(shape:Shape):void {
+			ignores[numIgnores++] = shape;
+		}
+		
+		/**
+		 * 描画から除外した形状を全て削除します。
+		 */
+		public function clearIgnore():void {
+			while (numIgnores > 0) {
+				ignores[--numIgnores] = null;
+			}
+		}
+		
+		/**
 		 * ワールドのレンダリングを行います。
 		 */
 		public function render():void {
@@ -108,7 +130,9 @@ package com.element.oimo.physics.util {
 			gl.beginScene(0.1, 0.1, 0.1);
 			var alpha:Number = 1;
 			var drawContacts:Boolean = false;
-			var drawNormals:Boolean = false;
+			var drawNormals:Boolean = true;
+			var drawForces:Boolean = true;
+			var drawJoints:Boolean = false;
 			var cs:Vector.<Contact> = wld.contacts;
 			var num:uint = wld.numContacts;
 			if (drawContacts) {
@@ -117,41 +141,79 @@ package com.element.oimo.physics.util {
 					gl.push();
 					gl.translate(c.position.x, c.position.y, c.position.z);
 					if (drawNormals) gl.push();
-					gl.scale(0.1, 0.1, 0.1);
 					if (c.warmStarted) {
+						gl.scale(0.1, 0.1, 0.1);
 						gl.color(0.5, 0.5, 0.5);
 					} else {
+						gl.scale(0.15, 0.15, 0.15);
 						gl.color(1, 1, 0);
 					}
 					gl.drawTriangles(0);
 					if (drawNormals) {
 						gl.pop();
 						gl.push();
-						gl.translate(c.normal.x * 0.3, c.normal.y * 0.3, c.normal.z * 0.3);
+						if (drawForces) gl.translate(c.normal.x * -c.normalImpulse * 0.3, c.normal.y * -c.normalImpulse * 0.3, c.normal.z * -c.normalImpulse * 0.3);
+						else gl.translate(c.normal.x * 0.3, c.normal.y * 0.3, c.normal.z * 0.3);
 						gl.scale(0.1, 0.1, 0.1);
 						gl.color(1, 0, 0);
 						gl.drawTriangles(0);
 						gl.pop();
-						gl.push();
-						gl.translate(c.tangent.x * 0.3, c.tangent.y * 0.3, c.tangent.z * 0.3);
-						gl.scale(0.1, 0.1, 0.1);
-						gl.color(0, 0.6, 0);
-						gl.drawTriangles(0);
-						gl.pop();
-						gl.push();
-						gl.translate(c.binormal.x * 0.3, c.binormal.y * 0.3, c.binormal.z * 0.3);
-						gl.scale(0.1, 0.1, 0.1);
-						gl.color(0, 0, 1);
-						gl.drawTriangles(0);
-						gl.pop();
+						if (!drawForces) {
+							gl.push();
+							gl.translate(c.tangent.x * 0.3, c.tangent.y * 0.3, c.tangent.z * 0.3);
+							gl.scale(0.1, 0.1, 0.1);
+							gl.color(0, 0.6, 0);
+							gl.drawTriangles(0);
+							gl.pop();
+							gl.push();
+							gl.translate(c.binormal.x * 0.3, c.binormal.y * 0.3, c.binormal.z * 0.3);
+							gl.scale(0.1, 0.1, 0.1);
+							gl.color(0, 0, 1);
+							gl.drawTriangles(0);
+							gl.pop();
+						}
+						if (drawForces) {
+							gl.push();
+							gl.translate(
+								(c.tangent.x * c.tangentImpulse + c.binormal.x * c.binormalImpulse) * 0.3,
+								(c.tangent.y * c.tangentImpulse + c.binormal.y * c.binormalImpulse) * 0.3,
+								(c.tangent.z * c.tangentImpulse + c.binormal.z * c.binormalImpulse) * 0.3
+							);
+							gl.scale(0.1, 0.1, 0.1);
+							gl.color(0, 1, 1);
+							gl.drawTriangles(0);
+							gl.pop();
+						}
 					}
+					gl.pop();
+				}
+			}
+			var js:Vector.<Joint> = wld.joints;
+			num = wld.numJoints;
+			if (drawJoints) {
+				for (var k:int = 0; k < num; k++) {
+					var jo:Joint = js[k];
+					gl.push();
+					gl.translate(jo.anchorPosition1.x, jo.anchorPosition1.y, jo.anchorPosition1.z);
+					gl.scale(0.1, 0.1, 0.1);
+					gl.color(0.2, 0.2, 0.8);
+					gl.drawTriangles(0);
+					gl.pop();
+					gl.push();
+					gl.translate(jo.anchorPosition2.x, jo.anchorPosition2.y, jo.anchorPosition2.z);
+					gl.scale(0.1, 0.1, 0.1);
+					gl.color(0.2, 0.2, 0.8);
+					gl.drawTriangles(0);
 					gl.pop();
 				}
 			}
 			var ss:Vector.<Shape> = wld.shapes;
 			num = wld.numShapes;
-			for (var i:int = 0; i < num; i++) {
+			shapeLoop: for (var i:int = 0; i < num; i++) {
 				var s:Shape = ss[i];
+				for (var l:int = 0; l < numIgnores; l++) {
+					if (s == ignores[l]) continue shapeLoop;
+				}
 				gl.push();
 				m44.copyMat33(s.rotation);
 				m44.e03 = s.position.x;
@@ -160,10 +222,11 @@ package com.element.oimo.physics.util {
 				gl.transform(m44);
 				switch(s.parent.type) {
 				case RigidBody.BODY_DYNAMIC:
-					gl.color(1, 0.8, 0.4, alpha);
+					if (s.id & 1) gl.color(1, 0.6, 0.1, alpha);
+					else gl.color(0.6, 0.1, 1, alpha);
 					break;
 				case RigidBody.BODY_STATIC:
-					gl.color(0.6, 1, 0.4, alpha);
+					gl.color(0.4, 0.4, 0.4, alpha);
 					break;
 				}
 				switch(s.type) {

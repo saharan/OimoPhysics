@@ -29,6 +29,7 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.constraint.contact.Contact;
+	import com.element.oimo.physics.constraint.joint.Joint;
 	import com.element.oimo.physics.util.Performance;
 	import flash.utils.getTimer;
 	/**
@@ -51,6 +52,11 @@ package com.element.oimo.physics.dynamics {
 		 * 検出できる接触点の最大数です。
 		 */
 		public static const MAX_CONTACTS:uint = 65536;
+		
+		/**
+		 * 追加できるジョイントの最大数です。
+		 */
+		public static const MAX_JOINTS:uint = 16384;
 		
 		/**
 		 * 検出できるプロキシが重なった形状のペアの最大数です。
@@ -107,6 +113,18 @@ package com.element.oimo.physics.dynamics {
 		public var numContacts:uint;
 		
 		/**
+		 * ジョイントの配列です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var joints:Vector.<Joint>;
+		
+		/**
+		 * ジョイントの数です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var numJoints:uint;
+		
+		/**
 		 * 1回のステップで進む時間の長さです。
 		 */
 		public var timeStep:Number;
@@ -161,6 +179,7 @@ package com.element.oimo.physics.dynamics {
 			detectors[Shape.SHAPE_BOX][Shape.SHAPE_BOX] = new BoxBoxCollisionDetector();
 			contactInfos = new Vector.<ContactInfo>(MAX_CONTACTS, true);
 			contacts = new Vector.<Contact>(MAX_CONTACTS, true);
+			joints = new Vector.<Joint>(MAX_JOINTS, true);
 			contactsBuffer = new Vector.<Contact>(MAX_CONTACTS, true);
 		}
 		
@@ -187,7 +206,7 @@ package com.element.oimo.physics.dynamics {
 		/**
 		 * ワールドから剛体を削除します。
 		 * 削除する剛体のインデックスを指定した場合は、インデックスのみを使用して削除します。
-		 * 削除された物体はステップ毎の演算対象から外されます。
+		 * 削除された剛体はステップ毎の演算対象から外されます。
 		 * @param	rigidBody 削除する剛体
 		 * @param	index 削除する剛体のインデックス
 		 */
@@ -211,10 +230,11 @@ package com.element.oimo.physics.dynamics {
 			for (var j:int = 0; j < num; j++) {
 				removeShape(rigidBody.shapes[j]);
 			}
-			for (var k:int = index; k < numRigidBodies - 1; k++) {
+			numRigidBodies--;
+			for (var k:int = index; k < numRigidBodies; k++) {
 				rigidBodies[k] = rigidBodies[k + 1];
 			}
-			rigidBodies[--numRigidBodies] = null;
+			rigidBodies[numRigidBodies] = null;
 		}
 		
 		/**
@@ -261,10 +281,85 @@ package com.element.oimo.physics.dynamics {
 			}
 			var remove:Shape = shapes[index];
 			broadPhase.removeProxy(remove.proxy);
-			for (var j:int = index; j < numShapes - 1; j++) {
+			numShapes--;
+			for (var j:int = index; j < numShapes; j++) {
 				shapes[j] = shapes[j + 1];
 			}
-			shapes[--numShapes] = null;
+			shapes[numShapes] = null;
+		}
+		
+		/**
+		 * ワールドにジョイントを追加します。
+		 * 追加されたジョイントはステップ毎の演算対象になります。
+		 * @param	joint 追加するジョイント
+		 */
+		public function addJoint(joint:Joint):void {
+			if (numJoints == MAX_JOINTS) {
+				throw new Error("これ以上ワールドにジョイントを追加することはできません");
+			}
+			if (joint.parent) {
+				throw new Error("一つのジョイントを複数ワールドに追加することはできません");
+			}
+			joints[numJoints++] = joint;
+			joint.rigid1.joints[joint.rigid1.numJoints++] = joint;
+			joint.rigid2.joints[joint.rigid2.numJoints++] = joint;
+			joint.parent = this;
+		}
+		
+		/**
+		 * ワールドからジョイントを削除します。
+		 * 削除するジョイントのインデックスを指定した場合は、インデックスのみを使用して削除します。
+		 * 削除されたジョイントはステップ毎の演算対象から外されます。
+		 * @param	joint 削除するジョイント
+		 * @param	index 削除するジョイントのインデックス
+		 */
+		public function removeJoint(joint:Joint, index:int = -1):void {
+			if (index < 0) {
+				for (var i:int = 0; i < numJoints; i++) {
+					if (joint == joints[i]) {
+						index = i;
+						break;
+					}
+				}
+				if (index == -1) {
+					return;
+				}
+			} else if (index >= numJoints) {
+				throw new Error("削除するジョイントのインデックスが範囲外です");
+			}
+			var remove:Joint = joints[index];
+			var js:Vector.<Joint> = remove.rigid1.joints;
+			var numJs:uint = remove.rigid1.numJoints;
+			for (var j:int = 0; j < numJs; j++) {
+				if (js[j] == remove) {
+					numJs--;
+					remove.rigid1.numJoints--;
+					for (var k:int = j; k < numJs; k++) {
+						js[k] = js[k + 1];
+					}
+					js[numJs] = null;
+					break;
+				}
+			}
+			js = remove.rigid2.joints;
+			numJs = remove.rigid2.numJoints;
+			for (var l:int = 0; l < numJs; l++) {
+				if (js[l] == remove) {
+					numJs--;
+					remove.rigid2.numJoints--;
+					for (var m:int = l; m < numJs; m++) {
+						js[m] = js[m + 1];
+					}
+					js[numJs] = null;
+					break;
+				}
+			}
+			remove.parent = null;
+			numJoints--;
+			for (var n:int = index; n < numJoints; n++) {
+				joints[n] = joints[n + 1];
+			}
+			joints[numJoints] = null;
 		}
 		
 		/**
@@ -357,21 +452,33 @@ package com.element.oimo.physics.dynamics {
 		
 		private function collisionResponse():void {
 			var start:int = getTimer();
+			var invTimeStep:Number = 1 / timeStep;
 			// reset contact counts
 			for (var i:int = 0; i < numShapes; i++) {
 				shapes[i].numContacts = 0;
 			}
+			// pre-solve
 			for (var j:int = 0; j < numContacts; j++) {
-				contacts[j].preSolve();
+				contacts[j].preSolve(timeStep, invTimeStep);
+			}
+			for (var k:int = 0; k < numJoints; k++) {
+				joints[k].preSolve(timeStep, invTimeStep);
 			}
 			// solve system of equations
-			for (var k:int = 0; k < iteration; k++) {
-				for (var l:int = 0; l < numContacts; l++) {
-					contacts[l].solve();
+			for (var l:int = 0; l < iteration; l++) {
+				for (var m:int = 0; m < numContacts; m++) {
+					contacts[m].solve();
+				}
+				for (var n:int = 0; n < numJoints; n++) {
+					joints[n].solve();
 				}
 			}
-			for (var m:int = 0; m < numContacts; m++) {
-				contacts[m].postSolve();
+			// post-solve
+			for (var o:int = 0; o < numContacts; o++) {
+				contacts[o].postSolve();
+			}
+			for (var p:int = 0; p < numJoints; p++) {
+				joints[p].postSolve();
 			}
 			performance.constraintsTime = getTimer() - start;
 		}

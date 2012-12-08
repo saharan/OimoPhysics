@@ -30,13 +30,16 @@ package com.element.oimo.physics.collision.narrow {
 	public class BoxBoxCollisionDetector extends CollisionDetector {
 		private var clipVertices1:Vector.<Number>;
 		private var clipVertices2:Vector.<Number>;
+		private var used:Vector.<Boolean>;
+		private const INF:Number = 1 / 0;
 		
 		/**
 		 * 新しく BoxBoxCollisionDetector オブジェクトを作成します。
 		 */
 		public function BoxBoxCollisionDetector() {
-			clipVertices1 = new Vector.<Number>(24); // 8 vertices x,y,z
-			clipVertices2 = new Vector.<Number>(24);
+			clipVertices1 = new Vector.<Number>(24, true); // 8 vertices x,y,z
+			clipVertices2 = new Vector.<Number>(24, true);
+			used = new Vector.<Boolean>(8, true);
 		}
 		
 		/**
@@ -51,7 +54,6 @@ package com.element.oimo.physics.collision.narrow {
 			// ・分離軸に対して深度を計算
 			//   ・内積を使って距離を計算し、めり込み量を出す
 			//   ・ただし辺と垂直な分離軸は振動を避けるため多少の重みをつける
-			//   ・さらに箱1の面に対してもデータ上での振動を防ぐためほんの少し重みをつける
 			//   ・一つでも離れている分離軸があったら終了
 			// ・一番めり込みの少ない分離軸を探す
 			//   ・最初の6個の分離軸なら面-面衝突
@@ -64,13 +66,9 @@ package com.element.oimo.physics.collision.narrow {
 			//   ・箱Aの分離軸を作った面を面Aとし、分離軸に対して最も逆向きに近い箱Bの面を面Bとする
 			//   ・面Aを正面から見たときに、面Bが面Aの領域からはみ出た部分を切り取る
 			//   ・面Bは3～8角形になるので、面Bの頂点を衝突点の候補とする
-			//   ・もしも面Bが完全に面Aの領域から出ていた場合は終了する
+			//   ・5つ以上の候補が存在した場合は、4つまで削る
 			//   ・全ての衝突点の候補に対し、面Aとの距離を調べる
 			//   ・面Aの内側にあった場合は、衝突点とする
-			// -------------------------------
-			// これからやるかもしれないこと
-			// ・衝突点が多すぎる場合に数を減らす
-			// ・その他最適化
 			// -------------------------------
 			if (numContactInfos == contactInfos.length) return numContactInfos;
 			var b1:BoxShape;
@@ -299,7 +297,7 @@ package com.element.oimo.physics.collision.narrow {
 			if (dot3 < 0) dot3 = -dot3;
 			len1 = dot1 * w1 + dot2 * h1 + dot3 * d1;
 			len2 = w2;
-			overlap4 = (len - len1 - len2) * 1.02;
+			overlap4 = len - len1 - len2;
 			if (overlap4 > 0) return numContactInfos;
 			// try axis 5
 			len = a5x * dx + a5y * dy + a5z * dz;
@@ -313,7 +311,7 @@ package com.element.oimo.physics.collision.narrow {
 			if (dot3 < 0) dot3 = -dot3;
 			len1 = dot1 * w1 + dot2 * h1 + dot3 * d1;
 			len2 = h2;
-			overlap5 = (len - len1 - len2) * 1.02;
+			overlap5 = len - len1 - len2;
 			if (overlap5 > 0) return numContactInfos;
 			// try axis 6
 			len = a6x * dx + a6y * dy + a6z * dz;
@@ -327,7 +325,7 @@ package com.element.oimo.physics.collision.narrow {
 			if (dot3 < 0) dot3 = -dot3;
 			len1 = dot1 * w1 + dot2 * h1 + dot3 * d1;
 			len2 = d2;
-			overlap6 = (len - len1 - len2) * 1.02;
+			overlap6 = len - len1 - len2;
 			if (overlap6 > 0) return numContactInfos;
 			// try axis 7
 			len = a7x * a7x + a7y * a7y + a7z * a7z;
@@ -349,7 +347,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * h2 + dot2 * d2;
-				overlap7 = (len - len1 - len2) * 1.06;
+				overlap7 = (len - len1 - len2) * 1.1;
 				if (overlap7 > 0) return numContactInfos;
 			} else {
 				right7 = false;
@@ -376,7 +374,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * w2 + dot2 * d2;
-				overlap8 = (len - len1 - len2) * 1.06;
+				overlap8 = (len - len1 - len2) * 1.1;
 				if (overlap8 > 0) return numContactInfos;
 			} else {
 				right8 = false;
@@ -403,7 +401,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * w2 + dot2 * h2;
-				overlap9 = (len - len1 - len2) * 1.06;
+				overlap9 = (len - len1 - len2) * 1.1;
 				if (overlap9 > 0) return numContactInfos;
 			} else {
 				right9 = false;
@@ -430,7 +428,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * h2 + dot2 * d2;
-				overlapa = (len - len1 - len2) * 1.06;
+				overlapa = (len - len1 - len2) * 1.1;
 				if (overlapa > 0) return numContactInfos;
 			} else {
 				righta = false;
@@ -457,7 +455,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * w2 + dot2 * d2;
-				overlapb = (len - len1 - len2) * 1.06;
+				overlapb = (len - len1 - len2) * 1.1;
 				if (overlapb > 0) return numContactInfos;
 			} else {
 				rightb = false;
@@ -484,7 +482,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * w2 + dot2 * h2;
-				overlapc = (len - len1 - len2) * 1.06;
+				overlapc = (len - len1 - len2) * 1.1;
 				if (overlapc > 0) return numContactInfos;
 			} else {
 				rightc = false;
@@ -511,7 +509,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * h2 + dot2 * d2;
-				overlapd = (len - len1 - len2) * 1.06;
+				overlapd = (len - len1 - len2) * 1.1;
 				if (overlapd > 0) return numContactInfos;
 			} else {
 				rightd = false;
@@ -538,7 +536,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * w2 + dot2 * d2;
-				overlape = (len - len1 - len2) * 1.06;
+				overlape = (len - len1 - len2) * 1.1;
 				if (overlape > 0) return numContactInfos;
 			} else {
 				righte = false;
@@ -565,7 +563,7 @@ package com.element.oimo.physics.collision.narrow {
 				if (dot1 < 0) dot1 = -dot1;
 				if (dot2 < 0) dot2 = -dot2;
 				len2 = dot1 * w2 + dot2 * h2;
-				overlapf = (len - len1 - len2) * 1.06;
+				overlapf = (len - len1 - len2) * 1.1;
 				if (overlapf > 0) return numContactInfos;
 			} else {
 				rightf = false;
@@ -1671,8 +1669,60 @@ package com.element.oimo.physics.collision.narrow {
 			}
 			numClipVertices = numAddedClipVertices;
 			if (numClipVertices == 0) return numContactInfos;
-			for (i = 0; i < numClipVertices; i++) {
-				index = i * 3;
+			if (numClipVertices > 4) {
+				// sweep vertices
+				x1 = (q1x + q2x + q3x + q4x) * 0.25;
+				y1 = (q1y + q2y + q3y + q4y) * 0.25;
+				z1 = (q1z + q2z + q3z + q4z) * 0.25;
+				n1x = q1x - x1;
+				n1y = q1y - y1;
+				n1z = q1z - z1;
+				n2x = q2x - x1;
+				n2y = q2y - y1;
+				n2z = q2z - z1;
+				var index1:uint = 0;
+				var index2:uint = 0;
+				var index3:uint = 0;
+				var index4:uint = 0;
+				var maxDot:Number = -INF;
+				minDot = INF;
+				for (i = 0; i < numClipVertices; i++) {
+					used[i] = false;
+					index = i * 3;
+					x1 = clipVertices1[index];
+					y1 = clipVertices1[index + 1];
+					z1 = clipVertices1[index + 2];
+					dot = x1 * n1x + y1 * n1y + z1 * n1z;
+					if (dot < minDot) {
+						minDot = dot;
+						index1 = i;
+					}
+					if (dot > maxDot) {
+						maxDot = dot;
+						index3 = i;
+					}
+				}
+				used[index1] = true;
+				used[index3] = true;
+				maxDot = -INF;
+				minDot = INF;
+				for (i = 0; i < numClipVertices; i++) {
+					if (used[i]) continue;
+					index = i * 3;
+					x1 = clipVertices1[index];
+					y1 = clipVertices1[index + 1];
+					z1 = clipVertices1[index + 2];
+					dot = x1 * n2x + y1 * n2y + z1 * n2z;
+					if (dot < minDot) {
+						minDot = dot;
+						index2 = i;
+					}
+					if (dot > maxDot) {
+						maxDot = dot;
+						index4 = i;
+					}
+				}
+				index = index1 * 3;
 				x1 = clipVertices1[index];
 				y1 = clipVertices1[index + 1];
 				z1 = clipVertices1[index + 2];
@@ -1696,9 +1746,124 @@ package com.element.oimo.physics.collision.narrow {
 						c.shape1 = b1;
 						c.shape2 = b2;
 					}
-					c.id.data1 = minDotIndex;
-					c.id.data2 = i;
-					c.id.flip = swap;
+					c.id.data1 = 0;
+					c.id.data2 = 0;
+					c.id.flip = false;
+				}
+				index = index2 * 3;
+				x1 = clipVertices1[index];
+				y1 = clipVertices1[index + 1];
+				z1 = clipVertices1[index + 2];
+				dot = (x1 - cx) * nx + (y1 - cy) * ny + (z1 - cz) * nz;
+				if (dot < 0) {
+					if (!contactInfos[numContactInfos]) {
+						contactInfos[numContactInfos] = new ContactInfo();
+					}
+					c = contactInfos[numContactInfos++];
+					c.normal.x = nx;
+					c.normal.y = ny;
+					c.normal.z = nz;
+					c.position.x = x1;
+					c.position.y = y1;
+					c.position.z = z1;
+					c.overlap = dot;
+					if (swap) {
+						c.shape1 = b2;
+						c.shape2 = b1;
+					} else {
+						c.shape1 = b1;
+						c.shape2 = b2;
+					}
+					c.id.data1 = 1;
+					c.id.data2 = 0;
+					c.id.flip = false;
+				}
+				index = index3 * 3;
+				x1 = clipVertices1[index];
+				y1 = clipVertices1[index + 1];
+				z1 = clipVertices1[index + 2];
+				dot = (x1 - cx) * nx + (y1 - cy) * ny + (z1 - cz) * nz;
+				if (dot < 0) {
+					if (!contactInfos[numContactInfos]) {
+						contactInfos[numContactInfos] = new ContactInfo();
+					}
+					c = contactInfos[numContactInfos++];
+					c.normal.x = nx;
+					c.normal.y = ny;
+					c.normal.z = nz;
+					c.position.x = x1;
+					c.position.y = y1;
+					c.position.z = z1;
+					c.overlap = dot;
+					if (swap) {
+						c.shape1 = b2;
+						c.shape2 = b1;
+					} else {
+						c.shape1 = b1;
+						c.shape2 = b2;
+					}
+					c.id.data1 = 2;
+					c.id.data2 = 0;
+					c.id.flip = false;
+				}
+				index = index4 * 3;
+				x1 = clipVertices1[index];
+				y1 = clipVertices1[index + 1];
+				z1 = clipVertices1[index + 2];
+				dot = (x1 - cx) * nx + (y1 - cy) * ny + (z1 - cz) * nz;
+				if (dot < 0) {
+					if (!contactInfos[numContactInfos]) {
+						contactInfos[numContactInfos] = new ContactInfo();
+					}
+					c = contactInfos[numContactInfos++];
+					c.normal.x = nx;
+					c.normal.y = ny;
+					c.normal.z = nz;
+					c.position.x = x1;
+					c.position.y = y1;
+					c.position.z = z1;
+					c.overlap = dot;
+					if (swap) {
+						c.shape1 = b2;
+						c.shape2 = b1;
+					} else {
+						c.shape1 = b1;
+						c.shape2 = b2;
+					}
+					c.id.data1 = 3;
+					c.id.data2 = 0;
+					c.id.flip = false;
+				}
+			} else {
+				for (i = 0; i < numClipVertices; i++) {
+					index = i * 3;
+					x1 = clipVertices1[index];
+					y1 = clipVertices1[index + 1];
+					z1 = clipVertices1[index + 2];
+					dot = (x1 - cx) * nx + (y1 - cy) * ny + (z1 - cz) * nz;
+					if (dot < 0) {
+						if (!contactInfos[numContactInfos]) {
+							contactInfos[numContactInfos] = new ContactInfo();
+						}
+						c = contactInfos[numContactInfos++];
+						c.normal.x = nx;
+						c.normal.y = ny;
+						c.normal.z = nz;
+						c.position.x = x1;
+						c.position.y = y1;
+						c.position.z = z1;
+						c.overlap = dot;
+						if (swap) {
+							c.shape1 = b2;
+							c.shape2 = b1;
+						} else {
+							c.shape1 = b1;
+							c.shape2 = b2;
+						}
+						c.id.data1 = i;
+						c.id.data2 = 0;
+						c.id.flip = false;
+					}
 				}
 			}
 			return numContactInfos;

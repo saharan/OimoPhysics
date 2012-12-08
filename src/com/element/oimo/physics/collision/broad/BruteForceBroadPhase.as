@@ -2,7 +2,6 @@ package com.element.oimo.physics.collision.broad {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
-	import com.element.oimo.physics.test.OimoPhysicsTest;
 	import flash.utils.getTimer;
 	/**
 	 * 総当りアルゴリズムを使用して広域衝突判定を行うクラスです。
@@ -67,10 +66,10 @@ package com.element.oimo.physics.collision.broad {
 					var b2:RigidBody = s2.parent;
 					if (
 						b1 == b2 ||
-						b1.type == RigidBody.BODY_STATIC && b2.type == RigidBody.BODY_STATIC ||
 						p1.maxX < p2.minX || p1.minX > p2.maxX ||
 						p1.maxY < p2.minY || p1.minY > p2.maxY ||
-						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ
+						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ ||
+						!isAvailablePair(b1, b2)
 					) {
 						continue;
 					}

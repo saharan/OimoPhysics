@@ -107,8 +107,6 @@ package com.element.oimo.physics.collision.shape {
 		 */
 		public var localInertia:Mat33;
 		
-		// public var aabb:AABB;
-		
 		/**
 		 * 広域衝突判定に用いられる単純化された形状です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
