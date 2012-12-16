@@ -28,6 +28,7 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.physics.collision.narrow.SphereSphereCollisionDetector;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.math.Vec3;
+	import com.element.oimo.physics.constraint.Constraint;
 	import com.element.oimo.physics.constraint.contact.Contact;
 	import com.element.oimo.physics.constraint.joint.Joint;
 	import com.element.oimo.physics.util.Performance;
@@ -124,6 +125,9 @@ package com.element.oimo.physics.dynamics {
 		 */
 		public var numJoints:uint;
 		
+		private var constraints:Vector.<Constraint>;
+		private var numConstraints:uint;
+		
 		/**
 		 * 1回のステップで進む時間の長さです。
 		 */
@@ -153,6 +157,10 @@ package com.element.oimo.physics.dynamics {
 		private var contactInfos:Vector.<ContactInfo>;
 		private var numContactInfos:uint;
 		
+		private var randX:uint;
+		private var randA:uint;
+		private var randB:uint;
+		
 		/**
 		 * 新しく World オブジェクトを作成します。
 		 * ワールドのタイムステップは、1秒間でのステップの実行回数から算出されます。
@@ -180,7 +188,11 @@ package com.element.oimo.physics.dynamics {
 			contactInfos = new Vector.<ContactInfo>(MAX_CONTACTS, true);
 			contacts = new Vector.<Contact>(MAX_CONTACTS, true);
 			joints = new Vector.<Joint>(MAX_JOINTS, true);
+			constraints = new Vector.<Constraint>(MAX_CONTACTS + MAX_JOINTS, true);
 			contactsBuffer = new Vector.<Contact>(MAX_CONTACTS, true);
+			randX = 65535;
+			randA = 98765;
+			randB = 123456789;
 		}
 		
 		/**
@@ -457,28 +469,37 @@ package com.element.oimo.physics.dynamics {
 			for (var i:int = 0; i < numShapes; i++) {
 				shapes[i].numContacts = 0;
 			}
-			// pre-solve
-			for (var j:int = 0; j < numContacts; j++) {
-				contacts[j].preSolve(timeStep, invTimeStep);
+			
+			// collect all constraints
+			numConstraints = 0;
+			for (i = 0; i < numContacts; i++) {
+				constraints[numConstraints++] = contacts[i];
 			}
-			for (var k:int = 0; k < numJoints; k++) {
-				joints[k].preSolve(timeStep, invTimeStep);
+			for (i = 0; i < numJoints; i++) {
+				constraints[numConstraints++] = joints[i];
+			}
+			
+			// randomizing order
+			for (i = 1; i < numConstraints; i++) {
+				var swap:uint = (randX = (randX * randA + randB & 0x7fffffff)) / 2147483648.0 * i | 0;
+				var tmp:Constraint = constraints[i];
+				constraints[i] = constraints[swap];
+				constraints[swap] = tmp;
+			}
+			
+			// pre-solve
+			for (i = 0; i < numConstraints; i++) {
+				constraints[i].preSolve(timeStep, invTimeStep);
 			}
 			// solve system of equations
-			for (var l:int = 0; l < iteration; l++) {
-				for (var m:int = 0; m < numContacts; m++) {
-					contacts[m].solve();
-				}
-				for (var n:int = 0; n < numJoints; n++) {
-					joints[n].solve();
+			for (i = 0; i < iteration; i++) {
+				for (var j:int = 0; j < numConstraints; j++) {
+					constraints[j].solve();
 				}
 			}
 			// post-solve
-			for (var o:int = 0; o < numContacts; o++) {
-				contacts[o].postSolve();
-			}
-			for (var p:int = 0; p < numJoints; p++) {
-				joints[p].postSolve();
+			for (i = 0; i < numConstraints; i++) {
+				constraints[i].postSolve();
 			}
 			performance.constraintsTime = getTimer() - start;
 		}

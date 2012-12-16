@@ -21,20 +21,63 @@ package com.element.oimo.physics.constraint.joint {
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * 剛体間の一点を拘束するジョイントです。
+	 * 剛体間の回転を軸方向のみに拘束するジョイントです。
 	 * @author saharan
 	 */
-	public class BallJoint extends Joint {
+	public class HingeJoint extends Joint {
 		/**
-		 * 拘束力のベクトルです。
+		 * 並進速度の拘束力のベクトルです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 * この値は蓄積され、次ステップでも使い回されます。
 		 */
 		public var impulse:Vec3;
 		
+		/**
+		 * 角速度の拘束力のベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * この値は蓄積され、次ステップでも使い回されます。
+		 */
+		public var torque:Vec3;
+		
+		/**
+		 * 剛体1の回転の軸を表すベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var localAxis1:Vec3;
+		
+		/**
+		 * 剛体2の回転の軸を表すベクトルです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var localAxis2:Vec3;
+		
 		private var impulseX:Number;
 		private var impulseY:Number;
 		private var impulseZ:Number;
+		
+		private var torqueX:Number;
+		private var torqueY:Number;
+		private var torqueZ:Number;
+		
+		private var localAxis1X:Number;
+		private var localAxis1Y:Number;
+		private var localAxis1Z:Number;
+		
+		private var localAxis2X:Number;
+		private var localAxis2Y:Number;
+		private var localAxis2Z:Number;
+		
+		private var axis1X:Number;
+		private var axis1Y:Number;
+		private var axis1Z:Number;
+		
+		private var axis2X:Number;
+		private var axis2Y:Number;
+		private var axis2Z:Number;
+		
+		private var axisX:Number;
+		private var axisY:Number;
+		private var axisZ:Number;
 		
 		private var lVel1:Vec3;
 		private var lVel2:Vec3;
@@ -103,19 +146,43 @@ package com.element.oimo.physics.constraint.joint {
 		private var d21:Number;
 		private var d22:Number;
 		
+		// torque matrix
+		private var i00:Number;
+		private var i01:Number;
+		private var i02:Number;
+		private var i10:Number;
+		private var i11:Number;
+		private var i12:Number;
+		private var i20:Number;
+		private var i21:Number;
+		private var i22:Number;
+		
 		private var targetVelX:Number;
 		private var targetVelY:Number;
 		private var targetVelZ:Number;
+		private var targetAngVelX:Number;
+		private var targetAngVelY:Number;
+		private var targetAngVelZ:Number;
 		
 		/**
-		 * 新しい BallJoint オブジェクトを作成します。
+		 * 新しい HingeJoint オブジェクトを作成します。
 		 * @param	rigid1 剛体1
 		 * @param	rigid2 剛体2
 		 * @param	config ジョイントの設定
 		 */
-		public function BallJoint(rigid1:RigidBody, rigid2:RigidBody, config:JointConfig) {
+		public function HingeJoint(rigid1:RigidBody, rigid2:RigidBody, config:JointConfig) {
 			this.rigid1 = rigid1;
 			this.rigid2 = rigid2;
+			localAxis1 = new Vec3();
+			localAxis2 = new Vec3();
+			localAxis1.normalize(config.localAxis1);
+			localAxis2.normalize(config.localAxis2);
+			localAxis1X = localAxis1.x;
+			localAxis1Y = localAxis1.y;
+			localAxis1Z = localAxis1.z;
+			localAxis2X = localAxis2.x;
+			localAxis2Y = localAxis2.y;
+			localAxis2Z = localAxis2.z; // TODO: separate axis
 			allowCollide = config.allowCollide;
 			localRelativeAnchorPosition1.copy(config.localRelativeAnchorPosition1);
 			localRelativeAnchorPosition2.copy(config.localRelativeAnchorPosition2);
@@ -130,9 +197,13 @@ package com.element.oimo.physics.constraint.joint {
 			invM2 = this.rigid2.invertMass;
 			
 			impulse = new Vec3();
+			torque = new Vec3();
 			impulseX = 0;
 			impulseY = 0;
 			impulseZ = 0;
+			torqueX = 0;
+			torqueY = 0;
+			torqueZ = 0;
 		}
 		
 		/**
@@ -170,6 +241,9 @@ package com.element.oimo.physics.constraint.joint {
 			// ----------------------------------------------
 			
 			tmpM = rigid1.rotation;
+			axis1X = localAxis1X * tmpM.e00 + localAxis1Y * tmpM.e01 + localAxis1Z * tmpM.e02;
+			axis1Y = localAxis1X * tmpM.e10 + localAxis1Y * tmpM.e11 + localAxis1Z * tmpM.e12;
+			axis1Z = localAxis1X * tmpM.e20 + localAxis1Y * tmpM.e21 + localAxis1Z * tmpM.e22;
 			tmp1X = localRelativeAnchorPosition1.x;
 			tmp1Y = localRelativeAnchorPosition1.y;
 			tmp1Z = localRelativeAnchorPosition1.z;
@@ -177,6 +251,9 @@ package com.element.oimo.physics.constraint.joint {
 			relPos1Y = relativeAnchorPosition1.y = tmp1X * tmpM.e10 + tmp1Y * tmpM.e11 + tmp1Z * tmpM.e12;
 			relPos1Z = relativeAnchorPosition1.z = tmp1X * tmpM.e20 + tmp1Y * tmpM.e21 + tmp1Z * tmpM.e22;
 			tmpM = rigid2.rotation;
+			axis2X = localAxis2X * tmpM.e00 + localAxis2Y * tmpM.e01 + localAxis2Z * tmpM.e02;
+			axis2Y = localAxis2X * tmpM.e10 + localAxis2Y * tmpM.e11 + localAxis2Z * tmpM.e12;
+			axis2Z = localAxis2X * tmpM.e20 + localAxis2Y * tmpM.e21 + localAxis2Z * tmpM.e22;
 			tmp1X = localRelativeAnchorPosition2.x;
 			tmp1Y = localRelativeAnchorPosition2.y;
 			tmp1Z = localRelativeAnchorPosition2.z;
@@ -189,6 +266,15 @@ package com.element.oimo.physics.constraint.joint {
 			anchorPosition2.x = relPos2X + rigid2.position.x;
 			anchorPosition2.y = relPos2Y + rigid2.position.y;
 			anchorPosition2.z = relPos2Z + rigid2.position.z;
+			tmp1X = 1 / (invM1 + invM2);
+			axisX = (axis1X * invM1 + axis2X * invM2) * tmp1X;
+			axisY = (axis1Y * invM1 + axis2Y * invM2) * tmp1X;
+			axisZ = (axis1Z * invM1 + axis2Z * invM2) * tmp1X;
+			tmp1X = Math.sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
+			if (tmp1X > 0) tmp1X = 1 / tmp1X;
+			axisX *= tmp1X;
+			axisY *= tmp1X;
+			axisZ *= tmp1X;
 			
 			// ----------------------------------------------
 			//        calculate angular accelerations
@@ -334,25 +420,59 @@ package com.element.oimo.physics.constraint.joint {
 			d21 = t21;
 			d22 = t22;
 			
+			i00 = invI1e00 + invI2e00;
+			i01 = invI1e01 + invI2e01;
+			i02 = invI1e02 + invI2e02;
+			i10 = invI1e10 + invI2e10;
+			i11 = invI1e11 + invI2e11;
+			i12 = invI1e12 + invI2e12;
+			i20 = invI1e20 + invI2e20;
+			i21 = invI1e21 + invI2e21;
+			i22 = invI1e22 + invI2e22;
+			tmp1X = 1 / (i00 * (i11 * i22 - i21 * i12) + i10 * (i21 * i02 - i01 * i22) + i20 * (i01 * i12 - i11 * i02));
+			t00 = (i11 * i22 - i12 * i21) * tmp1X;
+			t01 = (i02 * i21 - i01 * i22) * tmp1X;
+			t02 = (i01 * i12 - i02 * i11) * tmp1X;
+			t10 = (i12 * i20 - i10 * i22) * tmp1X;
+			t11 = (i00 * i22 - i02 * i20) * tmp1X;
+			t12 = (i02 * i10 - i00 * i12) * tmp1X;
+			t20 = (i10 * i21 - i11 * i20) * tmp1X;
+			t21 = (i01 * i20 - i00 * i21) * tmp1X;
+			t22 = (i00 * i11 - i01 * i10) * tmp1X;
+			i00 = t00;
+			i01 = t01;
+			i02 = t02;
+			i10 = t10;
+			i11 = t11;
+			i12 = t12;
+			i20 = t20;
+			i21 = t21;
+			i22 = t22;
+			
 			// ----------------------------------------------
 			//           calculate initial forces
 			// ----------------------------------------------
 			
+			tmp1X = axisX * torqueX + axisY * torqueY + axisZ * torqueZ;
+			torqueX = (torqueX - axisX * tmp1X) * 0.95;
+			torqueY = (torqueY - axisY * tmp1X) * 0.95;
+			torqueZ = (torqueZ - axisZ * tmp1X) * 0.95;
 			impulseX *= 0.95;
 			impulseY *= 0.95;
 			impulseZ *= 0.95;
+			
 			lVel1.x += impulseX * invM1;
 			lVel1.y += impulseY * invM1;
 			lVel1.z += impulseZ * invM1;
-			aVel1.x += xTorqueUnit1X * impulseX + yTorqueUnit1X * impulseY + zTorqueUnit1X * impulseZ;
-			aVel1.y += xTorqueUnit1Y * impulseX + yTorqueUnit1Y * impulseY + zTorqueUnit1Y * impulseZ;
-			aVel1.z += xTorqueUnit1Z * impulseX + yTorqueUnit1Z * impulseY + zTorqueUnit1Z * impulseZ;
+			aVel1.x += xTorqueUnit1X * impulseX + yTorqueUnit1X * impulseY + zTorqueUnit1X * impulseZ + torqueX * invI1e00 + torqueY * invI1e01 + torqueZ * invI1e02;
+			aVel1.y += xTorqueUnit1Y * impulseX + yTorqueUnit1Y * impulseY + zTorqueUnit1Y * impulseZ + torqueX * invI1e10 + torqueY * invI1e11 + torqueZ * invI1e12;
+			aVel1.z += xTorqueUnit1Z * impulseX + yTorqueUnit1Z * impulseY + zTorqueUnit1Z * impulseZ + torqueX * invI1e20 + torqueY * invI1e21 + torqueZ * invI1e22;
 			lVel2.x -= impulseX * invM2;
 			lVel2.y -= impulseY * invM2;
 			lVel2.z -= impulseZ * invM2;
-			aVel2.x -= xTorqueUnit2X * impulseX + yTorqueUnit2X * impulseY + zTorqueUnit2X * impulseZ;
-			aVel2.y -= xTorqueUnit2Y * impulseX + yTorqueUnit2Y * impulseY + zTorqueUnit2Y * impulseZ;
-			aVel2.z -= xTorqueUnit2Z * impulseX + yTorqueUnit2Z * impulseY + zTorqueUnit2Z * impulseZ;
+			aVel2.x -= xTorqueUnit2X * impulseX + yTorqueUnit2X * impulseY + zTorqueUnit2X * impulseZ + torqueX * invI2e00 + torqueY * invI2e01 + torqueZ * invI2e02;
+			aVel2.y -= xTorqueUnit2Y * impulseX + yTorqueUnit2Y * impulseY + zTorqueUnit2Y * impulseZ + torqueX * invI2e10 + torqueY * invI2e11 + torqueZ * invI2e12;
+			aVel2.z -= xTorqueUnit2Z * impulseX + yTorqueUnit2Z * impulseY + zTorqueUnit2Z * impulseZ + torqueX * invI2e20 + torqueY * invI2e21 + torqueZ * invI2e22;
 			
 			// ----------------------------------------------
 			//           calculate target velocity
@@ -372,6 +492,20 @@ package com.element.oimo.physics.constraint.joint {
 				targetVelY *= tmp1X;
 				targetVelZ *= tmp1X;
 			}
+			targetAngVelX = axis1Y * axis2Z - axis1Z * axis2Y;
+			targetAngVelY = axis1Z * axis2X - axis1X * axis2Z;
+			targetAngVelZ = axis1X * axis2Y - axis1Y * axis2X;
+			tmp1X = Math.sqrt(targetAngVelX * targetAngVelX + targetAngVelY * targetAngVelY + targetAngVelZ * targetAngVelZ);
+			if (tmp1X < 0.02) {
+				targetAngVelX = 0;
+				targetAngVelY = 0;
+				targetAngVelZ = 0;
+			} else {
+				tmp1X = (0.02 - tmp1X) / tmp1X * invTimeStep * 0.05;
+				targetAngVelX *= tmp1X;
+				targetAngVelY *= tmp1X;
+				targetAngVelZ *= tmp1X;
+			}
 		}
 		
 		/**
@@ -381,9 +515,11 @@ package com.element.oimo.physics.constraint.joint {
 			var relVelX:Number;
 			var relVelY:Number;
 			var relVelZ:Number;
+			var dot:Number;
 			var newImpulseX:Number;
 			var newImpulseY:Number;
 			var newImpulseZ:Number;
+			
 			relVelX = lVel2.x - lVel1.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y - aVel1.y * relPos1Z + aVel1.z * relPos1Y - targetVelX;
 			relVelY = lVel2.y - lVel1.y + aVel2.z * relPos2X - aVel2.x * relPos2Z - aVel1.z * relPos1X + aVel1.x * relPos1Z - targetVelY;
 			relVelZ = lVel2.z - lVel1.z + aVel2.x * relPos2Y - aVel2.y * relPos2X - aVel1.x * relPos1Y + aVel1.y * relPos1X - targetVelZ;
@@ -405,6 +541,26 @@ package com.element.oimo.physics.constraint.joint {
 			aVel2.x -= xTorqueUnit2X * newImpulseX + yTorqueUnit2X * newImpulseY + zTorqueUnit2X * newImpulseZ;
 			aVel2.y -= xTorqueUnit2Y * newImpulseX + yTorqueUnit2Y * newImpulseY + zTorqueUnit2Y * newImpulseZ;
 			aVel2.z -= xTorqueUnit2Z * newImpulseX + yTorqueUnit2Z * newImpulseY + zTorqueUnit2Z * newImpulseZ;
+			
+			relVelX = aVel2.x - aVel1.x - targetAngVelX;
+			relVelY = aVel2.y - aVel1.y - targetAngVelY;
+			relVelZ = aVel2.z - aVel1.z - targetAngVelZ;
+			dot = axisX * relVelX + axisY * relVelY + axisZ * relVelZ;
+			relVelX -= dot * axisX;
+			relVelY -= dot * axisY;
+			relVelZ -= dot * axisZ;
+			newImpulseX = relVelX * i00 + relVelY * i01 + relVelZ * i02;
+			newImpulseY = relVelX * i10 + relVelY * i11 + relVelZ * i12;
+			newImpulseZ = relVelX * i20 + relVelY * i21 + relVelZ * i22;
+			torqueX += newImpulseX;
+			torqueY += newImpulseY;
+			torqueZ += newImpulseZ;
+			aVel1.x += newImpulseX * invI1e00 + newImpulseY * invI1e01 + newImpulseZ * invI1e02;
+			aVel1.y += newImpulseX * invI1e10 + newImpulseY * invI1e11 + newImpulseZ * invI1e12;
+			aVel1.z += newImpulseX * invI1e20 + newImpulseY * invI1e21 + newImpulseZ * invI1e22;
+			aVel2.x -= newImpulseX * invI2e00 + newImpulseY * invI2e01 + newImpulseZ * invI2e02;
+			aVel2.y -= newImpulseX * invI2e10 + newImpulseY * invI2e11 + newImpulseZ * invI2e12;
+			aVel2.z -= newImpulseX * invI2e20 + newImpulseY * invI2e21 + newImpulseZ * invI2e22;
 		}
 		
 		/**
@@ -414,6 +570,9 @@ package com.element.oimo.physics.constraint.joint {
 			impulse.x = impulseX;
 			impulse.y = impulseY;
 			impulse.z = impulseZ;
+			torque.x = torqueX;
+			torque.y = torqueY;
+			torque.z = torqueZ;
 		}
 		
 	}

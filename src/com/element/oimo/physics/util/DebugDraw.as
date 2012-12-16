@@ -73,6 +73,7 @@ package com.element.oimo.physics.util {
 		 * @param	world
 		 */
 		public function setWorld(world:World):void {
+			clearIgnores();
 			wld = world;
 		}
 		
@@ -114,7 +115,7 @@ package com.element.oimo.physics.util {
 		/**
 		 * 描画から除外した形状を全て削除します。
 		 */
-		public function clearIgnore():void {
+		public function clearIgnores():void {
 			while (numIgnores > 0) {
 				ignores[--numIgnores] = null;
 			}

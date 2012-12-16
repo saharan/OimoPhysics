@@ -21,7 +21,7 @@ package com.element.oimo.physics.constraint.joint {
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * 剛体間の距離を拘束するジョイントです。
+	 * 剛体間の二点の距離を拘束するジョイントです。
 	 * @author saharan
 	 */
 	public class DistanceJoint extends Joint {
@@ -120,28 +120,6 @@ package com.element.oimo.physics.constraint.joint {
 			invM1 = this.rigid1.invertMass;
 			invM2 = this.rigid2.invertMass;
 			
-			var tmpI:Mat33;
-			tmpI = this.rigid1.invertInertia;
-			invI1e00 = tmpI.e00;
-			invI1e01 = tmpI.e01;
-			invI1e02 = tmpI.e02;
-			invI1e10 = tmpI.e10;
-			invI1e11 = tmpI.e11;
-			invI1e12 = tmpI.e12;
-			invI1e20 = tmpI.e20;
-			invI1e21 = tmpI.e21;
-			invI1e22 = tmpI.e22;
-			tmpI = this.rigid2.invertInertia;
-			invI2e00 = tmpI.e00;
-			invI2e01 = tmpI.e01;
-			invI2e02 = tmpI.e02;
-			invI2e10 = tmpI.e10;
-			invI2e11 = tmpI.e11;
-			invI2e12 = tmpI.e12;
-			invI2e20 = tmpI.e20;
-			invI2e21 = tmpI.e21;
-			invI2e22 = tmpI.e22;
-			
 			impulse = 0;
 		}
 		
@@ -194,6 +172,27 @@ package com.element.oimo.physics.constraint.joint {
 			// calculate torque axes and angular accelerations
 			// ----------------------------------------------
 			
+			tmpM = rigid1.invertInertia;
+			invI1e00 = tmpM.e00;
+			invI1e01 = tmpM.e01;
+			invI1e02 = tmpM.e02;
+			invI1e10 = tmpM.e10;
+			invI1e11 = tmpM.e11;
+			invI1e12 = tmpM.e12;
+			invI1e20 = tmpM.e20;
+			invI1e21 = tmpM.e21;
+			invI1e22 = tmpM.e22;
+			tmpM = rigid2.invertInertia;
+			invI2e00 = tmpM.e00;
+			invI2e01 = tmpM.e01;
+			invI2e02 = tmpM.e02;
+			invI2e10 = tmpM.e10;
+			invI2e11 = tmpM.e11;
+			invI2e12 = tmpM.e12;
+			invI2e20 = tmpM.e20;
+			invI2e21 = tmpM.e21;
+			invI2e22 = tmpM.e22;
+			
 			norTorque1X = relPos1Y * norZ - relPos1Z * norY;
 			norTorque1Y = relPos1Z * norX - relPos1X * norZ;
 			norTorque1Z = relPos1X * norY - relPos1Y * norX;
@@ -230,6 +229,7 @@ package com.element.oimo.physics.constraint.joint {
 			//           calculate initial forces
 			// ----------------------------------------------
 			
+			impulse *= 0.95;
 			tmp1X = norX * impulse;
 			tmp1Y = norY * impulse;
 			tmp1Z = norZ * impulse;
@@ -253,8 +253,7 @@ package com.element.oimo.physics.constraint.joint {
 			if (posError < -0.05) posError += 0.05; // allow 5cm error
 			else if (posError > 0.05) posError -= 0.05;
 			else posError = 0;
-			var separationalVelocity:Number = posError * invTimeStep * 0.05;
-			targetNormalVelocity = separationalVelocity;
+			targetNormalVelocity = posError * invTimeStep * 0.05;
 		}
 		
 		/**

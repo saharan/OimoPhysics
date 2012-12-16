@@ -36,6 +36,18 @@ package com.element.oimo.physics.constraint.joint {
 		public var localRelativeAnchorPosition2:Vec3;
 		
 		/**
+		 * 剛体1に対する初期状態での回転軸です。
+		 * このオプションは一部のジョイントにおいてのみ有効です。
+		 */
+		public var localAxis1:Vec3;
+		
+		/**
+		 * 剛体2に対する初期状態での回転軸です。
+		 * このオプションは一部のジョイントにおいてのみ有効です。
+		 */
+		public var localAxis2:Vec3;
+		
+		/**
 		 * 接続された剛体同士が衝突するかどうかを表します。
 		 */
 		public var allowCollide:Boolean;
@@ -46,6 +58,8 @@ package com.element.oimo.physics.constraint.joint {
 		public function JointConfig() {
 			localRelativeAnchorPosition1 = new Vec3();
 			localRelativeAnchorPosition2 = new Vec3();
+			localAxis1 = new Vec3();
+			localAxis2 = new Vec3();
 		}
 		
 	}
