@@ -347,7 +347,7 @@ package com.element.oimo.physics.constraint.contact {
 				len = 1 / Math.sqrt(len);
 			} else {
 				tanX = norY * norX - norZ * norZ;
-				tanY = norZ * -norY - norX * norX;
+				tanY = -norZ * norY - norX * norX;
 				tanZ = norX * norZ + norY * norY;
 				len = 1 / Math.sqrt(tanX * tanX + tanY * tanY + tanZ * tanZ);
 			}

@@ -42,6 +42,11 @@ package com.element.oimo.physics.constraint.joint {
 		public static const JOINT_BALL:uint = 0x2;
 		
 		/**
+		 * ヒンジジョイント表すジョイントの種類です。
+		 */
+		public static const JOINT_HINGE:uint = 0x3;
+		
+		/**
 		 * ジョイントの種類を表します。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */

@@ -21,6 +21,7 @@ package com.element.oimo.physics.test {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
 	import com.element.oimo.physics.collision.shape.SphereShape;
+	import com.element.oimo.physics.constraint.contact.Contact;
 	import com.element.oimo.physics.constraint.joint.BallJoint;
 	import com.element.oimo.physics.constraint.joint.DistanceJoint;
 	import com.element.oimo.physics.constraint.joint.HingeJoint;
@@ -37,6 +38,7 @@ package com.element.oimo.physics.test {
 	import flash.display.Stage3D;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
+	import flash.geom.Matrix3D;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.ui.Keyboard;
@@ -182,7 +184,7 @@ package com.element.oimo.physics.test {
 			rb.setupMass(RigidBody.BODY_STATIC);
 			world.addRigidBody(rb);
 			
-			c.position.init(0, 0.5, 7);
+			c.position.init(0, 0.5, 12);
 			c.density = 6;
 			c.rotation.init();
 			s = new SphereShape(0.75, c);
@@ -198,7 +200,7 @@ package com.element.oimo.physics.test {
 			var jo:Joint;
 			var prv:RigidBody = ctr;
 			c.position.y += 0.5;
-			for (var m:int = 0; m < 16; m++) {
+			for (var m:int = 0; m < 8; m++) {
 				c.position.y += 0.6;
 				s = (m & 1) ? new BoxShape(0.6, 0.6, 0.6, c) : new SphereShape(0.3, c);
 				rb = new RigidBody();
@@ -289,7 +291,7 @@ package com.element.oimo.physics.test {
 			for (var o:int = 0; o < 3; o++) {
 				jc.localRelativeAnchorPosition1.init(0, 0.3, 0);
 				jc.localRelativeAnchorPosition2.init(0, -0.3, 0);
-				c.position.init(-5 - o * 1.4, 0, 0);
+				c.position.init(-5 - o * 2, 0, 0);
 				for (m = 0; m < 12; m++) {
 					c.position.y += 0.4;
 					s = m == 11 ? new SphereShape(0.2, c) : new BoxShape(1, 0.6, 0.5, c);
@@ -304,6 +306,11 @@ package com.element.oimo.physics.test {
 							jc.localRelativeAnchorPosition2.y = -10;
 						}
 						jo = new HingeJoint(prv, rb, jc);
+						if (m != 11) {
+							(jo as HingeJoint).enableLimits = true;
+							(jo as HingeJoint).lowerLimit = -Math.PI * 0.2 * (o + 1);
+							(jo as HingeJoint).upperLimit = Math.PI * 0.2 * (o + 1);
+						}
 						world.addJoint(jo);
 					}
 					prv = rb;
@@ -312,10 +319,29 @@ package com.element.oimo.physics.test {
 			
 			jc.localAxis1.init(0, 1, 0);
 			jc.localAxis2.init(0, 1, 0);
-			jc.localRelativeAnchorPosition1.init(1.6, 0, 0);
+			jc.localRelativeAnchorPosition1.init(0, 0, 0);
 			jc.localRelativeAnchorPosition2.init(0, -1, 0);
-			c.position.init(-1.6, 1.1, 0);
-			s = new BoxShape(3.2, 2, 0.4, c);
+			
+			c.position.init(0, 1.1, 7);
+			s = new BoxShape(5, 2, 0.4, c);
+			rb = new RigidBody();
+			rb.addShape(s);
+			rb.setupMass();
+			world.addRigidBody(rb);
+			c.position.init(0, 2.1, 7);
+			s = new SphereShape(0.25, c);
+			prv = new RigidBody();
+			prv.addShape(s);
+			prv.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(prv);
+			jo = new HingeJoint(rb, prv, jc);
+			(jo as HingeJoint).enableMotor = true;
+			(jo as HingeJoint).motorSpeed = Math.PI * 2;
+			(jo as HingeJoint).maxMotorTorque = 1200;
+			world.addJoint(jo);
+			
+			c.position.init(0, 1.1, 0);
+			s = new BoxShape(5, 2, 0.4, c);
 			rb = new RigidBody();
 			rb.addShape(s);
 			rb.setupMass();
@@ -327,7 +353,54 @@ package com.element.oimo.physics.test {
 			prv.setupMass(RigidBody.BODY_STATIC);
 			world.addRigidBody(prv);
 			jo = new HingeJoint(rb, prv, jc);
+			(jo as HingeJoint).enableMotor = true;
+			(jo as HingeJoint).motorSpeed = Math.PI * 2 * 3;
+			(jo as HingeJoint).maxMotorTorque = 300;
 			world.addJoint(jo);
+			
+			c.position.init(0, 1.1, -7);
+			s = new BoxShape(5, 2, 0.4, c);
+			rb = new RigidBody();
+			rb.addShape(s);
+			rb.setupMass();
+			world.addRigidBody(rb);
+			c.position.init(0, 2.1, -7);
+			s = new SphereShape(0.25, c);
+			prv = new RigidBody();
+			prv.addShape(s);
+			prv.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(prv);
+			jo = new HingeJoint(rb, prv, jc);
+			(jo as HingeJoint).enableMotor = true;
+			(jo as HingeJoint).motorSpeed = Math.PI * 2 * 8.33333;
+			(jo as HingeJoint).maxMotorTorque = 50;
+			world.addJoint(jo);
+			
+			c.position.init(0, 5, 0);
+			jc.localAxis1.init(0, 1, 0);
+			jc.localAxis2.init(0, 1, 0);
+			jc.localRelativeAnchorPosition1.init(0, 0.5, 0);
+			jc.localRelativeAnchorPosition2.init(0, -0.5, 0);
+			for (var i:int = 0; i < 4; i++) {
+				s = new BoxShape(2, 1, 1, c);
+				rb = new RigidBody();
+				rb.addShape(s);
+				rb.setupMass();
+				world.addRigidBody(rb);
+				prv = rb;
+				rb = new RigidBody();
+				c.position.y += 1;
+				s = new BoxShape(2, 1, 1, c);
+				rb.addShape(s);
+				rb.setupMass();
+				world.addRigidBody(rb);
+				jo = new HingeJoint(prv, rb, jc);
+				HingeJoint(jo).enableMotor = true;
+				HingeJoint(jo).motorSpeed = Math.PI * 4;
+				HingeJoint(jo).maxMotorTorque = 100;
+				world.addJoint(jo);
+				c.position.y += 2;
+			}
 		}
 		
 		private function onContext3DCreated(e:Event = null):void {
@@ -340,9 +413,11 @@ package com.element.oimo.physics.test {
 			var ang:Number = (320 - mouseX) * 0.01 + Math.PI * 0.5;
 			renderer.camera(
 				ctr.position.x + Math.cos(ang) * 8,
-				ctr.position.y + (240 - mouseY) * 0.1,
+				ctr.position.y + (320 - mouseY) * 0.1,
 				ctr.position.z + Math.sin(ang) * 8,
-				ctr.position.x, ctr.position.y, ctr.position.z
+				ctr.position.x - Math.cos(ang) * 2,
+				ctr.position.y,
+				ctr.position.z - Math.sin(ang) * 2
 			);
 			if (l || ka) {
 				ctr.linearVelocity.x -= Math.cos(ang - Math.PI * 0.5) * 0.8;
