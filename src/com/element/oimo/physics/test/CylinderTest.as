@@ -18,9 +18,13 @@
  */
 package com.element.oimo.physics.test {
 	import com.element.oimo.physics.collision.shape.BoxShape;
+	import com.element.oimo.physics.collision.shape.CylinderShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
 	import com.element.oimo.physics.collision.shape.SphereShape;
+	import com.element.oimo.physics.constraint.joint.DistanceJoint;
+	import com.element.oimo.physics.constraint.joint.Joint;
+	import com.element.oimo.physics.constraint.joint.JointConfig;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	import com.element.oimo.math.Mat33;
@@ -41,7 +45,7 @@ package com.element.oimo.physics.test {
 	 * @author saharan
 	 */
 	[SWF(width = "640", height = "480", frameRate = "60")]
-	public class PyramidTest extends Sprite {
+	public class CylinderTest extends Sprite {
 		private var s3d:Stage3D;
 		private var world:World;
 		private var renderer:DebugDraw;
@@ -55,7 +59,7 @@ package com.element.oimo.physics.test {
 		private var d:Boolean;
 		private var ctr:RigidBody;
 		
-		public function PyramidTest() {
+		public function CylinderTest() {
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -126,47 +130,42 @@ package com.element.oimo.physics.test {
 			var c:ShapeConfig = new ShapeConfig();
 			c.restitution = 0;
 			rb = new RigidBody();
-			c.position.init(0, -0.5, 0);
+			c.position.init(0, -10.5, 0);
 			c.rotation.init();
-			s = new BoxShape(32, 1, 50, c);
+			s = new BoxShape(32, 1, 32, c);
 			rb.addShape(s);
 			rb.setupMass(RigidBody.BODY_STATIC);
 			world.addRigidBody(rb);
 			
-			c.rotation.init();
-			var width:uint = 15;
-			var height:uint = 5;
-			var depth:uint = 3;
-			var bw:Number = 0.75;
-			var bh:Number = 0.5;
-			var bd:Number = 0.6;
-			for (var i:int = 0; i < width; i++) {
-				for (var j:int = i; j < width; j++) {
-					for (var k:int = 0; k < depth; k++) {
-						rb = new RigidBody();
-						c.position.init(
-							(j - i * 0.5 - (width - 1) * 0.5) * (bw * 1.05),
-							i * (bh + 0.1) + bh * 0.6,
-							(k - (depth - 1) * 0.5) * 5
-						);
-						s = new BoxShape(bw, bh, bd, c);
-						rb.addShape(s);
-						rb.setupMass(RigidBody.BODY_DYNAMIC);
-						world.addRigidBody(rb);
-					}
-				}
-			}
+			world.gravity.init();
 			
-			c.friction = 2;
-			c.position.init(0, 1.5, 20);
-			c.density = 10;
+			c.friction = 1;
+			c.position.init(0, 1, 4);
+			c.density = 1;
 			c.rotation.init();
-			s = new SphereShape(1.5, c);
+			
+			s = new CylinderShape(0.5 + Math.random() * 2, 0.25 + Math.random() * 4, c);
 			ctr = new RigidBody();
-			ctr.linearVelocity.z = -20;
 			ctr.addShape(s);
+			ctr.orientation.s = Math.random() - 0.5;
+			ctr.orientation.x = Math.random() - 0.5;
+			ctr.orientation.y = Math.random() - 0.5;
+			ctr.orientation.z = Math.random() - 0.5;
+			ctr.orientation.normalize(ctr.orientation);
 			ctr.setupMass(RigidBody.BODY_DYNAMIC);
 			world.addRigidBody(ctr);
+			
+			rb = new RigidBody();
+			c.position.init(0, 1, 0);
+			s = new BoxShape(0.25 + Math.random() * 4, 0.25 + Math.random() * 4, 0.25 + Math.random() * 4, c);
+			rb.addShape(s);
+			rb.orientation.s = Math.random() - 0.5;
+			rb.orientation.x = Math.random() - 0.5;
+			rb.orientation.y = Math.random() - 0.5;
+			rb.orientation.z = Math.random() - 0.5;
+			rb.orientation.normalize(rb.orientation);
+			rb.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(rb);
 		}
 		
 		private function onContext3DCreated(e:Event = null):void {
@@ -175,12 +174,15 @@ package com.element.oimo.physics.test {
 		}
 		
 		private function frame(e:Event = null):void {
+			ctr.position.y = 1;
+			ctr.linearVelocity.scale(ctr.linearVelocity, 0.9);
+			ctr.angularVelocity.scale(ctr.angularVelocity, 0.9);
 			count++;
 			var ang:Number = (320 - mouseX) * 0.01 + Math.PI * 0.5;
 			renderer.camera(
-				ctr.position.x + Math.cos(ang) * 8,
+				ctr.position.x + Math.cos(ang) * 6,
 				ctr.position.y + (240 - mouseY) * 0.1,
-				ctr.position.z + Math.sin(ang) * 8,
+				ctr.position.z + Math.sin(ang) * 6,
 				ctr.position.x, ctr.position.y, ctr.position.z
 			);
 			if (l) {

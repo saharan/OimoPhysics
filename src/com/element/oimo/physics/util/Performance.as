@@ -16,14 +16,14 @@ package com.element.oimo.physics.util {
 		public var narrowPhaseTime:uint;
 		
 		/**
-		 * 拘束の計算に要した時間です。
+		 * 拘束や積分の計算に要した時間です。
 		 */
-		public var constraintsTime:uint;
+		public var solvingTime:uint;
 		
 		/**
-		 * 位置などの更新に要した時間です。
+		 * その他の更新に要した時間です。
 		 */
-		public var updateTime:uint;
+		public var updatingTime:uint;
 		
 		/**
 		 * ステップ計算に要した合計時間です。

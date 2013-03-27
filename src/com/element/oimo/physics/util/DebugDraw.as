@@ -20,6 +20,7 @@ package com.element.oimo.physics.util {
 	import com.element.oimo.glmini.OimoGLMini;
 	import com.element.oimo.math.Mat44;
 	import com.element.oimo.physics.collision.shape.BoxShape;
+	import com.element.oimo.physics.collision.shape.CylinderShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.SphereShape;
 	import com.element.oimo.physics.constraint.contact.Contact;
@@ -65,6 +66,7 @@ package com.element.oimo.physics.util {
 			gl.material(1, 1, 0, 0.6, 32);
 			gl.registerSphere(0, 1, 8, 4);
 			gl.registerBox(1, 1, 1, 1);
+			gl.registerCylinder(2, 1, 1, 8);
 			gl.camera(0, 5, 10, 0, 0, 0, 0, 1, 0);
 		}
 		
@@ -132,7 +134,7 @@ package com.element.oimo.physics.util {
 			var alpha:Number = 1;
 			var drawContacts:Boolean = false;
 			var drawNormals:Boolean = true;
-			var drawForces:Boolean = true;
+			var drawForces:Boolean = false;
 			var drawJoints:Boolean = false;
 			var cs:Vector.<Contact> = wld.contacts;
 			var num:uint = wld.numContacts;
@@ -154,22 +156,23 @@ package com.element.oimo.physics.util {
 						gl.pop();
 						gl.push();
 						if (drawForces) gl.translate(c.normal.x * -c.normalImpulse * 0.3, c.normal.y * -c.normalImpulse * 0.3, c.normal.z * -c.normalImpulse * 0.3);
-						else gl.translate(c.normal.x * 0.3, c.normal.y * 0.3, c.normal.z * 0.3);
-						gl.scale(0.1, 0.1, 0.1);
-						gl.color(1, 0, 0);
+						else gl.translate(c.normal.x * 0.5, c.normal.y * 0.5, c.normal.z * 0.5);
+						var size:Number = 0.075 + Math.sqrt(-c.normalImpulse / c.normalDenominator) * 0.1;
+						gl.scale(size, size, size);
+						gl.color(1, 0.2, 0.2);
 						gl.drawTriangles(0);
 						gl.pop();
 						if (!drawForces) {
 							gl.push();
-							gl.translate(c.tangent.x * 0.3, c.tangent.y * 0.3, c.tangent.z * 0.3);
-							gl.scale(0.1, 0.1, 0.1);
-							gl.color(0, 0.6, 0);
+							gl.translate(c.tangent.x * 0.2, c.tangent.y * 0.2, c.tangent.z * 0.2);
+							gl.scale(0.075, 0.075, 0.075);
+							gl.color(0.2, 0.6, 0.2);
 							gl.drawTriangles(0);
 							gl.pop();
 							gl.push();
-							gl.translate(c.binormal.x * 0.3, c.binormal.y * 0.3, c.binormal.z * 0.3);
-							gl.scale(0.1, 0.1, 0.1);
-							gl.color(0, 0, 1);
+							gl.translate(c.binormal.x * 0.2, c.binormal.y * 0.2, c.binormal.z * 0.2);
+							gl.scale(0.075, 0.075, 0.075);
+							gl.color(0.2, 0.2, 1);
 							gl.drawTriangles(0);
 							gl.pop();
 						}
@@ -180,8 +183,16 @@ package com.element.oimo.physics.util {
 								(c.tangent.y * c.tangentImpulse + c.binormal.y * c.binormalImpulse) * 0.3,
 								(c.tangent.z * c.tangentImpulse + c.binormal.z * c.binormalImpulse) * 0.3
 							);
-							gl.scale(0.1, 0.1, 0.1);
-							gl.color(0, 1, 1);
+							size = 0.075 +
+								Math.sqrt(
+									(c.tangentImpulse > 0 ? c.tangentImpulse : -c.tangentImpulse)
+									/ c.tangentDenominator +
+									(c.binormalImpulse > 0 ? c.binormalImpulse : -c.binormalImpulse)
+									/ c.binormalDenominator
+								) * 0.1
+							;
+							gl.scale(size, size, size);
+							gl.color(0.2, 1, 1);
 							gl.drawTriangles(0);
 							gl.pop();
 						}
@@ -223,11 +234,18 @@ package com.element.oimo.physics.util {
 				gl.transform(m44);
 				switch(s.parent.type) {
 				case RigidBody.BODY_DYNAMIC:
-					if (s.id & 1) gl.color(1, 0.6, 0.1, alpha);
-					else gl.color(0.6, 0.1, 1, alpha);
+					if (s.id & 1) {
+						if (s.parent.sleeping) gl.color(0.2, 0.8, 0.4, alpha);
+						else if (s.parent.sleepTime > 0.5) gl.color(0.6, 0.7, 0.1, alpha);
+						else gl.color(1, 0.6, 0.2, alpha);
+					} else {
+						if (s.parent.sleeping) gl.color(0.2, 0.4, 0.8, alpha);
+						else if (s.parent.sleepTime > 0.5) gl.color(0.4, 0.3, 0.9, alpha);
+						else gl.color(0.6, 0.2, 1, alpha);
+					}
 					break;
 				case RigidBody.BODY_STATIC:
-					gl.color(0.4, 0.4, 0.4, alpha);
+					gl.color(0.5, 0.5, 0.5, alpha);
 					break;
 				}
 				switch(s.type) {
@@ -240,6 +258,11 @@ package com.element.oimo.physics.util {
 					var box:BoxShape = s as BoxShape;
 					gl.scale(box.width, box.height, box.depth);
 					gl.drawTriangles(1);
+					break;
+				case Shape.SHAPE_CYLINDER:
+					var cyl:CylinderShape = s as CylinderShape;
+					gl.scale(cyl.radius, cyl.height, cyl.radius);
+					gl.drawTriangles(2);
 					break;
 				}
 				gl.pop();

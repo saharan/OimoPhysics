@@ -93,6 +93,24 @@ package com.element.oimo.physics.constraint.contact {
 		public var tangentImpulse:Number;
 		
 		/**
+		 * 法線方向の適正質量の大きさです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var normalDenominator:Number;
+		
+		/**
+		 * 接線方向の適正質量の大きさです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var tangentDenominator:Number;
+		
+		/**
+		 * 従法線方向の適正質量の大きさです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var binormalDenominator:Number;
+		
+		/**
 		 * 従法線方向に働いた摩擦力の大きさです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 * この値は蓄積され、次ステップでも使い回されます。
@@ -112,16 +130,28 @@ package com.element.oimo.physics.constraint.contact {
 		public var shape2:Shape;
 		
 		/**
-		 * 接触を起こした剛体1です。
+		 * 形状1に対する繋がりです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var rigid1:RigidBody;
+		public var shapeConnection1:ContactConnection;
 		
 		/**
-		 * 接触を起こした剛体2です。
+		 * 形状2に対する繋がりです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var rigid2:RigidBody;
+		public var shapeConnection2:ContactConnection;
+		
+		/**
+		 * 剛体1に対する繋がりです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var bodyConnection1:ContactConnection;
+		
+		/**
+		 * 剛体2に対する繋がりです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var bodyConnection2:ContactConnection;
 		
 		/**
 		 * 接触点の識別データです。
@@ -228,10 +258,6 @@ package com.element.oimo.physics.constraint.contact {
 		private var invI2e21:Number;
 		private var invI2e22:Number;
 		
-		private var normalDenominator:Number;
-		private var tangentDenominator:Number;
-		private var binormalDenominator:Number;
-		
 		private var targetNormalVelocity:Number;
 		private var targetSeparateVelocity:Number;
 		private var friction:Number;
@@ -247,6 +273,10 @@ package com.element.oimo.physics.constraint.contact {
 			normal = new Vec3();
 			tangent = new Vec3();
 			binormal = new Vec3();
+			shapeConnection1 = new ContactConnection(this);
+			shapeConnection2 = new ContactConnection(this);
+			bodyConnection1 = new ContactConnection(this);
+			bodyConnection2 = new ContactConnection(this);
 			id = new ContactID();
 			normalImpulse = 0;
 			tangentImpulse = 0;
@@ -269,26 +299,35 @@ package com.element.oimo.physics.constraint.contact {
 			overlap = contactInfo.overlap;
 			shape1 = contactInfo.shape1;
 			shape2 = contactInfo.shape2;
-			rigid1 = shape1.parent;
-			rigid2 = shape2.parent;
+			body1 = shape1.parent;
+			body2 = shape2.parent;
 			
-			relPos1X = position.x - rigid1.position.x;
-			relPos1Y = position.y - rigid1.position.y;
-			relPos1Z = position.z - rigid1.position.z;
-			relPos2X = position.x - rigid2.position.x;
-			relPos2Y = position.y - rigid2.position.y;
-			relPos2Z = position.z - rigid2.position.z;
+			bodyConnection1.connectedBody = body2;
+			bodyConnection1.connectedShape = shape2;
+			shapeConnection1.connectedBody = body2;
+			shapeConnection1.connectedShape = shape2;
+			bodyConnection2.connectedBody = body1;
+			bodyConnection2.connectedShape = shape1;
+			shapeConnection2.connectedBody = body1;
+			shapeConnection2.connectedShape = shape1;
 			
-			lVel1 = rigid1.linearVelocity;
-			lVel2 = rigid2.linearVelocity;
-			aVel1 = rigid1.angularVelocity;
-			aVel2 = rigid2.angularVelocity;
+			relPos1X = position.x - body1.position.x;
+			relPos1Y = position.y - body1.position.y;
+			relPos1Z = position.z - body1.position.z;
+			relPos2X = position.x - body2.position.x;
+			relPos2Y = position.y - body2.position.y;
+			relPos2Z = position.z - body2.position.z;
 			
-			invM1 = rigid1.invertMass;
-			invM2 = rigid2.invertMass;
+			lVel1 = body1.linearVelocity;
+			lVel2 = body2.linearVelocity;
+			aVel1 = body1.angularVelocity;
+			aVel2 = body2.angularVelocity;
+			
+			invM1 = body1.invertMass;
+			invM2 = body2.invertMass;
 			
 			var tmpI:Mat33;
-			tmpI = rigid1.invertInertia;
+			tmpI = body1.invertInertia;
 			invI1e00 = tmpI.e00;
 			invI1e01 = tmpI.e01;
 			invI1e02 = tmpI.e02;
@@ -298,7 +337,7 @@ package com.element.oimo.physics.constraint.contact {
 			invI1e20 = tmpI.e20;
 			invI1e21 = tmpI.e21;
 			invI1e22 = tmpI.e22;
-			tmpI = rigid2.invertInertia;
+			tmpI = body2.invertInertia;
 			invI2e00 = tmpI.e00;
 			invI2e01 = tmpI.e01;
 			invI2e02 = tmpI.e02;
@@ -319,6 +358,24 @@ package com.element.oimo.physics.constraint.contact {
 			tangentImpulse = 0;
 			binormalImpulse = 0;
 			warmStarted = false;
+		}
+		
+		/**
+		 * この接触からの全ての剛体と形状への参照を破棄します。
+		 */
+		public function removeReferences():void {
+			shape1 = null;
+			shape2 = null;
+			body1 = null;
+			body2 = null;
+			bodyConnection1.connectedBody = null;
+			bodyConnection1.connectedShape = null;
+			shapeConnection1.connectedBody = null;
+			shapeConnection1.connectedShape = null;
+			bodyConnection2.connectedBody = null;
+			bodyConnection2.connectedShape = null;
+			shapeConnection2.connectedBody = null;
+			shapeConnection2.connectedShape = null;
 		}
 		
 		/**
@@ -461,6 +518,8 @@ package com.element.oimo.physics.constraint.contact {
 			// ----------------------------------------------
 			
 			if (warmStarted) {
+				tangentImpulse *= 0.95;
+				binormalImpulse *= 0.95;
 				tmp1X = norX * normalImpulse + tanX * tangentImpulse + binX * binormalImpulse;
 				tmp1Y = norY * normalImpulse + tanY * tangentImpulse + binY * binormalImpulse;
 				tmp1Z = norZ * normalImpulse + tanZ * tangentImpulse + binZ * binormalImpulse;
@@ -476,7 +535,7 @@ package com.element.oimo.physics.constraint.contact {
 				aVel2.x -= norTorqueUnit2X * normalImpulse + tanTorqueUnit2X * tangentImpulse + binTorqueUnit2X * binormalImpulse;
 				aVel2.y -= norTorqueUnit2Y * normalImpulse + tanTorqueUnit2Y * tangentImpulse + binTorqueUnit2Y * binormalImpulse;
 				aVel2.z -= norTorqueUnit2Z * normalImpulse + tanTorqueUnit2Z * tangentImpulse + binTorqueUnit2Z * binormalImpulse;
-				rvn = 0; // disabling bounce
+				rvn = 0; // disable bouncing
 			}
 			
 			// ----------------------------------------------
@@ -484,10 +543,10 @@ package com.element.oimo.physics.constraint.contact {
 			// ----------------------------------------------
 			
 			if (rvn > -1) {
-				rvn = 0; // disabling bounce
+				rvn = 0; // disable bouncing
 			}
 			targetNormalVelocity = restitution * -rvn;
-			var separationalVelocity:Number = -overlap - 0.05; // allow 5cm overlap
+			var separationalVelocity:Number = -overlap - 0.005; // allow 0.5cm overlap
 			if (separationalVelocity > 0) {
 				separationalVelocity *= invTimeStep * 0.05;
 				if (targetNormalVelocity < separationalVelocity) {
@@ -500,6 +559,7 @@ package com.element.oimo.physics.constraint.contact {
 		 * @inheritDoc
 		 */
 		override public function solve():void {
+			var error:Number;
 			var oldImpulse1:Number;
 			var newImpulse1:Number;
 			var oldImpulse2:Number;
@@ -520,7 +580,7 @@ package com.element.oimo.physics.constraint.contact {
 				aVel1.x * norTorque1X - aVel1.y * norTorque1Y - aVel1.z * norTorque1Z
 			;
 			oldImpulse1 = normalImpulse;
-			newImpulse1 = (rvn - targetNormalVelocity) * normalDenominator;
+			newImpulse1 = (rvn - targetNormalVelocity) * normalDenominator * 1.4; // SOR
 			normalImpulse += newImpulse1;
 			if (normalImpulse > 0) normalImpulse = 0;
 			newImpulse1 = normalImpulse - oldImpulse1;
@@ -596,12 +656,6 @@ package com.element.oimo.physics.constraint.contact {
 		 * @inheritDoc
 		 */
 		override public function postSolve():void {
-			if (shape1.numContacts < Shape.MAX_CONTACTS) {
-				shape1.contacts[shape1.numContacts++] = this;
-			}
-			if (shape2.numContacts < Shape.MAX_CONTACTS) {
-				shape2.contacts[shape2.numContacts++] = this;
-			}
 			relativePosition1.x = relPos1X;
 			relativePosition1.y = relPos1Y;
 			relativePosition1.z = relPos1Z;

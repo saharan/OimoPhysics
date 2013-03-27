@@ -19,6 +19,7 @@
 package com.element.oimo.physics.collision.shape {
 	import com.element.oimo.physics.collision.broad.Proxy;
 	import com.element.oimo.physics.constraint.contact.Contact;
+	import com.element.oimo.physics.constraint.contact.ContactConnection;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Vec3;
@@ -49,9 +50,9 @@ package com.element.oimo.physics.collision.shape {
 		public static const SHAPE_BOX:uint = 0x2;
 		
 		/**
-		 * 一つの形状に保持できる接触点の最大数です。
+		 * 円柱を表す形状の種類です。
 		 */
-		public static const MAX_CONTACTS:uint = 1024;
+		public static const SHAPE_CYLINDER:uint = 0x3;
 		
 		/**
 		 * この形状の固有数値です。
@@ -124,19 +125,19 @@ package com.element.oimo.physics.collision.shape {
 		public var restitution:Number;
 		
 		/**
-		 * この形状の親となる剛体です。
+		 * 形状の親となる剛体です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var parent:RigidBody;
 		
 		/**
-		 * この形状の接触点の配列です。
+		 * 形状に関与する接触点のリンク配列です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var contacts:Vector.<Contact>;
+		public var contactList:ContactConnection;
 		
 		/**
-		 * この形状の接触点の数です。
+		 * 形状の接触点の数です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var numContacts:uint;
@@ -155,7 +156,6 @@ package com.element.oimo.physics.collision.shape {
 			localInertia = new Mat33();
 			proxy = new Proxy();
 			proxy.parent = this;
-			contacts = new Vector.<Contact>(MAX_CONTACTS, true);
 		}
 		
 		/**

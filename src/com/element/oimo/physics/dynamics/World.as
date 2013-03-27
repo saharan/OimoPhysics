@@ -17,20 +17,27 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.dynamics {
+	import com.element.oimo.math.Quat;
 	import com.element.oimo.physics.collision.broad.BroadPhase;
 	import com.element.oimo.physics.collision.broad.BruteForceBroadPhase;
 	import com.element.oimo.physics.collision.broad.Pair;
 	import com.element.oimo.physics.collision.broad.SweepAndPruneBroadPhase;
 	import com.element.oimo.physics.collision.narrow.BoxBoxCollisionDetector;
+	import com.element.oimo.physics.collision.narrow.BoxCylinderCollisionDetector;
+	import com.element.oimo.physics.collision.narrow.CollisionResult;
 	import com.element.oimo.physics.collision.narrow.ContactInfo;
 	import com.element.oimo.physics.collision.narrow.CollisionDetector;
+	import com.element.oimo.physics.collision.narrow.CylinderCylinderCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.SphereBoxCollisionDetector;
+	import com.element.oimo.physics.collision.narrow.SphereCylinderCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.SphereSphereCollisionDetector;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.constraint.Constraint;
 	import com.element.oimo.physics.constraint.contact.Contact;
+	import com.element.oimo.physics.constraint.contact.ContactConnection;
 	import com.element.oimo.physics.constraint.joint.Joint;
+	import com.element.oimo.physics.constraint.joint.JointConnection;
 	import com.element.oimo.physics.util.Performance;
 	import flash.utils.getTimer;
 	/**
@@ -59,16 +66,13 @@ package com.element.oimo.physics.dynamics {
 		 */
 		public static const MAX_JOINTS:uint = 16384;
 		
-		/**
-		 * 検出できるプロキシが重なった形状のペアの最大数です。
-		 */
-		public static const MAX_PAIRS:uint = 65536;
+		private static const MAX_CONSTRAINTS:uint = MAX_CONTACTS + MAX_JOINTS;
 		
 		/**
 		 * 追加されている剛体の配列です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var rigidBodies:Vector.<RigidBody>;
+		public const rigidBodies:Vector.<RigidBody> = new Vector.<RigidBody>(MAX_BODIES, true);
 		
 		/**
 		 * 追加されている剛体の数です。
@@ -80,7 +84,7 @@ package com.element.oimo.physics.dynamics {
 		 * 追加されている形状の配列です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var shapes:Vector.<Shape>;
+		public const shapes:Vector.<Shape> = new Vector.<Shape>(MAX_SHAPES, true);
 		
 		/**
 		 * 追加されている形状の数です。
@@ -89,35 +93,27 @@ package com.element.oimo.physics.dynamics {
 		public var numShapes:uint;
 		
 		/**
-		 * プロキシが重なった形状のペアの配列です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var pairs:Vector.<Pair>;
-		
-		/**
-		 * プロキシが重なった形状のペアの数です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var numPairs:uint;
-		
-		/**
 		 * 剛体の接触点の配列です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var contacts:Vector.<Contact>;
-		private var contactsBuffer:Vector.<Contact>;
+		private var prevContacts:Vector.<Contact>;
+		private var contactPool1:Vector.<Contact> = new Vector.<Contact>(MAX_CONTACTS, true);
+		private var contactPool2:Vector.<Contact> = new Vector.<Contact>(MAX_CONTACTS, true);
 		
 		/**
 		 * 剛体の接触点の数です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var numContacts:uint;
+		public var numPrevContacts1:uint;
+		public var numPrevContacts2:uint;
 		
 		/**
 		 * ジョイントの配列です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var joints:Vector.<Joint>;
+		public const joints:Vector.<Joint> = new Vector.<Joint>(MAX_JOINTS, true);
 		
 		/**
 		 * ジョイントの数です。
@@ -125,7 +121,13 @@ package com.element.oimo.physics.dynamics {
 		 */
 		public var numJoints:uint;
 		
-		private var constraints:Vector.<Constraint>;
+		/**
+		 * シミュレーションアイランドの数です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var numIslands:uint;
+		
+		private const constraints:Vector.<Constraint> = new Vector.<Constraint>(MAX_CONSTRAINTS, true);
 		private var numConstraints:uint;
 		
 		/**
@@ -150,12 +152,19 @@ package com.element.oimo.physics.dynamics {
 		 */
 		public var performance:Performance;
 		
-		private var broadPhase:BroadPhase;
+		/**
+		 * 詳細な衝突判定をできるだけ削減するために使用される広域衝突判定です。
+		 */
+		public var broadPhase:BroadPhase;
 		
 		private var detectors:Vector.<Vector.<CollisionDetector>>;
+		private const collisionResult:CollisionResult = new CollisionResult(MAX_CONTACTS);
 		
-		private var contactInfos:Vector.<ContactInfo>;
-		private var numContactInfos:uint;
+		private const islandStack:Vector.<RigidBody> = new Vector.<RigidBody>(MAX_BODIES, true);
+		private const islandRigidBodies:Vector.<RigidBody> = new Vector.<RigidBody>(MAX_BODIES, true);
+		private var islandNumRigidBodies:uint;
+		private const islandConstraints:Vector.<Constraint> = new Vector.<Constraint>(MAX_CONSTRAINTS, true);
+		private var islandNumConstraints:uint;
 		
 		private var randX:uint;
 		private var randA:uint;
@@ -170,26 +179,25 @@ package com.element.oimo.physics.dynamics {
 			timeStep = 1 / stepPerSecond;
 			iteration = 8;
 			gravity = new Vec3(0, -9.80665, 0);
-			rigidBodies = new Vector.<RigidBody>(MAX_BODIES, true);
-			shapes = new Vector.<Shape>(MAX_SHAPES, true);
-			pairs = new Vector.<Pair>(MAX_PAIRS, true);
 			performance = new Performance();
 			broadPhase = new SweepAndPruneBroadPhase();
 			// broadPhase = new BruteForceBroadPhase();
-			var numShapeTypes:uint = 3;
+			var numShapeTypes:uint = 4;
 			detectors = new Vector.<Vector.<CollisionDetector>>(numShapeTypes, true);
 			for (var i:int = 0; i < numShapeTypes; i++) {
 				detectors[i] = new Vector.<CollisionDetector>(numShapeTypes, true);
 			}
 			detectors[Shape.SHAPE_SPHERE][Shape.SHAPE_SPHERE] = new SphereSphereCollisionDetector();
 			detectors[Shape.SHAPE_SPHERE][Shape.SHAPE_BOX] = new SphereBoxCollisionDetector(false);
+			detectors[Shape.SHAPE_SPHERE][Shape.SHAPE_CYLINDER] = new SphereCylinderCollisionDetector(false);
 			detectors[Shape.SHAPE_BOX][Shape.SHAPE_SPHERE] = new SphereBoxCollisionDetector(true);
 			detectors[Shape.SHAPE_BOX][Shape.SHAPE_BOX] = new BoxBoxCollisionDetector();
-			contactInfos = new Vector.<ContactInfo>(MAX_CONTACTS, true);
-			contacts = new Vector.<Contact>(MAX_CONTACTS, true);
-			joints = new Vector.<Joint>(MAX_JOINTS, true);
-			constraints = new Vector.<Constraint>(MAX_CONTACTS + MAX_JOINTS, true);
-			contactsBuffer = new Vector.<Contact>(MAX_CONTACTS, true);
+			detectors[Shape.SHAPE_CYLINDER][Shape.SHAPE_SPHERE] = new SphereCylinderCollisionDetector(true);
+			detectors[Shape.SHAPE_BOX][Shape.SHAPE_CYLINDER] = new BoxCylinderCollisionDetector(false);
+			detectors[Shape.SHAPE_CYLINDER][Shape.SHAPE_BOX] = new BoxCylinderCollisionDetector(true);
+			detectors[Shape.SHAPE_CYLINDER][Shape.SHAPE_CYLINDER] = new CylinderCylinderCollisionDetector();
+			contacts = contactPool1;
+			prevContacts = contactPool2;
 			randX = 65535;
 			randA = 98765;
 			randB = 123456789;
@@ -207,46 +215,43 @@ package com.element.oimo.physics.dynamics {
 			if (rigidBody.parent) {
 				throw new Error("一つの剛体を複数ワールドに追加することはできません");
 			}
-			rigidBodies[numRigidBodies++] = rigidBody;
+			rigidBody.awake();
 			var num:uint = rigidBody.numShapes;
 			for (var i:int = 0; i < num; i++) {
 				addShape(rigidBody.shapes[i]);
 			}
+			rigidBodies[numRigidBodies++] = rigidBody;
 			rigidBody.parent = this;
 		}
 		
 		/**
 		 * ワールドから剛体を削除します。
-		 * 削除する剛体のインデックスを指定した場合は、インデックスのみを使用して削除します。
 		 * 削除された剛体はステップ毎の演算対象から外されます。
 		 * @param	rigidBody 削除する剛体
-		 * @param	index 削除する剛体のインデックス
 		 */
-		public function removeRigidBody(rigidBody:RigidBody, index:int = -1):void {
-			if (index < 0) {
-				for (var i:int = 0; i < numRigidBodies; i++) {
-					if (rigidBody == rigidBodies[i]) {
-						index = i;
-						break;
-					}
+		public function removeRigidBody(rigidBody:RigidBody):void {
+			var remove:RigidBody = null;
+			for (var i:int = 0; i < numRigidBodies; i++) {
+				if (rigidBodies[i] == rigidBody) {
+					remove = rigidBody;
+					rigidBodies[i] = rigidBodies[--numRigidBodies];
+					rigidBodies[numRigidBodies] = null;
+					break;
 				}
-				if (index == -1) {
-					return;
-				}
-			} else if (index >= numRigidBodies) {
-				throw new Error("削除する剛体のインデックスが範囲外です");
 			}
-			var remove:RigidBody = rigidBodies[index];
+			if (remove == null) return;
+			remove.awake();
+			var jc:JointConnection = remove.jointList;
+			while (jc != null) {
+				var joint:Joint = jc.parent;
+				jc = jc.next;
+				removeJoint(joint);
+			}
+			var num:uint = remove.numShapes;
+			for (i = 0; i < num; i++) {
+				removeShape(remove.shapes[i]);
+			}
 			remove.parent = null;
-			var num:uint = rigidBody.numShapes;
-			for (var j:int = 0; j < num; j++) {
-				removeShape(rigidBody.shapes[j]);
-			}
-			numRigidBodies--;
-			for (var k:int = index; k < numRigidBodies; k++) {
-				rigidBodies[k] = rigidBodies[k + 1];
-			}
-			rigidBodies[numRigidBodies] = null;
 		}
 		
 		/**
@@ -270,34 +275,23 @@ package com.element.oimo.physics.dynamics {
 		}
 		
 		/**
-		 * ワールドからから形状を削除します。
-		 * 削除する形状のインデックスを指定した場合は、インデックスのみを使用して削除します。
+		 * ワールドから形状を削除します。
 		 * <strong>剛体をワールドから削除、およびワールドに追加されている剛体から形状を削除すると、
 		 * 自動で形状もワールドから削除されるので、このメソッドは外部から呼ばないでください。</strong>
 		 * @param	shape 削除する形状
-		 * @param	index 削除する形状のインデックス
 		 */
-		public function removeShape(shape:Shape, index:int = -1):void {
-			if (index < 0) {
-				for (var i:int = 0; i < numShapes; i++) {
-					if (shape == shapes[i]) {
-						index = i;
-						break;
-					}
+		public function removeShape(shape:Shape):void {
+			var remove:Shape = null;
+			for (var i:int = 0; i < numShapes; i++) {
+				if (shapes[i] == shape) {
+					remove = shape;
+					shapes[i] = shapes[--numShapes];
+					shapes[numShapes] = null;
+					break;
 				}
-				if (index == -1) {
-					return;
-				}
-			} else if (index >= numShapes) {
-				throw new Error("削除する形状のインデックスが範囲外です");
 			}
-			var remove:Shape = shapes[index];
+			if (remove == null) return;
 			broadPhase.removeProxy(remove.proxy);
-			numShapes--;
-			for (var j:int = index; j < numShapes; j++) {
-				shapes[j] = shapes[j + 1];
-			}
-			shapes[numShapes] = null;
 		}
 		
 		/**
@@ -312,196 +306,399 @@ package com.element.oimo.physics.dynamics {
 			if (joint.parent) {
 				throw new Error("一つのジョイントを複数ワールドに追加することはできません");
 			}
+			var b:RigidBody = joint.body1;
+			var jc:JointConnection = joint.connection1;
+			b.awake();
+			b.numJoints++;
+			jc.next = b.jointList;
+			if (b.jointList != null) {
+				b.jointList.prev = jc;
+			}
+			b.jointList = jc;
+			b = joint.body2;
+			jc = joint.connection2;
+			b.awake();
+			b.numJoints++;
+			jc.next = b.jointList;
+			if (b.jointList != null) {
+				b.jointList.prev = jc;
+			}
+			b.jointList = jc;
 			joints[numJoints++] = joint;
-			joint.rigid1.joints[joint.rigid1.numJoints++] = joint;
-			joint.rigid2.joints[joint.rigid2.numJoints++] = joint;
 			joint.parent = this;
 		}
 		
 		/**
 		 * ワールドからジョイントを削除します。
-		 * 削除するジョイントのインデックスを指定した場合は、インデックスのみを使用して削除します。
 		 * 削除されたジョイントはステップ毎の演算対象から外されます。
 		 * @param	joint 削除するジョイント
 		 * @param	index 削除するジョイントのインデックス
 		 */
-		public function removeJoint(joint:Joint, index:int = -1):void {
-			if (index < 0) {
-				for (var i:int = 0; i < numJoints; i++) {
-					if (joint == joints[i]) {
-						index = i;
-						break;
-					}
-				}
-				if (index == -1) {
-					return;
-				}
-			} else if (index >= numJoints) {
-				throw new Error("削除するジョイントのインデックスが範囲外です");
-			}
-			var remove:Joint = joints[index];
-			var js:Vector.<Joint> = remove.rigid1.joints;
-			var numJs:uint = remove.rigid1.numJoints;
-			for (var j:int = 0; j < numJs; j++) {
-				if (js[j] == remove) {
-					numJs--;
-					remove.rigid1.numJoints--;
-					for (var k:int = j; k < numJs; k++) {
-						js[k] = js[k + 1];
-					}
-					js[numJs] = null;
+		public function removeJoint(joint:Joint):void {
+			var remove:Joint = null;
+			for (var i:int = 0; i < numJoints; i++) {
+				if (joints[i] == joint) {
+					remove = joint;
+					joints[i] = joints[--numJoints];
+					joints[numJoints] = null;
 					break;
 				}
 			}
-			js = remove.rigid2.joints;
-			numJs = remove.rigid2.numJoints;
-			for (var l:int = 0; l < numJs; l++) {
-				if (js[l] == remove) {
-					numJs--;
-					remove.rigid2.numJoints--;
-					for (var m:int = l; m < numJs; m++) {
-						js[m] = js[m + 1];
-					}
-					js[numJs] = null;
-					break;
-				}
+			if (remove == null) return;
+			remove.body1.awake();
+			remove.body1.numJoints--;
+			remove.body2.awake();
+			remove.body2.numJoints--;
+			var jc:JointConnection = remove.connection1;
+			if (jc.prev != null) {
+				jc.prev.next = jc.next;
+				jc.prev = null;
+			}
+			if (jc.next != null) {
+				jc.next.prev = jc.prev;
+				jc.next = null;
+			}
+			jc = remove.connection2;
+			if (jc.prev != null) {
+				jc.prev.next = jc.next;
+				jc.prev = null;
+			}
+			if (jc.next != null) {
+				jc.next.prev = jc.prev;
+				jc.next = null;
 			}
 			remove.parent = null;
-			numJoints--;
-			for (var n:int = index; n < numJoints; n++) {
-				joints[n] = joints[n + 1];
-			}
-			joints[numJoints] = null;
 		}
 		
 		/**
 		 * ワールドの時間をタイムステップ秒だけ進めます。
 		 */
 		public function step():void {
-			var start1:int = getTimer();
-			var tmp:Vector.<Contact> = contacts; // swap contacts
-			contacts = contactsBuffer;
-			contactsBuffer = tmp;
+			var time1:int = getTimer();
+			var tmpC:Vector.<Contact> = contacts; // swap contacts
+			contacts = prevContacts;
+			prevContacts = tmpC;
 			for (var i:int = 0; i < numRigidBodies; i++) {
-				rigidBodies[i].updateVelocity(timeStep, gravity);
+				var tmpB:RigidBody = rigidBodies[i];
+				if (tmpB.sleeping) {
+					var lv:Vec3 = tmpB.linearVelocity;
+					var av:Vec3 = tmpB.linearVelocity;
+					var p:Vec3 = tmpB.position;
+					var sp:Vec3 = tmpB.sleepPosition;
+					var o:Quat = tmpB.orientation;
+					var so:Quat = tmpB.sleepOrientation;
+					if (
+						lv.x != 0 || lv.y != 0 || lv.z != 0 ||
+						av.x != 0 || av.y != 0 || av.z != 0 ||
+						p.x != sp.x || p.y != sp.y || p.z != sp.z ||
+						o.s != so.s || o.x != so.x || o.y != so.y || o.z != so.z
+					){
+						tmpB.awake(); // awaking check
+						continue;
+					}
+				}
 			}
-			performance.updateTime = getTimer() - start1;
-			collisionDetection();
-			collisionResponse();
-			var start2:int = getTimer();
-			for (var j:int = 0; j < numRigidBodies; j++) {
-				rigidBodies[j].updatePosition(timeStep);
-			}
-			performance.updateTime += getTimer() - start2;
-			performance.totalTime = getTimer() - start1;
+			detectCollisions();
+			updateIslands();
+			var time2:int = getTimer();
+			performance.solvingTime = time2 - performance.solvingTime;
+			performance.totalTime = time2 - time1;
 		}
 		
-		private function collisionDetection():void {
+		private function detectCollisions():void {
 			collectContactInfos();
 			setupContacts();
 		}
 		
 		private function collectContactInfos():void {
 			// broad phase
-			var start:int = getTimer();
-			numPairs = broadPhase.detectPairs(pairs);
-			performance.broadPhaseTime = getTimer() - start;
+			var time1:int = getTimer();
+			broadPhase.detectPairs();
+			var time2:int = getTimer();
+			performance.broadPhaseTime = time2 - time1;
 			// narrow phase
-			performance.narrowPhaseTime = getTimer();
-			numContactInfos = 0;
+			collisionResult.numContactInfos = 0;
+			var pairs:Vector.<Pair> = broadPhase.pairs;
+			var numPairs:uint = broadPhase.numPairs;
 			for (var i:int = 0; i < numPairs; i++) {
 				var pair:Pair = pairs[i];
 				var s1:Shape = pair.shape1;
 				var s2:Shape = pair.shape2;
 				var detector:CollisionDetector = detectors[s1.type][s2.type];
 				if (detector) {
-					numContactInfos = detector.detectCollision(s1, s2, contactInfos, numContactInfos);
-					if (numContactInfos == MAX_CONTACTS) {
+					detector.detectCollision(s1, s2, collisionResult);
+					if (collisionResult.numContactInfos == MAX_CONTACTS) {
 						return;
 					}
 				}
 			}
+			var time3:int = getTimer();
+			performance.narrowPhaseTime = time3 - time2;
+			performance.updatingTime = time3;
 		}
 		
 		private function setupContacts():void {
-			numContacts = numContactInfos;
-			for (var i:int = 0; i < numContacts; i++) {
+			numPrevContacts2 = numPrevContacts1;
+			numPrevContacts1 = numContacts;
+			var numSleptContacts:uint = 0;
+			for (var i:int = 0; i < numPrevContacts1; i++) {
+				var c:Contact = prevContacts[i];
+				if (c.sleeping) { // keep slept contacts
+					prevContacts[i] = contacts[numSleptContacts];
+					contacts[numSleptContacts++] = c;
+				}
+			}
+			var contactInfos:Vector.<ContactInfo> = collisionResult.contactInfos;
+			numContacts = numSleptContacts + collisionResult.numContactInfos;
+			for (i = numSleptContacts; i < numContacts; i++) {
 				if (!contacts[i]) {
 					contacts[i] = new Contact();
 				}
-				var c:Contact = contacts[i];
-				c.setupFromContactInfo(contactInfos[i]);
+				c = contacts[i];
+				c.setupFromContactInfo(contactInfos[i - numSleptContacts]);
 				// search old contacts
 				var s1:Shape = c.shape1;
 				var s2:Shape = c.shape2;
-				var sc:Vector.<Contact>;
-				var numSc:uint;
-				if (s1.numContacts < s2.numContacts) {
-					sc = s1.contacts;
-					numSc = s1.numContacts;
-				} else {
-					sc = s2.contacts;
-					numSc = s2.numContacts;
-				}
-				for (var j:int = 0; j < numSc; j++) {
-					var oc:Contact = sc[j];
+				var cc:ContactConnection;
+				if (s1.numContacts < s2.numContacts) cc = s1.contactList;
+				else cc = s2.contactList;
+				while (cc != null) {
+					var old:Contact = cc.parent;
 					if (
-						(oc.shape1 == c.shape1 && oc.shape2 == c.shape2 ||
-						oc.shape1 == c.shape2 && oc.shape2 == c.shape1) &&
-						oc.id.equals(c.id)
+						(old.shape1 == c.shape1 && old.shape2 == c.shape2 ||
+						old.shape1 == c.shape2 && old.shape2 == c.shape1) &&
+						old.id.equals(c.id)
 					) {
 						// warm starting
-						c.normalImpulse = oc.normalImpulse;
-						c.tangentImpulse = oc.tangentImpulse;
-						c.binormalImpulse = oc.binormalImpulse;
+						c.normalImpulse = old.normalImpulse;
+						c.tangentImpulse = old.tangentImpulse;
+						c.binormalImpulse = old.binormalImpulse;
 						c.warmStarted = true;
 						break;
 					}
+					cc = cc.next;
 				}
 			}
-			performance.narrowPhaseTime = getTimer() - performance.narrowPhaseTime;
+			for (i = numContacts; i < numPrevContacts2; i++) {
+				contacts[i].removeReferences(); // remove old references
+			}
 		}
 		
-		private function collisionResponse():void {
-			var start:int = getTimer();
+		private function updateIslands():void {
 			var invTimeStep:Number = 1 / timeStep;
-			// reset contact counts
+			var tmpC:Constraint;
+			var tmpB:RigidBody;
+			var tmpS:Shape;
+			var num:uint;
+			
+			// reset contact and connection counts
 			for (var i:int = 0; i < numShapes; i++) {
-				shapes[i].numContacts = 0;
+				tmpS = shapes[i];
+				tmpS.contactList = null;
+				tmpS.numContacts = 0;
+			}
+			for (i = 0; i < numRigidBodies; i++) {
+				tmpB = rigidBodies[i];
+				tmpB.contactList = null;
+				tmpB.addedToIsland = false;
 			}
 			
 			// collect all constraints
 			numConstraints = 0;
 			for (i = 0; i < numContacts; i++) {
-				constraints[numConstraints++] = contacts[i];
+				var c:Contact = contacts[i];
+				c.addedToIsland = false;
+				// add to shape1
+				var cc:ContactConnection = c.shapeConnection1;
+				tmpS = c.shape1;
+				cc.prev = null;
+				cc.next = tmpS.contactList;
+				if (tmpS.contactList != null) {
+					tmpS.contactList.prev = cc;
+				}
+				tmpS.contactList = cc;
+				tmpS.numContacts++;
+				// add to shape2
+				cc = c.shapeConnection2;
+				tmpS = c.shape2;
+				cc.prev = null;
+				cc.next = tmpS.contactList;
+				if (tmpS.contactList != null) {
+					tmpS.contactList.prev = cc;
+				}
+				tmpS.contactList = cc;
+				tmpS.numContacts++;
+				// add to body1
+				cc = c.bodyConnection1;
+				tmpB = c.body1;
+				cc.prev = null;
+				cc.next = tmpB.contactList;
+				if (tmpB.contactList != null) {
+					tmpB.contactList.prev = cc;
+				}
+				tmpB.contactList = cc;
+				// add to body2
+				cc = c.bodyConnection2;
+				tmpB = c.body2;
+				cc.prev = null;
+				cc.next = tmpB.contactList;
+				if (tmpB.contactList != null) {
+					tmpB.contactList.prev = cc;
+				}
+				tmpB.contactList = cc;
+				constraints[numConstraints++] = c;
 			}
 			for (i = 0; i < numJoints; i++) {
-				constraints[numConstraints++] = joints[i];
+				tmpC = joints[i];
+				tmpC.addedToIsland = false;
+				constraints[numConstraints++] = tmpC;
 			}
 			
-			// randomizing order
+			// randomizing order TODO: it should be able to be disabled by simulation setting
 			for (i = 1; i < numConstraints; i++) {
 				var swap:uint = (randX = (randX * randA + randB & 0x7fffffff)) / 2147483648.0 * i | 0;
-				var tmp:Constraint = constraints[i];
+				tmpC = constraints[i];
 				constraints[i] = constraints[swap];
-				constraints[swap] = tmp;
+				constraints[swap] = tmpC;
 			}
 			
-			// pre-solve
-			for (i = 0; i < numConstraints; i++) {
-				constraints[i].preSolve(timeStep, invTimeStep);
-			}
-			// solve system of equations
-			for (i = 0; i < iteration; i++) {
-				for (var j:int = 0; j < numConstraints; j++) {
-					constraints[j].solve();
+			var time1:int = getTimer();
+			performance.updatingTime = time1 - performance.updatingTime;
+			performance.solvingTime = time1;
+			
+			numIslands = 0;
+			// build and solve simulation islands
+			for (i = 0; i < numRigidBodies; i++) {
+				var base:RigidBody = rigidBodies[i];
+				if (base.addedToIsland || base.type == RigidBody.BODY_STATIC || base.sleeping) continue; // ignore
+				islandNumRigidBodies = 0;
+				islandNumConstraints = 0;
+				var numStacks:uint = 1;
+				// add rigid body to stack
+				islandStack[0] = base;
+				base.addedToIsland = true;
+				// build an island
+				while (numStacks > 0) {
+					// get rigid body from stack
+					tmpB = islandStack[--numStacks];
+					tmpB.sleeping = false;
+					// add rigid body to the island
+					islandRigidBodies[islandNumRigidBodies++] = tmpB;
+					// search connections
+					cc = tmpB.contactList;
+					while (cc != null) {
+						tmpC = cc.parent;
+						if (tmpC.addedToIsland) {
+							cc = cc.next;
+							continue; // ignore
+						}
+						// add constraint to the island
+						islandConstraints[islandNumConstraints++] = tmpC;
+						tmpC.addedToIsland = true;
+						tmpC.sleeping = false;
+						var next:RigidBody = cc.connectedBody;
+						if (next.addedToIsland || next.type == RigidBody.BODY_STATIC) {
+							cc = cc.next;
+							continue;
+						}
+						// add rigid body to stack
+						islandStack[numStacks++] = next;
+						next.addedToIsland = true;
+						cc = cc.next;
+					}
+					var jc:JointConnection = tmpB.jointList;
+					while (jc != null) {
+						tmpC = jc.parent;
+						if (tmpC.addedToIsland) {
+							jc = jc.next;
+							continue; // ignore
+						}
+						// add constraint to the island
+						islandConstraints[islandNumConstraints++] = tmpC;
+						tmpC.addedToIsland = true;
+						tmpC.sleeping = false;
+						next = jc.connected;
+						if (next.addedToIsland || next.type == RigidBody.BODY_STATIC) {
+							jc = jc.next;
+							continue;
+						}
+						// add rigid body to stack
+						islandStack[numStacks++] = next;
+						next.addedToIsland = true;
+						jc = jc.next;
+					}
 				}
+				// update the island
+				
+				// update velocities
+				for (var j:int = 0; j < islandNumRigidBodies; j++) {
+					tmpB = islandRigidBodies[j];
+					tmpB.updateVelocity(timeStep, gravity);
+				}
+				
+				// solve contraints
+				for (j = 0; j < islandNumConstraints; j++) {
+					islandConstraints[j].preSolve(timeStep, invTimeStep); // pre-solve
+				}
+				for (j = 0; j < iteration; j++) {
+					for (var k:int = 0; k < islandNumConstraints; k++) {
+						islandConstraints[k].solve(); // main-solve
+					}
+				}
+				for (j = 0; j < islandNumConstraints; j++) {
+					islandConstraints[j].postSolve(); // post-solve
+				}
+				
+				// sleeping check
+				var sleepTime:Number = 1000;
+				for (j = 0; j < islandNumRigidBodies; j++) {
+					tmpB = islandRigidBodies[j];
+					if (!tmpB.allowSleep) {
+						tmpB.sleepTime = 0;
+						sleepTime = 0;
+						continue;
+					}
+					var vx:Number = tmpB.linearVelocity.x;
+					var vy:Number = tmpB.linearVelocity.y;
+					var vz:Number = tmpB.linearVelocity.z;
+					if (vx * vx + vy * vy + vz * vz > 0.01) {
+						tmpB.sleepTime = 0;
+						sleepTime = 0;
+						continue;
+					}
+					vx = tmpB.angularVelocity.x;
+					vy = tmpB.angularVelocity.y;
+					vz = tmpB.angularVelocity.z;
+					if (vx * vx + vy * vy + vz * vz > 0.04) {
+						tmpB.sleepTime = 0;
+						sleepTime = 0;
+						continue;
+					}
+					tmpB.sleepTime += timeStep;
+					if (tmpB.sleepTime < sleepTime) sleepTime = tmpB.sleepTime;
+				}
+				if (sleepTime > 0.5) {
+					// sleep the island
+					for (j = 0; j < islandNumRigidBodies; j++) {
+						tmpB = islandRigidBodies[j];
+						tmpB.linearVelocity.init();
+						tmpB.angularVelocity.init();
+						tmpB.sleepPosition.copy(tmpB.position);
+						tmpB.sleepOrientation.copy(tmpB.orientation);
+						tmpB.sleepTime = 0;
+						tmpB.sleeping = true;
+					}
+					for (j = 0; j < islandNumConstraints; j++) {
+						islandConstraints[j].sleeping = true;
+					}
+				} else {
+					// update positions
+					for (j = 0; j < islandNumRigidBodies; j++) {
+						islandRigidBodies[j].updatePosition(timeStep);
+					}
+				}
+				numIslands++;
 			}
-			// post-solve
-			for (i = 0; i < numConstraints; i++) {
-				constraints[i].postSolve();
-			}
-			performance.constraintsTime = getTimer() - start;
 		}
 		
 	}

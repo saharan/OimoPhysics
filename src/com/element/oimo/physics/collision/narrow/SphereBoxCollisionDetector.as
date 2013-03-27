@@ -22,8 +22,9 @@ package com.element.oimo.physics.collision.narrow {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.SphereShape;
 	/**
-	 * 球体同士の詳細な衝突判定を行います。
+	 * 球体と箱との詳細な衝突判定を行います。
 	 * detectCollision 関数の引数に指定する形状は、
+	 * コンストラクタで flip を true にしていない場合、
 	 * 一つ目が球体、二つ目が箱である必要があります。
 	 * @author saharan
 	 */
@@ -40,8 +41,7 @@ package com.element.oimo.physics.collision.narrow {
 		/**
 		 * @inheritDoc
 		 */
-		override public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint):uint {
-			if (numContactInfos == contactInfos.length) return numContactInfos;
+		override public function detectCollision(shape1:Shape, shape2:Shape, result:CollisionResult):void {
 			var s:SphereShape;
 			var b:BoxShape;
 			if (flip) {
@@ -186,22 +186,7 @@ package com.element.oimo.physics.collision.narrow {
 				cx = pbx + sx * nw.x + sy * nh.x + sz * nd.x;
 				cy = pby + sx * nw.y + sy * nh.y + sz * nd.y;
 				cz = pbz + sx * nw.z + sy * nh.z + sz * nd.z;
-				if (!contactInfos[numContactInfos]) {
-					contactInfos[numContactInfos] = new ContactInfo();
-				}
-				c = contactInfos[numContactInfos++];
-				c.normal.x = dx;
-				c.normal.y = dy;
-				c.normal.z = dz;
-				c.position.x = psx + rad * dx;
-				c.position.y = psy + rad * dy;
-				c.position.z = psz + rad * dz;
-				c.overlap = len;
-				c.shape1 = s;
-				c.shape2 = b;
-				c.id.data1 = 0;
-				c.id.data2 = 0;
-				c.id.flip = false;
+				result.addContactInfo(psx + rad * dx, psy + rad * dy, psz + rad * dz, dx, dy, dz, len, s, b, 0, 0, false);
 			} else {
 				// closest
 				cx = pbx + sx * nw.x + sy * nh.x + sz * nd.x;
@@ -217,25 +202,9 @@ package com.element.oimo.physics.collision.narrow {
 					dx *= invLen;
 					dy *= invLen;
 					dz *= invLen;
-					if (!contactInfos[numContactInfos]) {
-						contactInfos[numContactInfos] = new ContactInfo();
-					}
-					c = contactInfos[numContactInfos++];
-					c.normal.x = dx;
-					c.normal.y = dy;
-					c.normal.z = dz;
-					c.position.x = psx + rad * dx;
-					c.position.y = psy + rad * dy;
-					c.position.z = psz + rad * dz;
-					c.overlap = len - rad;
-					c.shape1 = s;
-					c.shape2 = b;
-					c.id.data1 = 0;
-					c.id.data2 = 0;
-					c.id.flip = false;
+					result.addContactInfo(psx + rad * dx, psy + rad * dy, psz + rad * dz, dx, dy, dz, len, s, b, 0, 0, false);
 				}
 			}
-			return numContactInfos;
 		}
 		
 	}

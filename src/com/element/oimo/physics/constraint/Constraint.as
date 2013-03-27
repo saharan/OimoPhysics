@@ -17,6 +17,7 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.constraint {
+	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	/**
 	 * 剛体の拘束を扱うクラスです。
@@ -29,6 +30,31 @@ package com.element.oimo.physics.constraint {
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var parent:World;
+		
+		/**
+		 * 拘束の対象となる剛体1です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var body1:RigidBody;
+		
+		/**
+		 * 拘束の対象となる剛体2です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var body2:RigidBody;
+		
+		/**
+		 * この拘束がシミュレーションアイランドに追加されたかどうかを示します。
+		 * この変数は内部でのみ使用されます。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var addedToIsland:Boolean;
+		
+		/**
+		 * この拘束がスリープ状態かどうかを示します。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var sleeping:Boolean;
 		
 		/**
 		 * 新しく Constraint オブジェクトを作成します。

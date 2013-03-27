@@ -18,6 +18,7 @@
  */
 package com.element.oimo.physics.test {
 	import com.element.oimo.physics.collision.shape.BoxShape;
+	import com.element.oimo.physics.collision.shape.CylinderShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
 	import com.element.oimo.physics.collision.shape.SphereShape;
@@ -72,8 +73,8 @@ package com.element.oimo.physics.test {
 			tf = new TextField();
 			tf.selectable = false;
 			tf.defaultTextFormat = new TextFormat("_monospace", 12, 0xffffff);
-			tf.x = 0;
-			tf.y = 0;
+			tf.x = 4;
+			tf.y = 4;
 			tf.width = 400;
 			tf.height = 400;
 			addChild(tf);
@@ -122,13 +123,14 @@ package com.element.oimo.physics.test {
 		
 		private function initWorld():void {
 			world = new World();
+			world.iteration = 8;
 			if (!renderer) renderer = new DebugDraw(640, 480);
 			renderer.setWorld(world);
 			var rb:RigidBody;
 			var s:Shape;
 			var c:ShapeConfig = new ShapeConfig();
-			// c.restitution = 0;
 			// c.friction = 0;
+			c.restitution = 0;
 			rb = new RigidBody();
 			c.position.init(0, -0.5, 0);
 			c.rotation.init();
@@ -136,7 +138,6 @@ package com.element.oimo.physics.test {
 			rb.addShape(s);
 			rb.setupMass(RigidBody.BODY_STATIC);
 			world.addRigidBody(rb);
-			
 			c.rotation.init();
 			var width:uint = 6;
 			var height:uint = 6;
@@ -150,17 +151,17 @@ package com.element.oimo.physics.test {
 						rb = new RigidBody();
 						c.position.init(
 							(i - (width - 1) * 0.5) * bw,
-							j * (bh * 1.1) + bh * 0.5 + 0.05,
+							j * (bh * 1.01) + bh * 0.5,
 							(k - (depth - 1) * 0.5) * bd
 						);
-						//if (Math.random() > 0.5) s = new SphereShape((bw + bh + bd) / 6, c);
-						//else
+						//if (Math.random() > 0.5) s = new SphereShape((bw + bh + bd) / 6, c); else
+						//if (Math.random() > 0.5) s = new CylinderShape((bw + bd) / 4, bh, c); else
 						s = new BoxShape(bw, bh, bd, c);
 						rb.addShape(s);
 						rb.setupMass(RigidBody.BODY_DYNAMIC);
 						world.addRigidBody(rb);
 					}
-					Shape.nextID++; // little trick for shape color :)
+					Shape.nextID++;
 				}
 				Shape.nextID++;
 			}
@@ -196,7 +197,7 @@ package com.element.oimo.physics.test {
 			c.position.init(0, 1, 8);
 			c.density = 10;
 			c.rotation.init();
-			s = new SphereShape(1, c);
+			s = new BoxShape(2, 2, 2, c);
 			ctr = new RigidBody();
 			ctr.addShape(s);
 			ctr.setupMass(RigidBody.BODY_DYNAMIC);
@@ -215,7 +216,9 @@ package com.element.oimo.physics.test {
 				ctr.position.x + Math.cos(ang) * 8,
 				ctr.position.y + (240 - mouseY) * 0.1,
 				ctr.position.z + Math.sin(ang) * 8,
-				ctr.position.x, ctr.position.y, ctr.position.z
+				ctr.position.x - Math.cos(ang) * 2,
+				ctr.position.y,
+				ctr.position.z - Math.sin(ang) * 2
 			);
 			if (l) {
 				ctr.linearVelocity.x -= Math.cos(ang - Math.PI * 0.5) * 0.8;
@@ -241,11 +244,12 @@ package com.element.oimo.physics.test {
 			tf.text =
 				"Rigid Body Count: " + world.numRigidBodies + "\n" +
 				"Shape Count: " + world.numShapes + "\n" +
-				"Contacts Count: " + world.numContacts + "\n\n" +
+				"Contact Count: " + world.numContacts + "\n" +
+				"Island Count: " + world.numIslands + "\n\n" +
 				"Broad Phase Time: " + world.performance.broadPhaseTime + "ms\n" +
 				"Narrow Phase Time: " + world.performance.narrowPhaseTime + "ms\n" +
-				"Constraints Time: " + world.performance.constraintsTime + "ms\n" +
-				"Update Time: " + world.performance.updateTime + "ms\n" +
+				"Solving Time: " + world.performance.solvingTime + "ms\n" +
+				"Updating Time: " + world.performance.updatingTime + "ms\n" +
 				"Total Time: " + world.performance.totalTime + "ms\n" +
 				"Physics FPS: " + fps.toFixed(2) + "\n"
 			;

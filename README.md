@@ -1,4 +1,7 @@
 OimoPhysics
 ===========
 
-The 3D physics engine for ActionScript 3.0.
+A 3D physics engine.
+
+* For ActionScript 3.0
+* Alpha version

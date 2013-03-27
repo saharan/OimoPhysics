@@ -285,6 +285,90 @@ package com.element.oimo.glmini {
 			uploadIndexBuffer(bufferIndex, idx);
 		}
 		
+		public function registerCylinder(bufferIndex:uint, radius:Number, height:Number, division:uint):void {
+			height *= 0.5;
+			var count:uint = 0;
+			var theta:Number;
+			var dTheta:Number = Math.PI * 2 / division;
+			var numVertices:uint = (division << 2) + 2;
+			var numFaces:uint = division << 2;
+			var vtx:Vector.<Number> = new Vector.<Number>(numVertices * 3, true);
+			var nrm:Vector.<Number> = new Vector.<Number>(numVertices * 3, true);
+			vtx[count] = 0;
+			vtx[count + 1] = height;
+			vtx[count + 2] = 0;
+			nrm[count] = 0;
+			nrm[count + 1] = 1;
+			nrm[count + 2] = 0;
+			count += 3;
+			theta = 0;
+			for (var i:int = 0; i < division; i++) {
+				var st:Number = Math.sin(theta);
+				var ct:Number = Math.cos(theta);
+				var off:uint = (i + 1) * 3;
+				vtx[off] = radius * ct;
+				vtx[off + 1] = height;
+				vtx[off + 2] = radius * st;
+				nrm[off] = 0;
+				nrm[off + 1] = 1;
+				nrm[off + 2] = 0;
+				off += division * 3;
+				vtx[off] = radius * ct;
+				vtx[off + 1] = height;
+				vtx[off + 2] = radius * st;
+				nrm[off] = ct;
+				nrm[off + 1] = 0;
+				nrm[off + 2] = st;
+				off += division * 3;
+				vtx[off] = radius * ct;
+				vtx[off + 1] = -height;
+				vtx[off + 2] = radius * st;
+				nrm[off] = ct;
+				nrm[off + 1] = 0;
+				nrm[off + 2] = st;
+				off += division * 3;
+				vtx[off] = radius * ct;
+				vtx[off + 1] = -height;
+				vtx[off + 2] = radius * st;
+				nrm[off] = 0;
+				nrm[off + 1] = -1;
+				nrm[off + 2] = 0;
+				count += 12;
+				theta += dTheta;
+			}
+			vtx[count] = 0;
+			vtx[count + 1] = -height;
+			vtx[count + 2] = 0;
+			nrm[count] = 0;
+			nrm[count + 1] = -1;
+			nrm[count + 2] = 0;
+			count = 0;
+			var idx:Vector.<uint> = new Vector.<uint>(numFaces * 3, true);
+			for (i = 0; i < division; i++) {
+				idx[count] = 0;
+				idx[count + 1] = (i + 1) % division + 1;
+				idx[count + 2] = i + 1;
+				count += 3;
+				off = division + 1;
+				idx[count] = off + i;
+				idx[count + 1] = off + (i + 1) % division;
+				idx[count + 2] = off + (i + 1) % division + division;
+				count += 3;
+				idx[count] = off + i;
+				idx[count + 1] = off + (i + 1) % division + division;
+				idx[count + 2] = off + i + division;
+				count += 3;
+				off = division * 3 + 1;
+				idx[count] = off + division;
+				idx[count + 1] = off + i;
+				idx[count + 2] = off + (i + 1) % division;
+				count += 3;
+			}
+			registerBuffer(bufferIndex, numVertices, numFaces * 3);
+			uploadVertexBuffer(bufferIndex, vtx, nrm);
+			uploadIndexBuffer(bufferIndex, idx);
+		}
+		
 		public function registerBuffer(bufferIndex:uint, numVertices:uint, numIndices:uint):void {
 			if (vertexB[bufferIndex]) {
 				vertexB[bufferIndex].dispose();

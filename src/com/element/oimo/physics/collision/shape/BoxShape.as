@@ -30,7 +30,7 @@ package com.element.oimo.physics.collision.shape {
 		public var width:Number;
 		
 		/**
-		 * 箱の幅の半分の長さです。
+		 * 箱の幅の半分です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var halfWidth:Number;
@@ -42,7 +42,7 @@ package com.element.oimo.physics.collision.shape {
 		public var height:Number;
 		
 		/**
-		 * 箱の高さの半分の長さです。
+		 * 箱の高さの半分です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var halfHeight:Number;
@@ -54,7 +54,7 @@ package com.element.oimo.physics.collision.shape {
 		public var depth:Number;
 		
 		/**
-		 * 箱の奥行きの半分の長さです。
+		 * 箱の奥行きの半分です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var halfDepth:Number;
@@ -78,19 +78,19 @@ package com.element.oimo.physics.collision.shape {
 		public var normalDirectionDepth:Vec3;
 		
 		/**
-		 * ワールド座標系での幅の半分の長さの向きを示すベクトルです。
+		 * ワールド座標系での幅の向きを示す幅の半分の長さのベクトルです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var halfDirectionWidth:Vec3;
 		
 		/**
-		 * ワールド座標系での高さの半分の長さの向きを示すベクトルです。
+		 * ワールド座標系での高さの向きを示す高さの半分の長さのベクトルです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var halfDirectionHeight:Vec3;
 		
 		/**
-		 * ワールド座標系での奥行きの半分の長さの向きを示すベクトルです。
+		 * ワールド座標系での奥行きの向きを示す奥行きの半分の長さのベクトルです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var halfDirectionDepth:Vec3;

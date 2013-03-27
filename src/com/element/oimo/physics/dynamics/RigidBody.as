@@ -21,7 +21,10 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Quat;
 	import com.element.oimo.math.Vec3;
+	import com.element.oimo.physics.constraint.Constraint;
+	import com.element.oimo.physics.constraint.contact.ContactConnection;
 	import com.element.oimo.physics.constraint.joint.Joint;
+	import com.element.oimo.physics.constraint.joint.JointConnection;
 	/**
 	 * 剛体のクラスです。
 	 * 剛体は衝突処理用に単数あるいは複数の形状を持ち、
@@ -45,11 +48,6 @@ package com.element.oimo.physics.dynamics {
 		public static const MAX_SHAPES:uint = 64;
 		
 		/**
-		 * 一つの剛体に接続できるジョイントの最大数です。
-		 */
-		public static const MAX_JOINTS:uint = 512;
-		
-		/**
 		 * 剛体の種類を表します。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 * 
@@ -64,14 +62,31 @@ package com.element.oimo.physics.dynamics {
 		public var position:Vec3;
 		
 		/**
+		 * 姿勢を表すクォータニオンです。
+		 */
+		public var orientation:Quat;
+		
+		/**
+		 * スリープ直前での重心のワールド座標です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var sleepPosition:Vec3;
+		
+		/**
+		 * スリープ直前での姿勢を表すクォータニオンです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var sleepOrientation:Quat;
+		
+		/**
 		 * 並進速度です。
 		 */
 		public var linearVelocity:Vec3;
 		
 		/**
-		 * 姿勢を表すクォータニオンです。
+		 * 角速度です。
 		 */
-		public var orientation:Quat;
+		public var angularVelocity:Vec3;
 		
 		/**
 		 * 姿勢を表す回転行列です。
@@ -80,11 +95,6 @@ package com.element.oimo.physics.dynamics {
 		 * 回転行列は、ステップ毎にクォータニオンから再計算されます。
 		 */
 		public var rotation:Mat33;
-		
-		/**
-		 * 角速度です。
-		 */
-		public var angularVelocity:Vec3;
 		
 		/**
 		 * 質量です。
@@ -135,7 +145,7 @@ package com.element.oimo.physics.dynamics {
 		 * 剛体に含まれている形状の配列です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var shapes:Vector.<Shape>;
+		public const shapes:Vector.<Shape> = new Vector.<Shape>(MAX_SHAPES, true);
 		
 		/**
 		 * 剛体に含まれている形状の数です。
@@ -144,22 +154,58 @@ package com.element.oimo.physics.dynamics {
 		public var numShapes:uint;
 		
 		/**
-		 * 剛体に繋がれているジョイントの配列です。
+		 * 剛体が追加されているワールドです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var joints:Vector.<Joint>;
+		public var parent:World;
 		
 		/**
-		 * 剛体に繋がれているジョイントの数です。
+		 * 剛体に関与する接触点のリンク配列です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var contactList:ContactConnection;
+		
+		/**
+		 * 剛体に接続されているジョイントのリンク配列です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var jointList:JointConnection;
+		
+		/**
+		 * 剛体に接続されているジョイントの数です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var numJoints:uint;
 		
 		/**
-		 * この剛体が追加されているワールドです。
+		 * 剛体がシミュレーションアイランドに追加されたかどうかを示します。
+		 * この変数は内部でのみ使用されます。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var parent:World;
+		public var addedToIsland:Boolean;
+		
+		/**
+		 * 剛体が静止してからの時間です。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 */
+		public var sleepTime:Number;
+		
+		/**
+		 * 剛体がスリープ状態であるかどうかを示します。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * 剛体をスリープさせる場合は sleep メソッドを、
+		 * 剛体のスリープ状態を解除する場合は awake メソッドを呼び出してください。
+		 */
+		public var sleeping:Boolean;
+		
+		/**
+		 * 剛体をスリープさせるかを示します。
+		 * シミュレーションアイランド内の全ての剛体が静止している状態が一定時間続くと、
+		 * そのシミュレーションアイランドはスリープ状態に入ります。
+		 * スリープしている剛体は awake メソッドが呼び出されるか、
+		 * 外部からの干渉を受けるまで、スリープ状態が解除されることはありません。
+		 */
+		public var allowSleep:Boolean;
 		
 		/**
 		 * 新しく RigidBody オブジェクトを作成します。
@@ -171,7 +217,6 @@ package com.element.oimo.physics.dynamics {
 		 */
 		public function RigidBody(rad:Number = 0, ax:Number = 0, ay:Number = 0, az:Number = 0) {
 			position = new Vec3();
-			linearVelocity = new Vec3();
 			var len:Number = ax * ax + ay * ay + az * az;
 			if (len > 0) {
 				len = 1 / Math.sqrt(len);
@@ -182,13 +227,16 @@ package com.element.oimo.physics.dynamics {
 			var sin:Number = Math.sin(rad * 0.5);
 			var cos:Number = Math.cos(rad * 0.5);
 			orientation = new Quat(cos, sin * ax, sin * ay, sin * az);
-			rotation = new Mat33();
+			linearVelocity = new Vec3();
 			angularVelocity = new Vec3();
+			sleepPosition = new Vec3();
+			sleepOrientation = new Quat();
+			rotation = new Mat33();
 			invertInertia = new Mat33();
 			localInertia = new Mat33();
 			invertLocalInertia = new Mat33();
-			shapes = new Vector.<Shape>(MAX_SHAPES, true);
-			joints = new Vector.<Joint>(MAX_JOINTS, true);
+			allowSleep = true;
+			sleepTime = 0;
 		}
 		
 		/**
@@ -205,9 +253,7 @@ package com.element.oimo.physics.dynamics {
 			}
 			shapes[numShapes++] = shape;
 			shape.parent = this;
-			if (parent) {
-				parent.addShape(shape);
-			}
+			if (parent) parent.addShape(shape);
 		}
 		
 		/**
@@ -233,9 +279,7 @@ package com.element.oimo.physics.dynamics {
 			}
 			var remove:Shape = shapes[index];
 			remove.parent = null;
-			if (parent) {
-				parent.removeShape(remove);
-			}
+			if (parent) parent.removeShape(remove);
 			numShapes--;
 			for (var j:int = index; j < numShapes; j++) {
 				shapes[j] = shapes[j + 1];
@@ -333,6 +377,47 @@ package com.element.oimo.physics.dynamics {
 			invertInertia.e20 = e20 * r00 + e21 * r01 + e22 * r02;
 			invertInertia.e21 = e20 * r10 + e21 * r11 + e22 * r12;
 			invertInertia.e22 = e20 * r20 + e21 * r21 + e22 * r22;
+			syncShapes();
+			awake();
+		}
+		
+		/**
+		 * この剛体をスリープ状態から開放します。
+		 */
+		public function awake():void {
+			if (!allowSleep) return;
+			sleepTime = 0;
+			if (sleeping) {
+				// awake connected constraints
+				var cc:ContactConnection = contactList;
+				while (cc != null) {
+					cc.connectedBody.sleepTime = 0;
+					cc.connectedBody.sleeping = false;
+					cc.parent.sleeping = false;
+					cc = cc.next;
+				}
+				var jc:JointConnection = jointList;
+				while (jc != null) {
+					jc.connected.sleepTime = 0;
+					jc.connected.sleeping = false;
+					jc.parent.sleeping = false;
+					jc = jc.next;
+				}
+			}
+			sleeping = false;
+		}
+		
+		/**
+		 * この剛体をスリープさせます。
+		 */
+		public function sleep():void {
+			if (!allowSleep) return;
+			linearVelocity.init();
+			angularVelocity.init();
+			sleepPosition.copy(position);
+			sleepOrientation.copy(orientation);
+			sleepTime = 0;
+			sleeping = true;
 		}
 		
 		/**
@@ -357,10 +442,7 @@ package com.element.oimo.physics.dynamics {
 		 * @param	timeStep 時間刻み幅
 		 */
 		public function updatePosition(timeStep:Number):void {
-			var s:Number;
-			var x:Number;
-			var y:Number;
-			var z:Number;
+			if (!allowSleep) sleepTime = 0;
 			if (type == BODY_STATIC) {
 				linearVelocity.x = 0;
 				linearVelocity.y = 0;
@@ -369,34 +451,26 @@ package com.element.oimo.physics.dynamics {
 				angularVelocity.y = 0;
 				angularVelocity.z = 0;
 			} else if (type == BODY_DYNAMIC) {
-				position.x += linearVelocity.x * timeStep;
-				position.y += linearVelocity.y * timeStep;
-				position.z += linearVelocity.z * timeStep;
-				/*var ax:Number = angularVelocity.x;
-				var ay:Number = angularVelocity.y;
-				var az:Number = angularVelocity.z;
-				var len:Number = Math.sqrt(ax * ax + ay * ay + az * az);
-				var theta:Number = len * timeStep;
-				if (len > 0) len = 1 / len;
-				ax *= len;
-				ay *= len;
-				az *= len;
-				var sin:Number = Math.sin(theta * 0.5);
-				var cos:Number = Math.cos(theta * 0.5);
-				var q:Quat = new Quat(cos, ax * sin, ay * sin, az * sin);
-				orientation.mul(q, orientation);*/
-				var ax:Number = angularVelocity.x;
-				var ay:Number = angularVelocity.y;
-				var az:Number = angularVelocity.z;
+				var vx:Number = linearVelocity.x;
+				var vy:Number = linearVelocity.y;
+				var vz:Number = linearVelocity.z;
+				if (vx * vx + vy * vy + vz * vz > 0.01) sleepTime = 0;
+				position.x += vx * timeStep;
+				position.y += vy * timeStep;
+				position.z += vz * timeStep;
+				vx = angularVelocity.x;
+				vy = angularVelocity.y;
+				vz = angularVelocity.z;
+				if (vx * vx + vy * vy + vz * vz > 0.025) sleepTime = 0;
 				var os:Number = orientation.s;
 				var ox:Number = orientation.x;
 				var oy:Number = orientation.y;
 				var oz:Number = orientation.z;
 				timeStep *= 0.5;
-				s = (-ax * ox - ay * oy - az * oz) * timeStep;
-				x = (ax * os + ay * oz - az * oy) * timeStep;
-				y = (-ax * oz + ay * os + az * ox) * timeStep;
-				z = (ax * oy - ay * ox + az * os) * timeStep;
+				var s:Number = (-vx * ox - vy * oy - vz * oz) * timeStep;
+				var x:Number = (vx * os + vy * oz - vz * oy) * timeStep;
+				var y:Number = (-vx * oz + vy * os + vz * ox) * timeStep;
+				var z:Number = (vx * oy - vy * ox + vz * os) * timeStep;
 				os += s;
 				ox += x;
 				oy += y;
@@ -406,13 +480,28 @@ package com.element.oimo.physics.dynamics {
 				orientation.x = ox * s;
 				orientation.y = oy * s;
 				orientation.z = oz * s;
+				//var len:Number = Math.sqrt(vx * vx + vy * vy + vz * vz);
+				//var theta:Number = len * timeStep;
+				//if (len > 0) len = 1 / len;
+				//vx *= len;
+				//vy *= len;
+				//vz *= len;
+				//var sin:Number = Math.sin(theta * 0.5);
+				//var cos:Number = Math.cos(theta * 0.5);
+				//var q:Quat = new Quat(cos, vx * sin, vy * sin, vz * sin);
+				//orientation.mul(q, orientation);
+				//orientation.normalize(orientation);
 			} else {
 				throw new Error("未定義の剛体の種類です");
 			}
-			s = orientation.s;
-			x = orientation.x;
-			y = orientation.y;
-			z = orientation.z;
+			syncShapes();
+		}
+		
+		private function syncShapes():void {
+			var s:Number = orientation.s;
+			var x:Number = orientation.x;
+			var y:Number = orientation.y;
+			var z:Number = orientation.z;
 			var x2:Number = 2 * x;
 			var y2:Number = 2 * y;
 			var z2:Number = 2 * z;

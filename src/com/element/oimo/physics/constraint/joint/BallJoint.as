@@ -114,20 +114,22 @@ package com.element.oimo.physics.constraint.joint {
 		 * @param	config ジョイントの設定
 		 */
 		public function BallJoint(rigid1:RigidBody, rigid2:RigidBody, config:JointConfig) {
-			this.rigid1 = rigid1;
-			this.rigid2 = rigid2;
-			allowCollide = config.allowCollide;
+			this.body1 = rigid1;
+			this.body2 = rigid2;
+			connection1.connected = rigid2;
+			connection2.connected = rigid1;
+			allowCollision = config.allowCollision;
 			localRelativeAnchorPosition1.copy(config.localRelativeAnchorPosition1);
 			localRelativeAnchorPosition2.copy(config.localRelativeAnchorPosition2);
 			type = JOINT_BALL;
 			
-			lVel1 = this.rigid1.linearVelocity;
-			lVel2 = this.rigid2.linearVelocity;
-			aVel1 = this.rigid1.angularVelocity;
-			aVel2 = this.rigid2.angularVelocity;
+			lVel1 = this.body1.linearVelocity;
+			lVel2 = this.body2.linearVelocity;
+			aVel1 = this.body1.angularVelocity;
+			aVel2 = this.body2.angularVelocity;
 			
-			invM1 = this.rigid1.invertMass;
-			invM2 = this.rigid2.invertMass;
+			invM1 = this.body1.invertMass;
+			invM2 = this.body2.invertMass;
 			
 			impulse = new Vec3();
 			impulseX = 0;
@@ -169,32 +171,32 @@ package com.element.oimo.physics.constraint.joint {
 			//              calculate positions
 			// ----------------------------------------------
 			
-			tmpM = rigid1.rotation;
+			tmpM = body1.rotation;
 			tmp1X = localRelativeAnchorPosition1.x;
 			tmp1Y = localRelativeAnchorPosition1.y;
 			tmp1Z = localRelativeAnchorPosition1.z;
 			relPos1X = relativeAnchorPosition1.x = tmp1X * tmpM.e00 + tmp1Y * tmpM.e01 + tmp1Z * tmpM.e02;
 			relPos1Y = relativeAnchorPosition1.y = tmp1X * tmpM.e10 + tmp1Y * tmpM.e11 + tmp1Z * tmpM.e12;
 			relPos1Z = relativeAnchorPosition1.z = tmp1X * tmpM.e20 + tmp1Y * tmpM.e21 + tmp1Z * tmpM.e22;
-			tmpM = rigid2.rotation;
+			tmpM = body2.rotation;
 			tmp1X = localRelativeAnchorPosition2.x;
 			tmp1Y = localRelativeAnchorPosition2.y;
 			tmp1Z = localRelativeAnchorPosition2.z;
 			relPos2X = relativeAnchorPosition2.x = tmp1X * tmpM.e00 + tmp1Y * tmpM.e01 + tmp1Z * tmpM.e02;
 			relPos2Y = relativeAnchorPosition2.y = tmp1X * tmpM.e10 + tmp1Y * tmpM.e11 + tmp1Z * tmpM.e12;
 			relPos2Z = relativeAnchorPosition2.z = tmp1X * tmpM.e20 + tmp1Y * tmpM.e21 + tmp1Z * tmpM.e22;
-			anchorPosition1.x = relPos1X + rigid1.position.x;
-			anchorPosition1.y = relPos1Y + rigid1.position.y;
-			anchorPosition1.z = relPos1Z + rigid1.position.z;
-			anchorPosition2.x = relPos2X + rigid2.position.x;
-			anchorPosition2.y = relPos2Y + rigid2.position.y;
-			anchorPosition2.z = relPos2Z + rigid2.position.z;
+			anchorPosition1.x = relPos1X + body1.position.x;
+			anchorPosition1.y = relPos1Y + body1.position.y;
+			anchorPosition1.z = relPos1Z + body1.position.z;
+			anchorPosition2.x = relPos2X + body2.position.x;
+			anchorPosition2.y = relPos2Y + body2.position.y;
+			anchorPosition2.z = relPos2Z + body2.position.z;
 			
 			// ----------------------------------------------
 			//        calculate angular accelerations
 			// ----------------------------------------------
 			
-			tmpM = rigid1.invertInertia;
+			tmpM = body1.invertInertia;
 			invI1e00 = tmpM.e00;
 			invI1e01 = tmpM.e01;
 			invI1e02 = tmpM.e02;
@@ -204,7 +206,7 @@ package com.element.oimo.physics.constraint.joint {
 			invI1e20 = tmpM.e20;
 			invI1e21 = tmpM.e21;
 			invI1e22 = tmpM.e22;
-			tmpM = rigid2.invertInertia;
+			tmpM = body2.invertInertia;
 			invI2e00 = tmpM.e00;
 			invI2e01 = tmpM.e01;
 			invI2e02 = tmpM.e02;
@@ -338,9 +340,6 @@ package com.element.oimo.physics.constraint.joint {
 			//           calculate initial forces
 			// ----------------------------------------------
 			
-			impulseX *= 0.95;
-			impulseY *= 0.95;
-			impulseZ *= 0.95;
 			lVel1.x += impulseX * invM1;
 			lVel1.y += impulseY * invM1;
 			lVel1.z += impulseZ * invM1;
@@ -362,12 +361,12 @@ package com.element.oimo.physics.constraint.joint {
 			targetVelY = anchorPosition2.y - anchorPosition1.y;
 			targetVelZ = anchorPosition2.z - anchorPosition1.z;
 			tmp1X = Math.sqrt(targetVelX * targetVelX + targetVelY * targetVelY + targetVelZ * targetVelZ);
-			if (tmp1X < 0.05) {
+			if (tmp1X < 0.005) {
 				targetVelX = 0;
 				targetVelY = 0;
 				targetVelZ = 0;
 			} else {
-				tmp1X = (0.05 - tmp1X) / tmp1X * invTimeStep * 0.05;
+				tmp1X = (0.005 - tmp1X) / tmp1X * invTimeStep * 0.05;
 				targetVelX *= tmp1X;
 				targetVelY *= tmp1X;
 				targetVelZ *= tmp1X;

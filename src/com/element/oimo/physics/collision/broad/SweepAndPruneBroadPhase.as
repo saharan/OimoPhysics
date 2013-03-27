@@ -47,27 +47,23 @@ package com.element.oimo.physics.collision.broad {
 			numProxies--;
 		}
 		
-		/**
-		 * @inheritDoc
-		 */
-		override public function detectPairs(pairs:Vector.<Pair>):uint {
+		override protected function collectPairs():void {
 			numPairChecks = 0;
 			var proxyPool:Vector.<Proxy> = proxyPoolAxis[sortAxis];
 			var result:uint;
 			if (sortAxis == 0) {
 				insertionSortX(proxyPool);
-				return sweepX(pairs, proxyPool);
+				sweepX(proxyPool);
 			} else if (sortAxis == 1) {
 				insertionSortY(proxyPool);
-				return sweepY(pairs, proxyPool);
+				sweepY(proxyPool);
 			} else {
 				insertionSortZ(proxyPool);
-				return sweepZ(pairs, proxyPool);
+				sweepZ(proxyPool);
 			}
 		}
 		
-		private function sweepX(pairs:Vector.<Pair>, proxyPool:Vector.<Proxy>):uint {
-			var numPairs:uint = 0;
+		private function sweepX(proxyPool:Vector.<Proxy>):void {
 			var center:Number;
 			var sumX:Number = 0;
 			var sumX2:Number = 0;
@@ -77,7 +73,6 @@ package com.element.oimo.physics.collision.broad {
 			var sumZ2:Number = 0;
 			var invNum:Number = 1 / numProxies;
 			var bodyStatic:uint = RigidBody.BODY_STATIC;
-			var maxPairs:uint = World.MAX_PAIRS;
 			for (var i:int = 0; i < numProxies; i++) {
 				var p1:Proxy = proxyPool[i];
 				center = p1.minX + p1.maxX;
@@ -90,7 +85,6 @@ package com.element.oimo.physics.collision.broad {
 				sumZ += center;
 				sumZ2 += center * center;
 				var s1:Shape = p1.parent;
-				var b1:RigidBody = s1.parent;
 				for (var j:int = i + 1; j < numProxies; j++) {
 					var p2:Proxy = proxyPool[j];
 					numPairChecks++;
@@ -98,26 +92,14 @@ package com.element.oimo.physics.collision.broad {
 						break;
 					}
 					var s2:Shape = p2.parent;
-					var b2:RigidBody = s2.parent;
 					if (
-						b1 == b2 ||
 						p1.maxY < p2.minY || p1.minY > p2.maxY ||
 						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ ||
-						!isAvailablePair(b1, b2)
+						!isAvailablePair(s1, s2)
 					) {
 						continue;
 					}
-					if (numPairs >= maxPairs) {
-						return numPairs;
-					}
-					var pair:Pair = pairs[numPairs];
-					if (!pair) {
-						pair = new Pair();
-						pairs[numPairs] = pair;
-					}
-					pair.shape1 = s1;
-					pair.shape2 = s2;
-					numPairs++;
+					addPair(s1, s2);
 				}
 			}
 			sumX = sumX2 - sumX * sumX * invNum;
@@ -134,11 +116,9 @@ package com.element.oimo.physics.collision.broad {
 			} else {
 				sortAxis = 2;
 			}
-			return numPairs;
 		}
 		
-		private function sweepY(pairs:Vector.<Pair>, proxyPool:Vector.<Proxy>):uint {
-			var numPairs:uint = 0;
+		private function sweepY(proxyPool:Vector.<Proxy>):void {
 			var center:Number;
 			var sumX:Number = 0;
 			var sumX2:Number = 0;
@@ -148,7 +128,6 @@ package com.element.oimo.physics.collision.broad {
 			var sumZ2:Number = 0;
 			var invNum:Number = 1 / numProxies;
 			var bodyStatic:uint = RigidBody.BODY_STATIC;
-			var maxPairs:uint = World.MAX_PAIRS;
 			for (var i:int = 0; i < numProxies; i++) {
 				var p1:Proxy = proxyPool[i];
 				center = p1.minX + p1.maxX;
@@ -161,7 +140,6 @@ package com.element.oimo.physics.collision.broad {
 				sumZ += center;
 				sumZ2 += center * center;
 				var s1:Shape = p1.parent;
-				var b1:RigidBody = s1.parent;
 				for (var j:int = i + 1; j < numProxies; j++) {
 					var p2:Proxy = proxyPool[j];
 					numPairChecks++;
@@ -169,26 +147,14 @@ package com.element.oimo.physics.collision.broad {
 						break;
 					}
 					var s2:Shape = p2.parent;
-					var b2:RigidBody = s2.parent;
 					if (
-						b1 == b2 ||
 						p1.maxX < p2.minX || p1.minX > p2.maxX ||
 						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ ||
-						!isAvailablePair(b1, b2)
+						!isAvailablePair(s1, s2)
 					) {
 						continue;
 					}
-					if (numPairs >= maxPairs) {
-						return numPairs;
-					}
-					var pair:Pair = pairs[numPairs];
-					if (!pair) {
-						pair = new Pair();
-						pairs[numPairs] = pair;
-					}
-					pair.shape1 = s1;
-					pair.shape2 = s2;
-					numPairs++;
+					addPair(s1, s2);
 				}
 			}
 			sumX = sumX2 - sumX * sumX * invNum;
@@ -205,11 +171,9 @@ package com.element.oimo.physics.collision.broad {
 			} else {
 				sortAxis = 2;
 			}
-			return numPairs;
 		}
 		
-		private function sweepZ(pairs:Vector.<Pair>, proxyPool:Vector.<Proxy>):uint {
-			var numPairs:uint = 0;
+		private function sweepZ(proxyPool:Vector.<Proxy>):void {
 			var center:Number;
 			var sumX:Number = 0;
 			var sumX2:Number = 0;
@@ -219,7 +183,6 @@ package com.element.oimo.physics.collision.broad {
 			var sumZ2:Number = 0;
 			var invNum:Number = 1 / numProxies;
 			var bodyStatic:uint = RigidBody.BODY_STATIC;
-			var maxPairs:uint = World.MAX_PAIRS;
 			for (var i:int = 0; i < numProxies; i++) {
 				var p1:Proxy = proxyPool[i];
 				center = p1.minX + p1.maxX;
@@ -232,7 +195,6 @@ package com.element.oimo.physics.collision.broad {
 				sumZ += center;
 				sumZ2 += center * center;
 				var s1:Shape = p1.parent;
-				var b1:RigidBody = s1.parent;
 				for (var j:int = i + 1; j < numProxies; j++) {
 					var p2:Proxy = proxyPool[j];
 					numPairChecks++;
@@ -240,26 +202,14 @@ package com.element.oimo.physics.collision.broad {
 						break;
 					}
 					var s2:Shape = p2.parent;
-					var b2:RigidBody = s2.parent;
 					if (
-						b1 == b2 ||
 						p1.maxX < p2.minX || p1.minX > p2.maxX ||
 						p1.maxY < p2.minY || p1.minY > p2.maxY ||
-						!isAvailablePair(b1, b2)
+						!isAvailablePair(s1, s2)
 					) {
 						continue;
 					}
-					if (numPairs >= maxPairs) {
-						return numPairs;
-					}
-					var pair:Pair = pairs[numPairs];
-					if (!pair) {
-						pair = new Pair();
-						pairs[numPairs] = pair;
-					}
-					pair.shape1 = s1;
-					pair.shape2 = s2;
-					numPairs++;
+					addPair(s1, s2);
 				}
 			}
 			sumX = sumX2 - sumX * sumX * invNum;
@@ -276,7 +226,6 @@ package com.element.oimo.physics.collision.broad {
 			} else {
 				sortAxis = 2;
 			}
-			return numPairs;
 		}
 		
 		private function removeProxyAxis(proxy:Proxy, proxyPool:Vector.<Proxy>):void {

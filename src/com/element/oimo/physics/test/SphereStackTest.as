@@ -149,11 +149,12 @@ package com.element.oimo.physics.test {
 			tf.text =
 				"Rigid Body Count: " + world.numRigidBodies + "\n" +
 				"Shape Count: " + world.numShapes + "\n" +
-				"Contacts Count: " + world.numContacts + "\n\n" +
+				"Contact Count: " + world.numContacts + "\n" +
+				"Island Count: " + world.numIslands + "\n\n" +
 				"Broad Phase Time: " + world.performance.broadPhaseTime + "ms\n" +
 				"Narrow Phase Time: " + world.performance.narrowPhaseTime + "ms\n" +
-				"Constraints Time: " + world.performance.constraintsTime + "ms\n" +
-				"Update Time: " + world.performance.updateTime + "ms\n" +
+				"Solving Time: " + world.performance.solvingTime + "ms\n" +
+				"Updating Time: " + world.performance.updatingTime + "ms\n" +
 				"Total Time: " + world.performance.totalTime + "ms\n" +
 				"Physics FPS: " + fps.toFixed(2) + "\n"
 			;

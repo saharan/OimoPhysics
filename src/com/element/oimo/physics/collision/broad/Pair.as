@@ -1,5 +1,6 @@
 package com.element.oimo.physics.collision.broad {
 	import com.element.oimo.physics.collision.shape.Shape;
+	import com.element.oimo.physics.constraint.contact.Contact;
 	/**
 	 * 衝突の可能性のある形状の対を扱うクラスです。
 	 * @author saharan

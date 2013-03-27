@@ -50,7 +50,7 @@ package com.element.oimo.physics.constraint.joint {
 		/**
 		 * 接続された剛体同士が衝突するかどうかを表します。
 		 */
-		public var allowCollide:Boolean;
+		public var allowCollision:Boolean;
 		
 		/**
 		 * 新しく JointConfig オブジェクトを作成します。

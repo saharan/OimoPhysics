@@ -37,7 +37,7 @@ package com.element.oimo.physics.collision.narrow {
 		/**
 		 * @inheritDoc
 		 */
-		override public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint):uint {
+		override public function detectCollision(shape1:Shape, shape2:Shape, result:CollisionResult):void {
 			var s1:SphereShape = shape1 as SphereShape;
 			var s2:SphereShape = shape2 as SphereShape;
 			var p1:Vec3 = s1.position;
@@ -49,30 +49,14 @@ package com.element.oimo.physics.collision.narrow {
 			var r1:Number = s1.radius;
 			var r2:Number = s2.radius;
 			var rad:Number = r1 + r2;
-			if (len > 0 && len < rad * rad && contactInfos.length > numContactInfos) {
+			if (len > 0 && len < rad * rad) {
 				len = Math.sqrt(len);
 				var invLen:Number = 1 / len;
 				dx *= invLen;
 				dy *= invLen;
 				dz *= invLen;
-				if (!contactInfos[numContactInfos]) {
-					contactInfos[numContactInfos] = new ContactInfo();
-				}
-				var c:ContactInfo = contactInfos[numContactInfos++];
-				c.normal.x = dx;
-				c.normal.y = dy;
-				c.normal.z = dz;
-				c.position.x = p1.x + dx * r1;
-				c.position.y = p1.y + dy * r1;
-				c.position.z = p1.z + dz * r1;
-				c.overlap = len - rad;
-				c.shape1 = s1;
-				c.shape2 = s2;
-				c.id.data1 = 0;
-				c.id.data2 = 0;
-				c.id.flip = false;
+				result.addContactInfo(p1.x + dx * r1, p1.y + dy * r1, p1.z + dz * r1, dx, dy, dz, len - rad, s1, s2, 0, 0, false);
 			}
-			return numContactInfos;
 		}
 		
 	}

@@ -50,43 +50,25 @@ package com.element.oimo.physics.collision.broad {
 			numProxies--;
 		}
 		
-		/**
-		 * @inheritDoc
-		 */
-		override public function detectPairs(pairs:Vector.<Pair>):uint {
+		override protected function collectPairs():void {
 			numPairChecks = numProxies * (numProxies - 1) >> 1;
-			var numPairs:uint = 0;
 			for (var i:int = 0; i < numProxies; i++) {
 				var p1:Proxy = proxyPool[i];
 				var s1:Shape = p1.parent;
-				var b1:RigidBody = s1.parent;
 				for (var j:int = i + 1; j < numProxies; j++) {
 					var p2:Proxy = proxyPool[j];
 					var s2:Shape = p2.parent;
-					var b2:RigidBody = s2.parent;
 					if (
-						b1 == b2 ||
 						p1.maxX < p2.minX || p1.minX > p2.maxX ||
 						p1.maxY < p2.minY || p1.minY > p2.maxY ||
 						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ ||
-						!isAvailablePair(b1, b2)
+						!isAvailablePair(s1, s2)
 					) {
 						continue;
 					}
-					if (numPairs >= World.MAX_PAIRS) {
-						return numPairs;
-					}
-					var pair:Pair = pairs[numPairs];
-					if (!pair) {
-						pair = new Pair();
-						pairs[numPairs] = pair;
-					}
-					pair.shape1 = s1;
-					pair.shape2 = s2;
-					numPairs++;
+					addPair(s1, s2);
 				}
 			}
-			return numPairs;
 		}
 		
 	}

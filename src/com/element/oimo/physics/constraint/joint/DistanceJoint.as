@@ -104,21 +104,23 @@ package com.element.oimo.physics.constraint.joint {
 		 * @param	config ジョイントの設定
 		 */
 		public function DistanceJoint(rigid1:RigidBody, rigid2:RigidBody, distance:Number, config:JointConfig) {
-			this.rigid1 = rigid1;
-			this.rigid2 = rigid2;
+			this.body1 = rigid1;
+			this.body2 = rigid2;
+			connection1.connected = rigid2;
+			connection2.connected = rigid1;
 			this.distance = distance;
-			allowCollide = config.allowCollide;
+			allowCollision = config.allowCollision;
 			localRelativeAnchorPosition1.copy(config.localRelativeAnchorPosition1);
 			localRelativeAnchorPosition2.copy(config.localRelativeAnchorPosition2);
 			type = JOINT_DISTANCE;
 			
-			lVel1 = this.rigid1.linearVelocity;
-			lVel2 = this.rigid2.linearVelocity;
-			aVel1 = this.rigid1.angularVelocity;
-			aVel2 = this.rigid2.angularVelocity;
+			lVel1 = this.body1.linearVelocity;
+			lVel2 = this.body2.linearVelocity;
+			aVel1 = this.body1.angularVelocity;
+			aVel2 = this.body2.angularVelocity;
 			
-			invM1 = this.rigid1.invertMass;
-			invM2 = this.rigid2.invertMass;
+			invM1 = this.body1.invertMass;
+			invM2 = this.body2.invertMass;
 			
 			impulse = 0;
 		}
@@ -139,14 +141,14 @@ package com.element.oimo.physics.constraint.joint {
 			//              calculate positions
 			// ----------------------------------------------
 			
-			tmpM = rigid1.rotation;
+			tmpM = body1.rotation;
 			tmp1X = localRelativeAnchorPosition1.x;
 			tmp1Y = localRelativeAnchorPosition1.y;
 			tmp1Z = localRelativeAnchorPosition1.z;
 			relPos1X = relativeAnchorPosition1.x = tmp1X * tmpM.e00 + tmp1Y * tmpM.e01 + tmp1Z * tmpM.e02;
 			relPos1Y = relativeAnchorPosition1.y = tmp1X * tmpM.e10 + tmp1Y * tmpM.e11 + tmp1Z * tmpM.e12;
 			relPos1Z = relativeAnchorPosition1.z = tmp1X * tmpM.e20 + tmp1Y * tmpM.e21 + tmp1Z * tmpM.e22;
-			tmpM = rigid2.rotation;
+			tmpM = body2.rotation;
 			tmp1X = localRelativeAnchorPosition2.x;
 			tmp1Y = localRelativeAnchorPosition2.y;
 			tmp1Z = localRelativeAnchorPosition2.z;
@@ -158,9 +160,9 @@ package com.element.oimo.physics.constraint.joint {
 			//               calculate normal
 			// ----------------------------------------------
 			
-			norX = (anchorPosition2.x = relPos2X + rigid2.position.x) - (anchorPosition1.x = relPos1X + rigid1.position.x);
-			norY = (anchorPosition2.y = relPos2Y + rigid2.position.y) - (anchorPosition1.y = relPos1Y + rigid1.position.y);
-			norZ = (anchorPosition2.z = relPos2Z + rigid2.position.z) - (anchorPosition1.z = relPos1Z + rigid1.position.z);
+			norX = (anchorPosition2.x = relPos2X + body2.position.x) - (anchorPosition1.x = relPos1X + body1.position.x);
+			norY = (anchorPosition2.y = relPos2Y + body2.position.y) - (anchorPosition1.y = relPos1Y + body1.position.y);
+			norZ = (anchorPosition2.z = relPos2Z + body2.position.z) - (anchorPosition1.z = relPos1Z + body1.position.z);
 			tmp1X = Math.sqrt(norX * norX + norY * norY + norZ * norZ);
 			posError = distance - tmp1X;
 			if (tmp1X > 0) tmp1X = 1 / tmp1X;
@@ -172,7 +174,7 @@ package com.element.oimo.physics.constraint.joint {
 			// calculate torque axes and angular accelerations
 			// ----------------------------------------------
 			
-			tmpM = rigid1.invertInertia;
+			tmpM = body1.invertInertia;
 			invI1e00 = tmpM.e00;
 			invI1e01 = tmpM.e01;
 			invI1e02 = tmpM.e02;
@@ -182,7 +184,7 @@ package com.element.oimo.physics.constraint.joint {
 			invI1e20 = tmpM.e20;
 			invI1e21 = tmpM.e21;
 			invI1e22 = tmpM.e22;
-			tmpM = rigid2.invertInertia;
+			tmpM = body2.invertInertia;
 			invI2e00 = tmpM.e00;
 			invI2e01 = tmpM.e01;
 			invI2e02 = tmpM.e02;
@@ -229,7 +231,6 @@ package com.element.oimo.physics.constraint.joint {
 			//           calculate initial forces
 			// ----------------------------------------------
 			
-			impulse *= 0.95;
 			tmp1X = norX * impulse;
 			tmp1Y = norY * impulse;
 			tmp1Z = norZ * impulse;
@@ -250,8 +251,8 @@ package com.element.oimo.physics.constraint.joint {
 			//           calculate target velocity
 			// ----------------------------------------------
 			
-			if (posError < -0.05) posError += 0.05; // allow 5cm error
-			else if (posError > 0.05) posError -= 0.05;
+			if (posError < -0.005) posError += 0.005; // allow 0.5cm error
+			else if (posError > 0.005) posError -= 0.005;
 			else posError = 0;
 			targetNormalVelocity = posError * invTimeStep * 0.05;
 		}

@@ -47,6 +47,11 @@ package com.element.oimo.physics.constraint.joint {
 		public static const JOINT_HINGE:uint = 0x3;
 		
 		/**
+		 * ヒンジ2ジョイント表すジョイントの種類です。
+		 */
+		public static const JOINT_HINGE2:uint = 0x4;
+		
+		/**
 		 * ジョイントの種類を表します。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
@@ -55,7 +60,7 @@ package com.element.oimo.physics.constraint.joint {
 		/**
 		 * 接続された剛体同士が衝突するかどうかを表します。
 		 */
-		public var allowCollide:Boolean;
+		public var allowCollision:Boolean;
 		
 		/**
 		 * 剛体1に対する初期状態での相対接続位置です。
@@ -94,16 +99,16 @@ package com.element.oimo.physics.constraint.joint {
 		public var anchorPosition2:Vec3;
 		
 		/**
-		 * 接続されている剛体1です。
+		 * 剛体1に対する繋がりです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var rigid1:RigidBody;
+		public var connection1:JointConnection;
 		
 		/**
-		 * 接続されている剛体2です。
+		 * 剛体2に対する繋がりです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
-		public var rigid2:RigidBody;
+		public var connection2:JointConnection;
 		
 		/**
 		 * 新しい Joint オブジェクトを作成します。
@@ -116,6 +121,8 @@ package com.element.oimo.physics.constraint.joint {
 			relativeAnchorPosition2 = new Vec3();
 			anchorPosition1 = new Vec3();
 			anchorPosition2 = new Vec3();
+			connection1 = new JointConnection(this);
+			connection2 = new JointConnection(this);
 		}
 		
 		/**

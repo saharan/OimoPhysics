@@ -24,6 +24,7 @@ package com.element.oimo.physics.test {
 	import com.element.oimo.physics.constraint.contact.Contact;
 	import com.element.oimo.physics.constraint.joint.BallJoint;
 	import com.element.oimo.physics.constraint.joint.DistanceJoint;
+	import com.element.oimo.physics.constraint.joint.Hinge2Joint;
 	import com.element.oimo.physics.constraint.joint.HingeJoint;
 	import com.element.oimo.physics.constraint.joint.Joint;
 	import com.element.oimo.physics.constraint.joint.JointConfig;
@@ -194,7 +195,7 @@ package com.element.oimo.physics.test {
 			world.addRigidBody(ctr);
 			
 			var jc:JointConfig = new JointConfig();
-			jc.allowCollide = false;
+			jc.allowCollision = false;
 			jc.localRelativeAnchorPosition1.y += 0.75;
 			jc.localRelativeAnchorPosition2.y -= 0.3;
 			var jo:Joint;
@@ -287,7 +288,7 @@ package com.element.oimo.physics.test {
 			
 			jc.localAxis1.init(1, 0, 0);
 			jc.localAxis2.init(1, 0, 0);
-			jc.allowCollide = false;
+			jc.allowCollision = false;
 			for (var o:int = 0; o < 3; o++) {
 				jc.localRelativeAnchorPosition1.init(0, 0.3, 0);
 				jc.localRelativeAnchorPosition2.init(0, -0.3, 0);
@@ -321,24 +322,6 @@ package com.element.oimo.physics.test {
 			jc.localAxis2.init(0, 1, 0);
 			jc.localRelativeAnchorPosition1.init(0, 0, 0);
 			jc.localRelativeAnchorPosition2.init(0, -1, 0);
-			
-			c.position.init(0, 1.1, 7);
-			s = new BoxShape(5, 2, 0.4, c);
-			rb = new RigidBody();
-			rb.addShape(s);
-			rb.setupMass();
-			world.addRigidBody(rb);
-			c.position.init(0, 2.1, 7);
-			s = new SphereShape(0.25, c);
-			prv = new RigidBody();
-			prv.addShape(s);
-			prv.setupMass(RigidBody.BODY_STATIC);
-			world.addRigidBody(prv);
-			jo = new HingeJoint(rb, prv, jc);
-			(jo as HingeJoint).enableMotor = true;
-			(jo as HingeJoint).motorSpeed = Math.PI * 2;
-			(jo as HingeJoint).maxMotorTorque = 1200;
-			world.addJoint(jo);
 			
 			c.position.init(0, 1.1, 0);
 			s = new BoxShape(5, 2, 0.4, c);
@@ -376,13 +359,37 @@ package com.element.oimo.physics.test {
 			(jo as HingeJoint).maxMotorTorque = 50;
 			world.addJoint(jo);
 			
+			jc.localAxis1.init(0, 0, 1);
+			jc.localRelativeAnchorPosition2.init(0, 0, 0);
+			jc.localRelativeAnchorPosition1.init(0, 0, -1.5);
+			c.position.init(0, 1.5, 7);
+			s = new BoxShape(2.4, 0.6, 2.5, c);
+			rb = new RigidBody();
+			rb.addShape(s);
+			rb.setupMass();
+			world.addRigidBody(rb);
+			c.position.init(0, 2, 7);
+			s = new SphereShape(0.25, c);
+			prv = new RigidBody();
+			prv.addShape(s);
+			prv.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(prv);
+			jo = new Hinge2Joint(rb, prv, jc);
+			(jo as Hinge2Joint).enableMotor1 = true;
+			(jo as Hinge2Joint).motorSpeed1 = Math.PI * 2;
+			(jo as Hinge2Joint).maxMotorTorque1 = 50;
+			(jo as Hinge2Joint).enableMotor2 = true;
+			(jo as Hinge2Joint).motorSpeed2 = Math.PI * 2;
+			(jo as Hinge2Joint).maxMotorTorque2 = 50;
+			world.addJoint(jo);
+			
 			c.position.init(0, 5, 0);
 			jc.localAxis1.init(0, 1, 0);
-			jc.localAxis2.init(0, 1, 0);
-			jc.localRelativeAnchorPosition1.init(0, 0.5, 0);
-			jc.localRelativeAnchorPosition2.init(0, -0.5, 0);
+			jc.localAxis2.init(0, 0, 1);
+			jc.localRelativeAnchorPosition1.init(0, 1, 0);
+			jc.localRelativeAnchorPosition2.init(0, 0, 1);
 			for (var i:int = 0; i < 4; i++) {
-				s = new BoxShape(2, 1, 1, c);
+				s = new BoxShape(1, 0.6, 1, c);
 				rb = new RigidBody();
 				rb.addShape(s);
 				rb.setupMass();
@@ -390,14 +397,11 @@ package com.element.oimo.physics.test {
 				prv = rb;
 				rb = new RigidBody();
 				c.position.y += 1;
-				s = new BoxShape(2, 1, 1, c);
+				s = new BoxShape(1, 1, 0.6, c);
 				rb.addShape(s);
 				rb.setupMass();
 				world.addRigidBody(rb);
-				jo = new HingeJoint(prv, rb, jc);
-				HingeJoint(jo).enableMotor = true;
-				HingeJoint(jo).motorSpeed = Math.PI * 4;
-				HingeJoint(jo).maxMotorTorque = 100;
+				jo = new Hinge2Joint(prv, rb, jc);
 				world.addJoint(jo);
 				c.position.y += 2;
 			}
@@ -443,11 +447,12 @@ package com.element.oimo.physics.test {
 			tf.text =
 				"Rigid Body Count: " + world.numRigidBodies + "\n" +
 				"Shape Count: " + world.numShapes + "\n" +
-				"Contacts Count: " + world.numContacts + "\n\n" +
+				"Contact Count: " + world.numContacts + "\n" +
+				"Island Count: " + world.numIslands + "\n\n" +
 				"Broad Phase Time: " + world.performance.broadPhaseTime + "ms\n" +
 				"Narrow Phase Time: " + world.performance.narrowPhaseTime + "ms\n" +
-				"Constraints Time: " + world.performance.constraintsTime + "ms\n" +
-				"Update Time: " + world.performance.updateTime + "ms\n" +
+				"Solving Time: " + world.performance.solvingTime + "ms\n" +
+				"Updating Time: " + world.performance.updatingTime + "ms\n" +
 				"Total Time: " + world.performance.totalTime + "ms\n" +
 				"Physics FPS: " + fps.toFixed(2) + "\n"
 			;

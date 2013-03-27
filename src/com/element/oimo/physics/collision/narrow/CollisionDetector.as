@@ -41,11 +41,9 @@ package com.element.oimo.physics.collision.narrow {
 		 * 形状の種類は指定された物である必要があります。
 		 * @param	shape1 形状1
 		 * @param	shape2 形状2
-		 * @param	contactInfos 接触点情報を格納する配列
-		 * @param	numContactInfos 現在の接触点情報の数
-		 * @return 新しい接触点情報の数
+		 * @param	result 衝突結果の格納先
 		 */
-		public function detectCollision(shape1:Shape, shape2:Shape, contactInfos:Vector.<ContactInfo>, numContactInfos:uint):uint {
+		public function detectCollision(shape1:Shape, shape2:Shape, result:CollisionResult):void {
 			throw new Error("detectCollision 関数が継承されていません");
 			return -1;
 		}

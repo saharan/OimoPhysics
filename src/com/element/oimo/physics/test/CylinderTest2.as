@@ -18,9 +18,13 @@
  */
 package com.element.oimo.physics.test {
 	import com.element.oimo.physics.collision.shape.BoxShape;
+	import com.element.oimo.physics.collision.shape.CylinderShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
 	import com.element.oimo.physics.collision.shape.SphereShape;
+	import com.element.oimo.physics.constraint.joint.DistanceJoint;
+	import com.element.oimo.physics.constraint.joint.Joint;
+	import com.element.oimo.physics.constraint.joint.JointConfig;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	import com.element.oimo.math.Mat33;
@@ -41,7 +45,7 @@ package com.element.oimo.physics.test {
 	 * @author saharan
 	 */
 	[SWF(width = "640", height = "480", frameRate = "60")]
-	public class PyramidTest extends Sprite {
+	public class CylinderTest2 extends Sprite {
 		private var s3d:Stage3D;
 		private var world:World;
 		private var renderer:DebugDraw;
@@ -55,7 +59,7 @@ package com.element.oimo.physics.test {
 		private var d:Boolean;
 		private var ctr:RigidBody;
 		
-		public function PyramidTest() {
+		public function CylinderTest2() {
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -124,48 +128,46 @@ package com.element.oimo.physics.test {
 			var rb:RigidBody;
 			var s:Shape;
 			var c:ShapeConfig = new ShapeConfig();
-			c.restitution = 0;
+			// c.friction = 1;
 			rb = new RigidBody();
-			c.position.init(0, -0.5, 0);
+			c.position.init(0, -1, 0);
 			c.rotation.init();
-			s = new BoxShape(32, 1, 50, c);
+			s = new BoxShape(32, 2, 32, c);
+			//s = new CylinderShape(16, 2, c);
 			rb.addShape(s);
 			rb.setupMass(RigidBody.BODY_STATIC);
 			world.addRigidBody(rb);
 			
-			c.rotation.init();
-			var width:uint = 15;
-			var height:uint = 5;
-			var depth:uint = 3;
-			var bw:Number = 0.75;
-			var bh:Number = 0.5;
-			var bd:Number = 0.6;
-			for (var i:int = 0; i < width; i++) {
-				for (var j:int = i; j < width; j++) {
-					for (var k:int = 0; k < depth; k++) {
+			for (var k:int = 0; k < 5; k++) {
+				for (var j:int = 0; j < 5; j++) {
+					for (var i:int = 0; i < 7; i++) {
 						rb = new RigidBody();
-						c.position.init(
-							(j - i * 0.5 - (width - 1) * 0.5) * (bw * 1.05),
-							i * (bh + 0.1) + bh * 0.6,
-							(k - (depth - 1) * 0.5) * 5
-						);
-						s = new BoxShape(bw, bh, bd, c);
+						c.position.init((j - 2) * 1.4, i * 1.05 + 0.5, (k - 2) * 1.4);
+						s = new CylinderShape(0.5 + Math.random() * 0.1 - 0.05, 1 + Math.random() * 0.1 - 0.05, c);
 						rb.addShape(s);
-						rb.setupMass(RigidBody.BODY_DYNAMIC);
+						rb.orientation.s = Math.random();
+						rb.orientation.x = Math.random() * 0.01 - 0.005;
+						rb.orientation.y = 1;
+						rb.orientation.z = Math.random() * 0.01 - 0.005;
+						rb.orientation.normalize(rb.orientation);
+						rb.setupMass();
 						world.addRigidBody(rb);
 					}
 				}
 			}
 			
-			c.friction = 2;
-			c.position.init(0, 1.5, 20);
 			c.density = 10;
+			c.position.init(0, 2, 6);
 			c.rotation.init();
-			s = new SphereShape(1.5, c);
+			s = new BoxShape(2,2,2, c);
 			ctr = new RigidBody();
-			ctr.linearVelocity.z = -20;
 			ctr.addShape(s);
-			ctr.setupMass(RigidBody.BODY_DYNAMIC);
+			ctr.orientation.s = Math.random() - 0.5;
+			ctr.orientation.x = Math.random() - 0.5;
+			ctr.orientation.y = Math.random() - 0.5;
+			ctr.orientation.z = Math.random() - 0.5;
+			ctr.orientation.normalize(ctr.orientation);
+			ctr.setupMass();
 			world.addRigidBody(ctr);
 		}
 		
@@ -181,7 +183,9 @@ package com.element.oimo.physics.test {
 				ctr.position.x + Math.cos(ang) * 8,
 				ctr.position.y + (240 - mouseY) * 0.1,
 				ctr.position.z + Math.sin(ang) * 8,
-				ctr.position.x, ctr.position.y, ctr.position.z
+				ctr.position.x - Math.cos(ang) * 2,
+				ctr.position.y,
+				ctr.position.z - Math.sin(ang) * 2
 			);
 			if (l) {
 				ctr.linearVelocity.x -= Math.cos(ang - Math.PI * 0.5) * 0.8;

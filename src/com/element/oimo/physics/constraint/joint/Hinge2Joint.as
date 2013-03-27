@@ -21,11 +21,12 @@ package com.element.oimo.physics.constraint.joint {
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * 剛体間の回転を軸方向のみに拘束するジョイントです。
-	 * 蝶番のような動きをします。
+	 * 剛体間の回転を二つの軸方向のみに拘束するジョイントです。
+	 * それぞれの軸は剛体に付随し、直角に交わります。
+	 * これは車体とタイヤの接続部分のような動きをします。
 	 * @author saharan
 	 */
-	public class HingeJoint extends Joint {
+	public class Hinge2Joint extends Joint {
 		/**
 		 * 並進速度の拘束力のベクトルです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
@@ -34,18 +35,32 @@ package com.element.oimo.physics.constraint.joint {
 		public var impulse:Vec3;
 		
 		/**
-		 * 可動範囲の制限に使用した拘束力の大きさです。
+		 * 剛体1の回転軸に対する可動範囲の制限に使用した拘束力の大きさです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 * この値は蓄積され、次ステップでも使い回されます。
 		 */
-		public var limitTorque:Number;
+		public var limitTorque1:Number;
 		
 		/**
-		 * モーターに使用した拘束力の大きさです。
+		 * 剛体1の回転軸に対するモーターに使用した拘束力の大きさです。
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 * この値は蓄積され、次ステップでも使い回されます。
 		 */
-		public var motorTorque:Number;
+		public var motorTorque1:Number;
+		
+		/**
+		 * 剛体2の回転軸に対する可動範囲の制限に使用した拘束力の大きさです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * この値は蓄積され、次ステップでも使い回されます。
+		 */
+		public var limitTorque2:Number;
+		
+		/**
+		 * 剛体2の回転軸に対するモーターに使用した拘束力の大きさです。
+		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * この値は蓄積され、次ステップでも使い回されます。
+		 */
+		public var motorTorque2:Number;
 		
 		/**
 		 * 角速度の拘束力のベクトルです。
@@ -67,42 +82,80 @@ package com.element.oimo.physics.constraint.joint {
 		public var localAxis2:Vec3;
 		
 		/**
-		 * 可動範囲の制限が有効であるかどうかを表します。
+		 * 剛体1の回転軸に対する可動範囲の制限が有効であるかどうかを表します。
 		 */
-		public var enableLimits:Boolean;
+		public var enableLimits1:Boolean;
 		
 		/**
-		 * 可動範囲の下限です。
-		 * enableLimits が true の時にのみ有効になります。
+		 * 剛体1の回転軸に対する可動範囲の下限です。
+		 * enableLimits1 が true の時にのみ有効になります。
 		 */
-		public var lowerLimit:Number;
+		public var lowerLimit1:Number;
 		
 		/**
-		 * 可動範囲の上限です。
-		 * enableLimits が true の時にのみ有効になります。
+		 * 剛体1の回転軸に対する可動範囲の上限です。
+		 * enableLimits1 が true の時にのみ有効になります。
 		 */
-		public var upperLimit:Number;
+		public var upperLimit1:Number;
 		
-		private var limitSign:int;
+		private var limitSign1:int;
 		
 		/**
-		 * モーターが有効であるかどうかを表します。
+		 * 剛体1の回転軸に対する可動範囲の制限が有効であるかどうかを表します。
 		 */
-		public var enableMotor:Boolean;
+		public var enableLimits2:Boolean;
 		
 		/**
-		 * モーターの速度です。
-		 * enableMotor が true の時にのみ有効になります。
+		 * 剛体1の回転軸に対する可動範囲の下限です。
+		 * enableLimits1 が true の時にのみ有効になります。
 		 */
-		public var motorSpeed:Number;
+		public var lowerLimit2:Number;
 		
 		/**
-		 * モーターの最大のトルクです。
-		 * enableMotor が true の時にのみ有効になります。
+		 * 剛体1の回転軸に対する可動範囲の上限です。
+		 * enableLimits1 が true の時にのみ有効になります。
 		 */
-		public var maxMotorTorque:Number;
+		public var upperLimit2:Number;
 		
-		private var stepMotorTorque:Number;
+		private var limitSign2:int;
+		
+		/**
+		 * 剛体1の回転軸に対するモーターが有効であるかどうかを表します。
+		 */
+		public var enableMotor1:Boolean;
+		
+		/**
+		 * 剛体1の回転軸に対するモーターの速度です。
+		 * enableMotor1 が true の時にのみ有効になります。
+		 */
+		public var motorSpeed1:Number;
+		
+		/**
+		 * 剛体1の回転軸に対するモーターの最大のトルクです。
+		 * enableMotor1 が true の時にのみ有効になります。
+		 */
+		public var maxMotorTorque1:Number;
+		
+		private var stepMotorTorque1:Number;
+		
+		/**
+		 * 剛体2の回転軸に対するモーターが有効であるかどうかを表します。
+		 */
+		public var enableMotor2:Boolean;
+		
+		/**
+		 * 剛体2の回転軸に対するモーターの速度です。
+		 * enableMotor2 が true の時にのみ有効になります。
+		 */
+		public var motorSpeed2:Number;
+		
+		/**
+		 * 剛体2の回転軸に対するモーターの最大のトルクです。
+		 * enableMotor2 が true の時にのみ有効になります。
+		 */
+		public var maxMotorTorque2:Number;
+		
+		private var stepMotorTorque2:Number;
 		
 		private var impulseX:Number;
 		private var impulseY:Number;
@@ -112,8 +165,7 @@ package com.element.oimo.physics.constraint.joint {
 		private var torqueY:Number;
 		private var torqueZ:Number;
 		
-		private var torqueTan:Number;
-		private var torqueBin:Number;
+		private var torqueNor:Number;
 		
 		private var localAxis1X:Number;
 		private var localAxis1Y:Number;
@@ -131,13 +183,13 @@ package com.element.oimo.physics.constraint.joint {
 		private var localAngAxis2Y:Number;
 		private var localAngAxis2Z:Number;
 		
-		private var axis1X:Number;
-		private var axis1Y:Number;
-		private var axis1Z:Number;
+		private var tanX:Number;
+		private var tanY:Number;
+		private var tanZ:Number;
 		
-		private var axis2X:Number;
-		private var axis2Y:Number;
-		private var axis2Z:Number;
+		private var binX:Number;
+		private var binY:Number;
+		private var binZ:Number;
 		
 		private var angAxis1X:Number;
 		private var angAxis1Y:Number;
@@ -151,15 +203,8 @@ package com.element.oimo.physics.constraint.joint {
 		private var norY:Number;
 		private var norZ:Number;
 		
-		private var tanX:Number;
-		private var tanY:Number;
-		private var tanZ:Number;
-		
-		private var binX:Number;
-		private var binY:Number;
-		private var binZ:Number;
-		
-		private var hingeAngle:Number;
+		private var angle1:Number;
+		private var angle2:Number;
 		
 		private var lVel1:Vec3;
 		private var lVel2:Vec3;
@@ -232,7 +277,8 @@ package com.element.oimo.physics.constraint.joint {
 		private var tanDenominator:Number;
 		private var binDenominator:Number;
 		
-		private var invNorDenominator:Number;
+		private var invTanDenominator:Number;
+		private var invBinDenominator:Number;
 		
 		private var targetVelX:Number;
 		private var targetVelY:Number;
@@ -248,7 +294,7 @@ package com.element.oimo.physics.constraint.joint {
 		 * @param	rigid2 剛体2
 		 * @param	config ジョイントの設定
 		 */
-		public function HingeJoint(rigid1:RigidBody, rigid2:RigidBody, config:JointConfig) {
+		public function Hinge2Joint(rigid1:RigidBody, rigid2:RigidBody, config:JointConfig) {
 			this.body1 = rigid1;
 			this.body2 = rigid2;
 			connection1.connected = rigid2;
@@ -283,7 +329,7 @@ package com.element.oimo.physics.constraint.joint {
 			allowCollision = config.allowCollision;
 			localRelativeAnchorPosition1.copy(config.localRelativeAnchorPosition1);
 			localRelativeAnchorPosition2.copy(config.localRelativeAnchorPosition2);
-			type = JOINT_HINGE;
+			type = JOINT_HINGE2;
 			
 			lVel1 = this.body1.linearVelocity;
 			lVel2 = this.body2.linearVelocity;
@@ -298,13 +344,14 @@ package com.element.oimo.physics.constraint.joint {
 			impulseX = 0;
 			impulseY = 0;
 			impulseZ = 0;
-			limitTorque = 0;
-			motorTorque = 0;
+			limitTorque1 = 0;
+			motorTorque1 = 0;
+			limitTorque2 = 0;
+			motorTorque2 = 0;
 			torqueX = 0;
 			torqueY = 0;
 			torqueZ = 0;
-			torqueTan = 0;
-			torqueBin = 0;
+			torqueNor = 0;
 		}
 		
 		/**
@@ -342,9 +389,9 @@ package com.element.oimo.physics.constraint.joint {
 			// ----------------------------------------------
 			
 			tmpM = body1.rotation;
-			axis1X = localAxis1X * tmpM.e00 + localAxis1Y * tmpM.e01 + localAxis1Z * tmpM.e02;
-			axis1Y = localAxis1X * tmpM.e10 + localAxis1Y * tmpM.e11 + localAxis1Z * tmpM.e12;
-			axis1Z = localAxis1X * tmpM.e20 + localAxis1Y * tmpM.e21 + localAxis1Z * tmpM.e22;
+			tanX = localAxis1X * tmpM.e00 + localAxis1Y * tmpM.e01 + localAxis1Z * tmpM.e02;
+			tanY = localAxis1X * tmpM.e10 + localAxis1Y * tmpM.e11 + localAxis1Z * tmpM.e12;
+			tanZ = localAxis1X * tmpM.e20 + localAxis1Y * tmpM.e21 + localAxis1Z * tmpM.e22;
 			angAxis1X = localAngAxis1X * tmpM.e00 + localAngAxis1Y * tmpM.e01 + localAngAxis1Z * tmpM.e02;
 			angAxis1Y = localAngAxis1X * tmpM.e10 + localAngAxis1Y * tmpM.e11 + localAngAxis1Z * tmpM.e12;
 			angAxis1Z = localAngAxis1X * tmpM.e20 + localAngAxis1Y * tmpM.e21 + localAngAxis1Z * tmpM.e22;
@@ -355,9 +402,9 @@ package com.element.oimo.physics.constraint.joint {
 			relPos1Y = relativeAnchorPosition1.y = tmp1X * tmpM.e10 + tmp1Y * tmpM.e11 + tmp1Z * tmpM.e12;
 			relPos1Z = relativeAnchorPosition1.z = tmp1X * tmpM.e20 + tmp1Y * tmpM.e21 + tmp1Z * tmpM.e22;
 			tmpM = body2.rotation;
-			axis2X = localAxis2X * tmpM.e00 + localAxis2Y * tmpM.e01 + localAxis2Z * tmpM.e02;
-			axis2Y = localAxis2X * tmpM.e10 + localAxis2Y * tmpM.e11 + localAxis2Z * tmpM.e12;
-			axis2Z = localAxis2X * tmpM.e20 + localAxis2Y * tmpM.e21 + localAxis2Z * tmpM.e22;
+			binX = localAxis2X * tmpM.e00 + localAxis2Y * tmpM.e01 + localAxis2Z * tmpM.e02;
+			binY = localAxis2X * tmpM.e10 + localAxis2Y * tmpM.e11 + localAxis2Z * tmpM.e12;
+			binZ = localAxis2X * tmpM.e20 + localAxis2Y * tmpM.e21 + localAxis2Z * tmpM.e22;
 			angAxis2X = localAngAxis2X * tmpM.e00 + localAngAxis2Y * tmpM.e01 + localAngAxis2Z * tmpM.e02;
 			angAxis2Y = localAngAxis2X * tmpM.e10 + localAngAxis2Y * tmpM.e11 + localAngAxis2Z * tmpM.e12;
 			angAxis2Z = localAngAxis2X * tmpM.e20 + localAngAxis2Y * tmpM.e21 + localAngAxis2Z * tmpM.e22;
@@ -373,38 +420,37 @@ package com.element.oimo.physics.constraint.joint {
 			anchorPosition2.x = relPos2X + body2.position.x;
 			anchorPosition2.y = relPos2Y + body2.position.y;
 			anchorPosition2.z = relPos2Z + body2.position.z;
-			tmp1X = 1 / (invM1 + invM2);
-			norX = (axis1X * invM1 + axis2X * invM2) * tmp1X;
-			norY = (axis1Y * invM1 + axis2Y * invM2) * tmp1X;
-			norZ = (axis1Z * invM1 + axis2Z * invM2) * tmp1X;
+			norX = binY * tanZ - binZ * tanY;
+			norY = binZ * tanX - binX * tanZ;
+			norZ = binX * tanY - binY * tanX;
 			tmp1X = Math.sqrt(norX * norX + norY * norY + norZ * norZ);
 			if (tmp1X > 0) tmp1X = 1 / tmp1X;
 			norX *= tmp1X;
 			norY *= tmp1X;
 			norZ *= tmp1X;
-			tanX = norY * norX - norZ * norZ;
-			tanY = -norZ * norY - norX * norX;
-			tanZ = norX * norZ + norY * norY;
-			tmp1X = 1 / Math.sqrt(tanX * tanX + tanY * tanY + tanZ * tanZ);
-			tanX *= tmp1X;
-			tanY *= tmp1X;
-			tanZ *= tmp1X;
-			binX = norY * tanZ - norZ * tanY;
-			binY = norZ * tanX - norX * tanZ;
-			binZ = norX * tanY - norY * tanX;
 			
 			// ----------------------------------------------
-			//            calculate hinge angle
+			//              calculate angles
 			// ----------------------------------------------
 			
 			if (
-				norX * (angAxis1Y * angAxis2Z - angAxis1Z * angAxis2Y) +
-				norY * (angAxis1Z * angAxis2X - angAxis1X * angAxis2Z) +
-				norZ * (angAxis1X * angAxis2Y - angAxis1Y * angAxis2X) < 0 // cross product
+				tanX * (angAxis1Y * binZ - angAxis1Z * binY) +
+				tanY * (angAxis1Z * binX - angAxis1X * binZ) +
+				tanZ * (angAxis1X * binY - angAxis1Y * binX) < 0 // cross product
 			) {
-				hingeAngle = -Math.acos(angAxis1X * angAxis2X + angAxis1Y * angAxis2Y + angAxis1Z * angAxis2Z);
+				angle1 = -Math.acos(angAxis1X * binX + angAxis1Y * binY + angAxis1Z * binZ);
 			} else {
-				hingeAngle = Math.acos(angAxis1X * angAxis2X + angAxis1Y * angAxis2Y + angAxis1Z * angAxis2Z);
+				angle1 = Math.acos(angAxis1X * binX + angAxis1Y * binY + angAxis1Z * binZ);
+			}
+			
+			if (
+				binX * (angAxis2Y * tanZ - angAxis2Z * tanY) +
+				binY * (angAxis2Z * tanX - angAxis2X * tanZ) +
+				binZ * (angAxis2X * tanY - angAxis2Y * tanX) < 0 // cross product
+			) {
+				angle2 = Math.acos(angAxis2X * tanX + angAxis2Y * tanY + angAxis2Z * tanZ);
+			} else {
+				angle2 = -Math.acos(angAxis2X * tanX + angAxis2Y * tanY + angAxis2Z * tanZ);
 			}
 			
 			// ----------------------------------------------
@@ -561,67 +607,88 @@ package com.element.oimo.physics.constraint.joint {
 			t21 = invI1e21 + invI2e21;
 			t22 = invI1e22 + invI2e22;
 			
-			invNorDenominator =
-				norX * (norX * t00 + norY * t01 + norZ * t02) +
-				norY * (norX * t10 + norY * t11 + norZ * t12) +
-				norZ * (norX * t20 + norY * t21 + norZ * t22)
-			;
-			norDenominator = 1 / invNorDenominator;
-			
-			tanDenominator =
+			norDenominator =
 				1 / (
-					tanX * (tanX * t00 + tanY * t01 + tanZ * t02) +
-					tanY * (tanX * t10 + tanY * t11 + tanZ * t12) +
-					tanZ * (tanX * t20 + tanY * t21 + tanZ * t22)
+					norX * (norX * t00 + norY * t01 + norZ * t02) +
+					norY * (norX * t10 + norY * t11 + norZ * t12) +
+					norZ * (norX * t20 + norY * t21 + norZ * t22)
 				)
 			;
 			
-			binDenominator =
-				1 / (
-					binX * (binX * t00 + binY * t01 + binZ * t02) +
-					binY * (binX * t10 + binY * t11 + binZ * t12) +
-					binZ * (binX * t20 + binY * t21 + binZ * t22)
-				)
+			invTanDenominator =
+				tanX * (tanX * t00 + tanY * t01 + tanZ * t02) +
+				tanY * (tanX * t10 + tanY * t11 + tanZ * t12) +
+				tanZ * (tanX * t20 + tanY * t21 + tanZ * t22)
 			;
+			tanDenominator = 1 / invTanDenominator;
+			
+			invBinDenominator =
+				binX * (binX * t00 + binY * t01 + binZ * t02) +
+				binY * (binX * t10 + binY * t11 + binZ * t12) +
+				binZ * (binX * t20 + binY * t21 + binZ * t22)
+			;
+			binDenominator = 1 / invBinDenominator;
 			
 			// ----------------------------------------------
-			//           calculate limits and motor
+			//         calculate limits and motors
 			// ----------------------------------------------
 			
-			// limit error
-			if (enableLimits) {
-				if (hingeAngle < lowerLimit) {
-					if (limitSign != -1) limitTorque = 0;
-					limitSign = -1;
-				} else if (hingeAngle > upperLimit) {
-					if (limitSign != 1) limitTorque = 0;
-					limitSign = 1;
+			// limit errors
+			if (enableLimits1) {
+				if (angle1 < lowerLimit1) {
+					if (limitSign1 != -1) limitTorque1 = 0;
+					limitSign1 = -1;
+				} else if (angle1 > upperLimit1) {
+					if (limitSign1 != 1) limitTorque1 = 0;
+					limitSign1 = 1;
 				} else {
-					limitSign = 0;
-					limitTorque = 0;
+					limitSign1 = 0;
+					limitTorque1 = 0;
 				}
 			} else {
-				limitSign = 0;
-				limitTorque = 0;
+				limitSign1 = 0;
+				limitTorque1 = 0;
 			}
 			
-			if (enableMotor) {
-				stepMotorTorque = timeStep * maxMotorTorque;
+			if (enableLimits2) {
+				if (angle2 < lowerLimit2) {
+					if (limitSign2 != -1) limitTorque2 = 0;
+					limitSign2 = -1;
+				} else if (angle2 > upperLimit2) {
+					if (limitSign2 != 1) limitTorque2 = 0;
+					limitSign2 = 1;
+				} else {
+					limitSign2 = 0;
+					limitTorque2 = 0;
+				}
+			} else {
+				limitSign2 = 0;
+				limitTorque2 = 0;
+			}
+			
+			if (enableMotor1) {
+				stepMotorTorque1 = timeStep * maxMotorTorque1;
+			}
+			
+			if (enableMotor2) {
+				stepMotorTorque2 = timeStep * maxMotorTorque2;
 			}
 			
 			// ----------------------------------------------
 			//           calculate initial forces
 			// ----------------------------------------------
 			
-			torqueTan *= 0.95;
-			torqueBin *= 0.95;
-			motorTorque *= 0.95;
-			limitTorque *= 0.95;
+			torqueNor *= 0.95;
+			motorTorque1 *= 0.95;
+			limitTorque1 *= 0.95;
+			motorTorque2 *= 0.95;
+			limitTorque2 *= 0.95;
 			
-			tmp1X = limitTorque + motorTorque;
-			torqueX = tmp1X * norX + torqueTan * tanX + torqueBin * binX;
-			torqueY = tmp1X * norY + torqueTan * tanY + torqueBin * binY;
-			torqueZ = tmp1X * norZ + torqueTan * tanZ + torqueBin * binZ;
+			tmp1X = motorTorque1 + limitTorque1;
+			tmp1Y = motorTorque2 + limitTorque2;
+			torqueX = torqueNor * norX + tmp1X * tanX + tmp1Y * binX;
+			torqueY = torqueNor * norY + tmp1X * tanY + tmp1Y * binY;
+			torqueZ = torqueNor * norZ + tmp1X * tanZ + tmp1Y * binZ;
 			
 			lVel1.x += impulseX * invM1;
 			lVel1.y += impulseY * invM1;
@@ -657,31 +724,34 @@ package com.element.oimo.physics.constraint.joint {
 			}
 			
 			// angular error
-			tmp1X = axis2Y * axis1Z - axis2Z * axis1Y;
-			tmp1Y = axis2Z * axis1X - axis2X * axis1Z;
-			tmp1Z = axis2X * axis1Y - axis2Y * axis1X;
-			
-			targetAngVelTan = tanX * tmp1X + tanY * tmp1Y + tanZ * tmp1Z;
-			if (targetAngVelTan > 0.02) targetAngVelTan = (targetAngVelTan - 0.02) * invTimeStep * 0.05;
-			else if (targetAngVelTan < -0.02) targetAngVelTan = (targetAngVelTan + 0.02) * invTimeStep * 0.05;
-			else targetAngVelTan = 0;
-			
-			targetAngVelBin = binX * tmp1X + binY * tmp1Y + binZ * tmp1Z;
-			if (targetAngVelBin > 0.02) targetAngVelBin = (targetAngVelBin - 0.02) * invTimeStep * 0.05;
-			else if (targetAngVelBin < -0.02) targetAngVelBin = (targetAngVelBin + 0.02) * invTimeStep * 0.05;
-			else targetAngVelBin = 0;
+			targetAngVelNor = -(tanX * binX + tanY * binY + tanZ * binZ);
+			if (targetAngVelNor > 0.02) targetAngVelNor = (targetAngVelNor - 0.02) * invTimeStep * 0.05;
+			else if (targetAngVelNor < -0.02) targetAngVelNor = (targetAngVelNor + 0.02) * invTimeStep * 0.05;
+			else targetAngVelNor = 0;
 			
 			// limit error
-			if (limitSign == -1) {
-				targetAngVelNor = lowerLimit - hingeAngle;
-				if (targetAngVelNor < 0.02) targetAngVelNor = 0;
-				else targetAngVelNor = (targetAngVelNor - 0.02) * invTimeStep * 0.05;
-			} else if (limitSign == 1) {
-				targetAngVelNor = upperLimit - hingeAngle;
-				if (targetAngVelNor > -0.02) targetAngVelNor = 0;
-				else targetAngVelNor = (targetAngVelNor + 0.02) * invTimeStep * 0.05;
+			if (limitSign1 == -1) {
+				targetAngVelTan = lowerLimit1 - angle1;
+				if (targetAngVelTan < 0.02) targetAngVelTan = 0;
+				else targetAngVelTan = (targetAngVelTan - 0.02) * invTimeStep * 0.05;
+			} else if (limitSign1 == 1) {
+				targetAngVelTan = upperLimit1 - angle1;
+				if (targetAngVelTan > -0.02) targetAngVelTan = 0;
+				else targetAngVelTan = (targetAngVelTan + 0.02) * invTimeStep * 0.05;
 			} else {
-				targetAngVelNor = 0;
+				targetAngVelTan = 0;
+			}
+			
+			if (limitSign2 == -1) {
+				targetAngVelBin = lowerLimit2 - angle2;
+				if (targetAngVelBin < 0.02) targetAngVelBin = 0;
+				else targetAngVelBin = (targetAngVelBin - 0.02) * invTimeStep * 0.05;
+			} else if (limitSign2 == 1) {
+				targetAngVelBin = upperLimit2 - angle2;
+				if (targetAngVelBin > -0.02) targetAngVelBin = 0;
+				else targetAngVelBin = (targetAngVelBin + 0.02) * invTimeStep * 0.05;
+			} else {
+				targetAngVelBin = 0;
 			}
 		}
 		
@@ -696,12 +766,17 @@ package com.element.oimo.physics.constraint.joint {
 			var newImpulseX:Number;
 			var newImpulseY:Number;
 			var newImpulseZ:Number;
+			var newTorqueNor:Number;
 			var newTorqueTan:Number;
 			var newTorqueBin:Number;
-			var oldMotorTorque:Number;
-			var newMotorTorque:Number;
-			var oldLimitTorque:Number;
-			var newLimitTorque:Number;
+			var oldMotorTorque1:Number;
+			var newMotorTorque1:Number;
+			var oldLimitTorque1:Number;
+			var newLimitTorque1:Number;
+			var oldMotorTorque2:Number;
+			var newMotorTorque2:Number;
+			var oldLimitTorque2:Number;
+			var newLimitTorque2:Number;
 			
 			relVelX = lVel2.x - lVel1.x + aVel2.y * relPos2Z - aVel2.z * relPos2Y - aVel1.y * relPos1Z + aVel1.z * relPos1Y - targetVelX;
 			relVelY = lVel2.y - lVel1.y + aVel2.z * relPos2X - aVel2.x * relPos2Z - aVel1.z * relPos1X + aVel1.x * relPos1Z - targetVelY;
@@ -728,35 +803,56 @@ package com.element.oimo.physics.constraint.joint {
 			relVelX = aVel2.x - aVel1.x;
 			relVelY = aVel2.y - aVel1.y;
 			relVelZ = aVel2.z - aVel1.z;
-			tmp = relVelX * norX + relVelY * norY + relVelZ * norZ;
 			
-			if (enableMotor) {
-				newMotorTorque = (tmp - motorSpeed) * norDenominator;
-				oldMotorTorque = motorTorque;
-				motorTorque += newMotorTorque;
-				if (motorTorque > stepMotorTorque) motorTorque = stepMotorTorque; // clamp motor torque
-				else if (motorTorque < -stepMotorTorque) motorTorque = -stepMotorTorque;
-				newMotorTorque = motorTorque - oldMotorTorque;
-				tmp -= newMotorTorque * invNorDenominator; // add relative velocity
-			} else newMotorTorque = 0;
+			tmp = relVelX * tanX + relVelY * tanY + relVelZ * tanZ;
 			
-			if (limitSign != 0) {
-				newLimitTorque = (tmp - targetAngVelNor) * norDenominator;
-				oldLimitTorque = limitTorque;
-				limitTorque += newLimitTorque;
-				if (limitTorque * limitSign < 0) limitTorque = 0; // clamp limit torque
-				newLimitTorque = limitTorque - oldLimitTorque;
-			} else newLimitTorque = 0;
+			if (enableMotor1) {
+				newMotorTorque1 = (tmp - motorSpeed1) * tanDenominator;
+				oldMotorTorque1 = motorTorque1;
+				motorTorque1 += newMotorTorque1;
+				if (motorTorque1 > stepMotorTorque1) motorTorque1 = stepMotorTorque1; // clamp motor torque
+				else if (motorTorque1 < -stepMotorTorque1) motorTorque1 = -stepMotorTorque1;
+				newMotorTorque1 = motorTorque1 - oldMotorTorque1;
+				tmp -= newMotorTorque1 * invTanDenominator; // add relative velocity
+			} else newMotorTorque1 = 0;
 			
-			tmp = newMotorTorque + newLimitTorque;
-			newTorqueTan = (relVelX * tanX + relVelY * tanY + relVelZ * tanZ - targetAngVelTan) * tanDenominator;
-			newTorqueBin = (relVelX * binX + relVelY * binY + relVelZ * binZ - targetAngVelBin) * binDenominator;
-			torqueTan += newTorqueTan;
-			torqueBin += newTorqueBin;
+			if (limitSign1 != 0) {
+				newLimitTorque1 = (tmp - targetAngVelTan) * tanDenominator;
+				oldLimitTorque1 = limitTorque1;
+				limitTorque1 += newLimitTorque1;
+				if (limitTorque1 * limitSign1 < 0) limitTorque1 = 0; // clamp limit torque
+				newLimitTorque1 = limitTorque1 - oldLimitTorque1;
+			} else newLimitTorque1 = 0;
 			
-			newImpulseX = tmp * norX + newTorqueTan * tanX + newTorqueBin * binX;
-			newImpulseY = tmp * norY + newTorqueTan * tanY + newTorqueBin * binY;
-			newImpulseZ = tmp * norZ + newTorqueTan * tanZ + newTorqueBin * binZ;
+			tmp = relVelX * binX + relVelY * binY + relVelZ * binZ;
+			
+			if (enableMotor2) {
+				newMotorTorque2 = (tmp - motorSpeed2) * binDenominator;
+				oldMotorTorque2 = motorTorque2;
+				motorTorque2 += newMotorTorque2;
+				if (motorTorque2 > stepMotorTorque2) motorTorque2 = stepMotorTorque2; // clamp motor torque
+				else if (motorTorque2 < -stepMotorTorque2) motorTorque2 = -stepMotorTorque2;
+				newMotorTorque2 = motorTorque2 - oldMotorTorque2;
+				tmp -= newMotorTorque2 * invBinDenominator; // add relative velocity
+			} else newMotorTorque2 = 0;
+			
+			if (limitSign2 != 0) {
+				newLimitTorque2 = (tmp - targetAngVelBin) * binDenominator;
+				oldLimitTorque2 = limitTorque2;
+				limitTorque2 += newLimitTorque2;
+				if (limitTorque2 * limitSign2 < 0) limitTorque2 = 0; // clamp limit torque
+				newLimitTorque2 = limitTorque2 - oldLimitTorque2;
+			} else newLimitTorque2 = 0;
+			
+			newTorqueNor = (relVelX * norX + relVelY * norY + relVelZ * norZ - targetAngVelNor) * norDenominator;
+			newTorqueTan = newMotorTorque1 + newLimitTorque1;
+			newTorqueBin = newMotorTorque2 + newLimitTorque2;
+			
+			torqueNor += newTorqueNor;
+			
+			newImpulseX = newTorqueNor * norX + newTorqueTan * tanX + newTorqueBin * binX;
+			newImpulseY = newTorqueNor * norY + newTorqueTan * tanY + newTorqueBin * binY;
+			newImpulseZ = newTorqueNor * norZ + newTorqueTan * tanZ + newTorqueBin * binZ;
 			
 			aVel1.x += invI1e00 * newImpulseX + invI1e01 * newImpulseY + invI1e02 * newImpulseZ;
 			aVel1.y += invI1e10 * newImpulseX + invI1e11 * newImpulseY + invI1e12 * newImpulseZ;
