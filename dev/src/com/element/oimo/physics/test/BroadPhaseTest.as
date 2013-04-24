@@ -19,6 +19,8 @@
 package com.element.oimo.physics.test {
 	import com.element.oimo.physics.collision.broadphase.DynamicBVTree;
 	import com.element.oimo.physics.collision.broadphase.DynamicBVTreeBroadPhase;
+	import com.element.oimo.physics.collision.broadphase.SAPAxis;
+	import com.element.oimo.physics.collision.broadphase.SAPValue;
 	import com.element.oimo.physics.collision.shape.BoxShape;
 	import com.element.oimo.physics.collision.shape.CylinderShape;
 	import com.element.oimo.physics.collision.shape.Shape;
@@ -47,7 +49,7 @@ package com.element.oimo.physics.test {
 	 * @author saharan
 	 */
 	[SWF(width = "640", height = "480", frameRate = "60")]
-	public class BoxTest extends Sprite {
+	public class BroadPhaseTest extends Sprite {
 		private var s3d:Stage3D;
 		private var world:World;
 		private var renderer:DebugDraw;
@@ -60,13 +62,14 @@ package com.element.oimo.physics.test {
 		private var u:Boolean;
 		private var d:Boolean;
 		private var ctr:RigidBody;
+		BoxTest
 		CylinderTest
 		CylinderTest2
 		JointTest
 		PyramidTest
 		SphereStackTest
 		
-		public function BoxTest() {
+		public function BroadPhaseTest() {
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -144,70 +147,27 @@ package com.element.oimo.physics.test {
 			s = new BoxShape(32, 1, 32, c);
 			rb.addShape(s);
 			rb.setupMass(RigidBody.BODY_STATIC);
-			world.addRigidBody(rb);
+			//world.addRigidBody(rb);
 			c.rotation.init();
-			var width:uint = 9;
-			var height:uint = 9;
-			var depth:uint = 9;
-			var bw:Number = 0.75;
-			var bh:Number = 0.75;
-			var bd:Number = 0.75;
-			for (var i:int = 0; i < width; i++) {
-				for (var j:int = 0; j < height; j++) {
-					for (var k:int = 0; k < depth; k++) {
-						rb = new RigidBody();
-						rb.allowSleep = false;
-						c.position.init(
-							(i - (width - 1) * 0.5) * bw,
-							j * (bh * 1.00) + bh * 0.5,
-							(k - (depth - 1) * 0.5) * bd
-						);
-						//if (Math.random() > 0.5) s = new SphereShape((bw + bh + bd) / 6, c); else
-						//if (Math.random() > 0.5) s = new CylinderShape((bw + bd) / 4, bh, c); else
-						//s = new CylinderShape((bw + bd) / 4, bh, c);
-						s = new BoxShape(bw, bh, bd, c);
-						rb.addShape(s);
-						rb.setupMass(RigidBody.BODY_DYNAMIC);
-						world.addRigidBody(rb);
-					}
-					//Shape.nextID++;
-				}
-				//Shape.nextID++;
-			}
-			/*for (var j:int = 0; j < height; j++) {
-				for (var i:int = 0; i < 3; i++) {
-						var rot:Boolean = (j & 1) == 0;
-						rb = new RigidBody();
-						c.position.init(
-							rot ? 0 : (i - 1) * 0.75,
-							j * (0.75 * 1.1) + 0.75 * 0.5 + 0.05,
-							rot ? (i - 1) * 0.75 : 0
-						);
-						s = new BoxShape(rot ? 2.25 : 0.75, 0.75, rot ? 0.75 : 2.25, c);
-						rb.addShape(s);
-						rb.setupMass(RigidBody.BODY_DYNAMIC);
-						world.addRigidBody(rb);
-				}
-			}*/
-			/*for (var i:int = 0; i < height; i++) {
+			var num:uint = 1000;
+			var bw:Number = 0.5;
+			var bh:Number = 0.5;
+			var bd:Number = 0.5;
+			for (var i:int = 0; i < num; i++) {
 				rb = new RigidBody();
-				c.position.init(
-					0,
-					i * (bh * 1.1) + bh * 0.5 + 0.05,
-					0
-				);
-				s = new SphereShape(bh * 0.5, c);
+				rb.allowSleep = false;
+				c.position.init(Math.random() * 32 - 16, Math.random() * 32 - 16, Math.random() * 32 - 16);
+				s = new BoxShape(bw, bh, bd, c);
 				rb.addShape(s);
 				rb.setupMass(RigidBody.BODY_DYNAMIC);
 				world.addRigidBody(rb);
-			}*/
+			}
 			
 			c.friction = 2;
 			c.position.init(0, 1, 6);
 			c.density = 10;
 			c.rotation.init();
 			s = new BoxShape(2, 2, 2, c);
-			//s = new CylinderShape(1, 2, c);
 			ctr = new RigidBody();
 			ctr.addShape(s);
 			ctr.setupMass(RigidBody.BODY_DYNAMIC);
@@ -271,11 +231,11 @@ package com.element.oimo.physics.test {
 			renderer.render();
 			var body:RigidBody = world.rigidBodies;
 			while (body != null) {
-				if (body.position.y < -12) {
-					body.position.init(Math.random() * 8 - 4, Math.random() * 4 + 8, Math.random() * 8 - 4);
-					body.linearVelocity.x *= 0.75;
-					body.linearVelocity.y *= 0.75;
-					body.linearVelocity.z *= 0.75;
+				if (body.position.y < -16) {
+					body.position.init(Math.random() * 32 - 16, Math.random() * 32 - 16, Math.random() * 32 - 16);
+					body.linearVelocity.x = Math.random() * 64 - 32;
+					body.linearVelocity.y *= 0.8;
+					body.linearVelocity.z = Math.random() * 64 - 32;
 				}
 				body = body.next;
 			}

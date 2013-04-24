@@ -54,9 +54,9 @@ package com.element.oimo.physics.collision.shape {
 		 */
 		override public function updateProxy():void {
 			proxy.init(
-				position.x - radius - 0.01, position.x + radius + 0.01,
-				position.y - radius - 0.01, position.y + radius + 0.01,
-				position.z - radius - 0.01, position.z + radius + 0.01
+				position.x - radius - 0.005, position.x + radius + 0.005,
+				position.y - radius - 0.005, position.y + radius + 0.005,
+				position.z - radius - 0.005, position.z + radius + 0.005
 			);
 		}
 		

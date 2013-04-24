@@ -1,21 +1,21 @@
 package com.element.oimo.physics.collision.broadphase {
 	/**
-	 * An node of the Dynamic Bounding Volume Tree.
+	 * A node of the dynamic bounding volume tree.
 	 * @author saharan
 	 */
 	public class DynamicBVTreeNode {
 		/**
-		 * The first child of this node.
+		 * The first child node of this node.
 		 */
 		public var child1:DynamicBVTreeNode;
 		
 		/**
-		 * The second child of this node.
+		 * The second child node of this node.
 		 */
 		public var child2:DynamicBVTreeNode;
 		
 		/**
-		 * The parent of this tree.
+		 * The parent node of this tree.
 		 */
 		public var parent:DynamicBVTreeNode;
 		
@@ -25,11 +25,17 @@ package com.element.oimo.physics.collision.broadphase {
 		public var proxy:Proxy;
 		
 		/**
-		 * The balance of this node.
+		 * The maximum distance from leaf nodes.
 		 */
-		public var balance:int;
+		public var height:int;
+		
+		/**
+		 * The AABB of this node.
+		 */
+		public var aabb:AABB;
 		
 		public function DynamicBVTreeNode() {
+			aabb = new AABB();
 		}
 		
 	}

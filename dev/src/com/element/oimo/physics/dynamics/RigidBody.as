@@ -576,6 +576,7 @@ package com.element.oimo.physics.dynamics {
 				rot.e21 = r20 * e01 + r21 * e11 + r22 * e21;
 				rot.e22 = r20 * e02 + r21 * e12 + r22 * e22;
 				shape.updateProxy();
+				shape.proxy.sap.update(); // TODO
 			}
 		}
 		

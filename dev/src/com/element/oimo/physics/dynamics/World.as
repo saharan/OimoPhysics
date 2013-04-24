@@ -20,8 +20,10 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.math.Quat;
 	import com.element.oimo.physics.collision.broadphase.BroadPhase;
 	import com.element.oimo.physics.collision.broadphase.BruteForceBroadPhase;
+	import com.element.oimo.physics.collision.broadphase.DynamicBVTreeBroadPhase;
 	import com.element.oimo.physics.collision.broadphase.Pair;
 	import com.element.oimo.physics.collision.broadphase.SweepAndPruneBroadPhase;
+	import com.element.oimo.physics.collision.broadphase.SweepAndPruneBroadPhase_;
 	import com.element.oimo.physics.collision.narrow.BoxBoxCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.BoxCylinderCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.CollisionDetector;
@@ -53,7 +55,7 @@ package com.element.oimo.physics.dynamics {
 		/**
 		 * 追加できる形状の最大数です。
 		 */
-		public static const MAX_SHAPES:uint = 32768;
+		public static const MAX_SHAPES:uint = 65536;
 		
 		/**
 		 * 検出できる接触点の最大数です。
@@ -164,6 +166,7 @@ package com.element.oimo.physics.dynamics {
 			gravity = new Vec3(0, -9.80665, 0);
 			performance = new Performance();
 			broadPhase = new SweepAndPruneBroadPhase();
+			// broadPhase = new DynamicBVTreeBroadPhase();
 			// broadPhase = new BruteForceBroadPhase();
 			var numShapeTypes:uint = 4;
 			detectors = new Vector.<Vector.<CollisionDetector>>(numShapeTypes, true);
@@ -445,15 +448,15 @@ package com.element.oimo.physics.dynamics {
 				}
 				var islandNumRigidBodies:uint = 0;
 				var islandNumConstraints:uint = 0;
-				var numStacks:uint = 1;
+				var stackCount:uint = 1;
 				// add rigid body to stack
 				islandStack[0] = base;
 				base.addedToIsland = true;
 				// build an island
-				while (numStacks > 0) {
+				while (stackCount > 0) {
 					// get rigid body from stack
-					body = islandStack[--numStacks];
-					islandStack[numStacks] = null; // gc
+					body = islandStack[--stackCount];
+					islandStack[stackCount] = null; // gc
 					body.sleeping = false;
 					// add rigid body to the island
 					islandRigidBodies[islandNumRigidBodies++] = body;
@@ -475,7 +478,7 @@ package com.element.oimo.physics.dynamics {
 							continue;
 						}
 						// add rigid body to stack
-						islandStack[numStacks++] = next;
+						islandStack[stackCount++] = next;
 						next.addedToIsland = true;
 					}
 					for (var js:JointLink = body.jointLink; js != null; js = js.next) {
@@ -491,7 +494,7 @@ package com.element.oimo.physics.dynamics {
 							continue;
 						}
 						// add rigid body to stack
-						islandStack[numStacks++] = next;
+						islandStack[stackCount++] = next;
 						next.addedToIsland = true;
 					}
 				}

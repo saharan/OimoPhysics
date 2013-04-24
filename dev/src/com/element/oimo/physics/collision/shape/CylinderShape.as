@@ -128,9 +128,9 @@ package com.element.oimo.physics.collision.shape {
 			if (dz < 0) d -= dz;
 			else d += dz;
 			proxy.init(
-				position.x - w - 0.01, position.x + w + 0.01,
-				position.y - h - 0.01, position.y + h + 0.01,
-				position.z - d - 0.01, position.z + d + 0.01
+				position.x - w - 0.005, position.x + w + 0.005,
+				position.y - h - 0.005, position.y + h + 0.005,
+				position.z - d - 0.005, position.z + d + 0.005
 			);
 		}
 		

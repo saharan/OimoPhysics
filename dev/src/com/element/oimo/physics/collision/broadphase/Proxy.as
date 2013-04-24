@@ -69,6 +69,9 @@ package com.element.oimo.physics.collision.broadphase {
 		 */
 		public var parent:Shape;
 		
+		public var leaf:DynamicBVTreeNode;
+		public var sap:SAPProxy;
+		
 		/**
 		 * 新しく Proxy オブジェクトを作成します。
 		 * 引数を指定しない場合は、全ての値が0に初期化されます。
@@ -90,6 +93,9 @@ package com.element.oimo.physics.collision.broadphase {
 			this.maxY = maxY;
 			this.minZ = minZ;
 			this.maxZ = maxZ;
+			leaf = new DynamicBVTreeNode();
+			leaf.proxy = this;
+			sap = new SAPProxy(this);
 		}
 		
 		/**
