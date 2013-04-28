@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -20,7 +20,6 @@ package com.element.oimo.physics.util {
 	import com.element.oimo.glmini.OimoGLMini;
 	import com.element.oimo.math.Mat44;
 	import com.element.oimo.physics.collision.shape.BoxShape;
-	import com.element.oimo.physics.collision.shape.CylinderShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.SphereShape;
 	import com.element.oimo.physics.constraint.contact.Contact;
@@ -207,19 +206,16 @@ package com.element.oimo.physics.util {
 					contacts = contacts.next;
 				}
 			}
-			var js:Vector.<Joint> = wld.joints;
-			num = wld.numJoints;
 			if (drawJoints) {
-				for (var k:int = 0; k < num; k++) {
-					var jo:Joint = js[k];
+				for (var joint:Joint = wld.joints; joint != null; joint = joint.next) {
 					gl.push();
-					gl.translate(jo.anchorPosition1.x, jo.anchorPosition1.y, jo.anchorPosition1.z);
+					gl.translate(joint.anchorPosition1.x, joint.anchorPosition1.y, joint.anchorPosition1.z);
 					gl.scale(0.1, 0.1, 0.1);
 					gl.color(0.2, 0.2, 0.8);
 					gl.drawTriangles(0);
 					gl.pop();
 					gl.push();
-					gl.translate(jo.anchorPosition2.x, jo.anchorPosition2.y, jo.anchorPosition2.z);
+					gl.translate(joint.anchorPosition2.x, joint.anchorPosition2.y, joint.anchorPosition2.z);
 					gl.scale(0.1, 0.1, 0.1);
 					gl.color(0.2, 0.2, 0.8);
 					gl.drawTriangles(0);
@@ -264,11 +260,6 @@ package com.element.oimo.physics.util {
 						var box:BoxShape = s as BoxShape;
 						gl.scale(box.width, box.height, box.depth);
 						gl.drawTriangles(1);
-						break;
-					case Shape.SHAPE_CYLINDER:
-						var cyl:CylinderShape = s as CylinderShape;
-						gl.scale(cyl.radius, cyl.height, cyl.radius);
-						gl.drawTriangles(2);
 						break;
 					}
 					gl.pop();

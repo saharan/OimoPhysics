@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -18,25 +18,16 @@
  */
 package com.element.oimo.physics {
 	/**
-	 * OimoPhysics の情報のクラスです。
-	 * @author saharan
+	 * Information of OimoPhysics.
 	 */
 	public final class OimoPhysics {
 		/**
-		 * OimoPhysics のバージョンです。
+		 * Version of OimoPhysics.
 		 */
-		public static const VERSION:String = "1.0.0";
+		public static const VERSION:String = "1.1.0a";
 		
-		/**
-		 * OimoPhysics の説明です。
-		 */
-		public static const DESCRIPTION:String = "OimoPhysics " + VERSION + " (c) 2012 EL-EMENT saharan";
-		
-		/**
-		 * OimoPhysics オブジェクトを作成することはできません。
-		 */
 		public function OimoPhysics() {
-			throw new Error("OimoPhysics オブジェクトを作成することはできません");
+			throw new Error("Do not create an instance of Oimophysics.");
 		}
 		
 	}

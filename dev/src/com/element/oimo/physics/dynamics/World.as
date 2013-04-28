@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -18,18 +18,16 @@
  */
 package com.element.oimo.physics.dynamics {
 	import com.element.oimo.math.Quat;
+	import com.element.oimo.physics.collision.broadphase.AABB;
 	import com.element.oimo.physics.collision.broadphase.BroadPhase;
 	import com.element.oimo.physics.collision.broadphase.BruteForceBroadPhase;
-	import com.element.oimo.physics.collision.broadphase.DynamicBVTreeBroadPhase;
+	import com.element.oimo.physics.collision.broadphase.dbvt.DBVTBroadPhase;
 	import com.element.oimo.physics.collision.broadphase.Pair;
-	import com.element.oimo.physics.collision.broadphase.SweepAndPruneBroadPhase;
-	import com.element.oimo.physics.collision.broadphase.SweepAndPruneBroadPhase_;
+	import com.element.oimo.physics.collision.broadphase.Proxy;
+	import com.element.oimo.physics.collision.broadphase.sap.SAPBroadPhase;
 	import com.element.oimo.physics.collision.narrow.BoxBoxCollisionDetector;
-	import com.element.oimo.physics.collision.narrow.BoxCylinderCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.CollisionDetector;
-	import com.element.oimo.physics.collision.narrow.CylinderCylinderCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.SphereBoxCollisionDetector;
-	import com.element.oimo.physics.collision.narrow.SphereCylinderCollisionDetector;
 	import com.element.oimo.physics.collision.narrow.SphereSphereCollisionDetector;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.math.Vec3;
@@ -39,6 +37,7 @@ package com.element.oimo.physics.dynamics {
 	import com.element.oimo.physics.constraint.contact.ContactLink;
 	import com.element.oimo.physics.constraint.joint.Joint;
 	import com.element.oimo.physics.constraint.joint.JointLink;
+	import com.element.oimo.physics.OimoPhysics;
 	import com.element.oimo.physics.util.Performance;
 	import flash.utils.getTimer;
 	/**
@@ -48,73 +47,43 @@ package com.element.oimo.physics.dynamics {
 	 */
 	public class World {
 		/**
-		 * 追加できる剛体の最大数です。
-		 */
-		public static const MAX_BODIES:uint = 16384;
-		
-		/**
-		 * 追加できる形状の最大数です。
-		 */
-		public static const MAX_SHAPES:uint = 65536;
-		
-		/**
-		 * 検出できる接触点の最大数です。
-		 */
-		public static const MAX_CONTACTS:uint = 65536;
-		
-		/**
-		 * 追加できるジョイントの最大数です。
-		 */
-		public static const MAX_JOINTS:uint = 16384;
-		
-		private static const MAX_CONSTRAINTS:uint = MAX_CONTACTS + MAX_JOINTS;
-		
-		/**
-		 * 追加されている剛体のリンクリストです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The rigid body list.
 		 */
 		public var rigidBodies:RigidBody;
 		
 		/**
-		 * 追加されている剛体の数です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The number of rigid bodies.
 		 */
 		public var numRigidBodies:uint;
 		
 		/**
-		 * 形状の接触情報のリンク配列です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The contact list.
 		 */
 		public var contacts:Contact;
 		private var unusedContacts:Contact;
 		
 		/**
-		 * 形状の接触情報の数です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The number of contacts.
 		 */
 		public var numContacts:uint;
 		
 		/**
-		 * 接触点の数です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The number of contact points.
 		 */
 		public var numContactPoints:uint;
 		
 		/**
-		 * ジョイントの配列です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The joint list.
 		 */
-		public const joints:Vector.<Joint> = new Vector.<Joint>(MAX_JOINTS, true);
+		public var joints:Joint;
 		
 		/**
-		 * ジョイントの数です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The number of joints.
 		 */
 		public var numJoints:uint;
 		
 		/**
-		 * シミュレーションアイランドの数です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The number of simulation islands.
 		 */
 		public var numIslands:uint;
 		
@@ -129,10 +98,9 @@ package com.element.oimo.physics.dynamics {
 		public var gravity:Vec3;
 		
 		/**
-		 * 衝突応答の反復処理回数です。
-		 * 値が大きいほど、より正確な動きになります。
+		 * The number of iterations for constraint solvers.
 		 */
-		public var iteration:uint;
+		public var numIterations:int;
 		
 		/**
 		 * パフォーマンスの詳細情報です。
@@ -149,45 +117,65 @@ package com.element.oimo.physics.dynamics {
 		
 		private var islandStack:Vector.<RigidBody>;
 		private var islandRigidBodies:Vector.<RigidBody>;
+		private var maxIslandRigidBodies:int;
 		private var islandConstraints:Vector.<Constraint>;
+		private var maxIslandConstraints:int;
 		
 		private var randX:uint;
 		private var randA:uint;
 		private var randB:uint;
 		
-		/**
-		 * 新しく World オブジェクトを作成します。
-		 * ワールドのタイムステップは、1秒間でのステップの実行回数から算出されます。
-		 * @param stepPerSecond 1秒間でのステップの実行回数
-		 */
-		public function World(stepPerSecond:Number = 60) {
+		public function World(stepPerSecond:Number = 60, broadPhaseType:int = BroadPhase.BROAD_PHASE_SWEEP_AND_PRUNE) {
+			trace("OimoPhysics " + OimoPhysics.VERSION + " Copyright (c) 2012-2013 EL-EMENT saharan");
 			timeStep = 1 / stepPerSecond;
-			iteration = 8;
+			switch(broadPhaseType) {
+			case BroadPhase.BROAD_PHASE_BRUTE_FORCE:
+				broadPhase = new BruteForceBroadPhase();
+				break;
+			case BroadPhase.BROAD_PHASE_SWEEP_AND_PRUNE:
+				broadPhase = new SAPBroadPhase();
+				break;
+			case BroadPhase.BROAD_PHASE_DYNAMIC_BOUNDING_VOLUME_TREE:
+				broadPhase = new DBVTBroadPhase();
+				break;
+			default:
+				throw new Error("Invalid type.");
+			}
+			numIterations = 8;
 			gravity = new Vec3(0, -9.80665, 0);
 			performance = new Performance();
-			broadPhase = new SweepAndPruneBroadPhase();
-			// broadPhase = new DynamicBVTreeBroadPhase();
-			// broadPhase = new BruteForceBroadPhase();
-			var numShapeTypes:uint = 4;
+			var numShapeTypes:uint = 3;
 			detectors = new Vector.<Vector.<CollisionDetector>>(numShapeTypes, true);
 			for (var i:int = 0; i < numShapeTypes; i++) {
 				detectors[i] = new Vector.<CollisionDetector>(numShapeTypes, true);
 			}
 			detectors[Shape.SHAPE_SPHERE][Shape.SHAPE_SPHERE] = new SphereSphereCollisionDetector();
 			detectors[Shape.SHAPE_SPHERE][Shape.SHAPE_BOX] = new SphereBoxCollisionDetector(false);
-			detectors[Shape.SHAPE_SPHERE][Shape.SHAPE_CYLINDER] = new SphereCylinderCollisionDetector(false);
 			detectors[Shape.SHAPE_BOX][Shape.SHAPE_SPHERE] = new SphereBoxCollisionDetector(true);
 			detectors[Shape.SHAPE_BOX][Shape.SHAPE_BOX] = new BoxBoxCollisionDetector();
-			detectors[Shape.SHAPE_CYLINDER][Shape.SHAPE_SPHERE] = new SphereCylinderCollisionDetector(true);
-			detectors[Shape.SHAPE_BOX][Shape.SHAPE_CYLINDER] = new BoxCylinderCollisionDetector(false);
-			detectors[Shape.SHAPE_CYLINDER][Shape.SHAPE_BOX] = new BoxCylinderCollisionDetector(true);
-			detectors[Shape.SHAPE_CYLINDER][Shape.SHAPE_CYLINDER] = new CylinderCylinderCollisionDetector();
 			randX = 65535;
 			randA = 98765;
 			randB = 123456789;
-			islandRigidBodies = new Vector.<RigidBody>(64, true);
-			islandStack = new Vector.<RigidBody>(64, true);
-			islandConstraints = new Vector.<Constraint>(128, true);
+			maxIslandRigidBodies = 64;
+			islandRigidBodies = new Vector.<RigidBody>(maxIslandRigidBodies, true);
+			islandStack = new Vector.<RigidBody>(maxIslandRigidBodies, true);
+			maxIslandConstraints = 128;
+			islandConstraints = new Vector.<Constraint>(maxIslandConstraints, true);
+		}
+		
+		/**
+		 * Remove all rigid bodies, shapes, joints and any objects from the world.
+		 */
+		public function clear():void {
+			while (joints != null) {
+				removeJoint(joints);
+			}
+			while (contacts != null) {
+				removeContact(contacts);
+			}
+			while (rigidBodies != null) {
+				removeRigidBody(rigidBodies);
+			}
 		}
 		
 		/**
@@ -199,13 +187,13 @@ package com.element.oimo.physics.dynamics {
 			if (rigidBody.parent) {
 				throw new Error("一つの剛体を複数ワールドに追加することはできません");
 			}
+			rigidBody.parent = this;
 			rigidBody.awake();
 			for (var shape:Shape = rigidBody.shapes; shape != null; shape = shape.next) {
 				addShape(shape);
 			}
 			if (rigidBodies != null) (rigidBodies.prev = rigidBody).next = rigidBodies;
 			rigidBodies = rigidBody;
-			rigidBody.parent = this;
 			numRigidBodies++;
 		}
 		
@@ -232,6 +220,8 @@ package com.element.oimo.physics.dynamics {
 			if (prev != null) prev.next = next;
 			if (next != null) next.prev = prev;
 			if (rigidBodies == remove) rigidBodies = next;
+			remove.prev = null;
+			remove.next = null;
 			remove.parent = null;
 			numRigidBodies--;
 		}
@@ -243,12 +233,11 @@ package com.element.oimo.physics.dynamics {
 		 * @param	shape 追加する形状
 		 */
 		public function addShape(shape:Shape):void {
-			if (!shape.parent) {
+			if (!shape.parent || !shape.parent.parent) {
 				throw new Error("ワールドに形状を単体で追加することはできません");
 			}
-			if (shape.parent.parent) {
-				throw new Error("一つの形状を複数ワールドに追加することはできません");
-			}
+			shape.proxy = broadPhase.createProxy(shape);
+			shape.updateProxy();
 			broadPhase.addProxy(shape.proxy);
 		}
 		
@@ -260,6 +249,7 @@ package com.element.oimo.physics.dynamics {
 		 */
 		public function removeShape(shape:Shape):void {
 			broadPhase.removeProxy(shape.proxy);
+			shape.proxy = null;
 		}
 		
 		/**
@@ -268,35 +258,32 @@ package com.element.oimo.physics.dynamics {
 		 * @param	joint 追加するジョイント
 		 */
 		public function addJoint(joint:Joint):void {
-			if (numJoints == MAX_JOINTS) {
-				throw new Error("これ以上ワールドにジョイントを追加することはできません");
-			}
 			if (joint.parent) {
 				throw new Error("一つのジョイントを複数ワールドに追加することはできません");
 			}
+			if (joints != null) (joints.prev = joint).next = joints;
+			joints = joint;
+			joint.parent = this;
+			numJoints++;
 			joint.awake();
 			joint.attach();
-			joints[numJoints++] = joint;
-			joint.parent = this;
 		}
 		
 		/**
 		 * ワールドからジョイントを削除します。
 		 * 削除されたジョイントはステップ毎の演算対象から外されます。
 		 * @param	joint 削除するジョイント
-		 * @param	index 削除するジョイントのインデックス
 		 */
 		public function removeJoint(joint:Joint):void {
-			var remove:Joint = null;
-			for (var i:int = 0; i < numJoints; i++) {
-				if (joints[i] == joint) {
-					remove = joint;
-					joints[i] = joints[--numJoints];
-					joints[numJoints] = null;
-					break;
-				}
-			}
-			if (remove == null) return;
+			var remove:Joint = joint;
+			var prev:Joint = remove.prev;
+			var next:Joint = remove.next;
+			if (prev != null) prev.next = next;
+			if (next != null) next.prev = prev;
+			if (joints == remove) joints = next;
+			remove.prev = null;
+			remove.next = null;
+			numJoints--;
 			remove.awake();
 			remove.detach();
 			remove.parent = null;
@@ -322,8 +309,8 @@ package com.element.oimo.physics.dynamics {
 						av.x != 0 || av.y != 0 || av.z != 0 ||
 						p.x != sp.x || p.y != sp.y || p.z != sp.z ||
 						o.s != so.s || o.x != so.x || o.y != so.y || o.z != so.z
-					){
-						body.awake(); // awaking check
+					){ // awake the body
+						body.awake();
 					}
 				}
 				body = body.next;
@@ -352,7 +339,6 @@ package com.element.oimo.physics.dynamics {
 					s1 = pair.shape2;
 					s2 = pair.shape1;
 				}
-				
 				var link:ContactLink;
 				if (s1.numContacts < s2.numContacts) {
 					link = s1.contactLink;
@@ -370,17 +356,7 @@ package com.element.oimo.physics.dynamics {
 					link = link.next;
 				}
 				if (!exists) {
-					var newContact:Contact;
-					if (unusedContacts != null) {
-						newContact = unusedContacts;
-						unusedContacts = unusedContacts.next;
-					} else newContact = new Contact();
-					newContact.attach(s1, s2);
-					newContact.detector = detectors[s1.type][s2.type];
-					if (contacts) (contacts.prev = newContact).next = contacts;
-					else newContact.next = null;
-					contacts = newContact;
-					numContacts++;
+					addContact(s1, s2);
 				}
 			}
 			
@@ -392,19 +368,22 @@ package com.element.oimo.physics.dynamics {
 			contact = contacts;
 			while (contact != null) {
 				if (!contact.persisting) {
-					var prev:Contact = contact.prev;
-					var next:Contact = contact.next;
-					if (next) next.prev = prev;
-					if (prev) prev.next = next;
-					if (contacts == contact) contacts = next;
-					contact.detach();
-					contact.next = unusedContacts;
-					unusedContacts = contact;
-					contact = next;
-					numContacts--;
-					continue;
+					var aabb1:AABB = contact.shape1.aabb;
+					var aabb2:AABB = contact.shape2.aabb;
+					if (
+						aabb1.minX > aabb2.maxX || aabb1.maxX < aabb2.minX ||
+						aabb1.minY > aabb2.maxY || aabb1.maxY < aabb2.minY ||
+						aabb1.minZ > aabb2.maxZ || aabb1.maxZ < aabb2.minZ
+					) {
+						var next:Contact = contact.next;
+						removeContact(contact);
+						contact = next;
+						continue;
+					}
 				}
-				if (!contact.body1.sleeping || !contact.body2.sleeping) {
+				var b1:RigidBody = contact.body1;
+				var b2:RigidBody = contact.body2;
+				if (b1.isDynamic && !b1.sleeping || b2.isDynamic && !b2.sleeping) {
 					contact.updateManifold();
 				}
 				numContactPoints += contact.manifold.numPoints;
@@ -417,34 +396,93 @@ package com.element.oimo.physics.dynamics {
 			performance.narrowPhaseTime = time3 - time2;
 		}
 		
+		private function addContact(s1:Shape, s2:Shape):void {
+			var newContact:Contact;
+			if (unusedContacts != null) {
+				newContact = unusedContacts;
+				unusedContacts = unusedContacts.next;
+			} else {
+				newContact = new Contact();
+			}
+			newContact.attach(s1, s2);
+			newContact.detector = detectors[s1.type][s2.type];
+			if (contacts) (contacts.prev = newContact).next = contacts;
+			contacts = newContact;
+			numContacts++;
+		}
+		
+		private function removeContact(contact:Contact):void {
+			var prev:Contact = contact.prev;
+			var next:Contact = contact.next;
+			if (next) next.prev = prev;
+			if (prev) prev.next = next;
+			if (contacts == contact) contacts = next;
+			contact.prev = null;
+			contact.next = null;
+			contact.detach();
+			contact.next = unusedContacts;
+			unusedContacts = contact;
+			numContacts--;
+		}
+		
+		private function calSleep(body:RigidBody):Boolean {
+			if (!body.allowSleep) return false;
+			var v:Vec3 = body.linearVelocity;
+			if (v.x * v.x + v.y * v.y + v.z * v.z > 0.04) return false;
+			v = body.angularVelocity;
+			if (v.x * v.x + v.y * v.y + v.z * v.z > 0.25) return false;
+			return true;
+		}
+		
 		private function solveIslands():void {
 			var invTimeStep:Number = 1 / timeStep;
 			var body:RigidBody;
+			var joint:Joint;
 			var constraint:Constraint;
 			var num:uint;
 			
-			for (var i:int = 0; i < numJoints; i++) {
-				joints[i].addedToIsland = false;
+			for (joint = joints; joint != null; joint = joint.next) {
+				joint.addedToIsland = false;
 			}
 			
 			// expand island buffers
-			if (islandRigidBodies.length < numRigidBodies) {
-				islandRigidBodies = new Vector.<RigidBody>(numRigidBodies << 1, true);
-				islandStack = new Vector.<RigidBody>(numRigidBodies << 1, true);
+			if (maxIslandRigidBodies < numRigidBodies) {
+				maxIslandRigidBodies = numRigidBodies << 1;
+				islandRigidBodies = new Vector.<RigidBody>(maxIslandRigidBodies, true);
+				islandStack = new Vector.<RigidBody>(maxIslandRigidBodies, true);
 			}
 			var numConstraints:uint = numJoints + numContacts;
-			if (islandConstraints.length < numConstraints) {
-				islandConstraints = new Vector.<Constraint>(numConstraints << 1, true);
+			if (maxIslandConstraints < numConstraints) {
+				maxIslandConstraints = numConstraints << 1;
+				islandConstraints = new Vector.<Constraint>(maxIslandConstraints, true);
 			}
 			
 			var time1:int = getTimer();
 			numIslands = 0;
 			// build and solve simulation islands
-			var base:RigidBody = rigidBodies;
-			while (base != null) {
+			for (var base:RigidBody = rigidBodies; base != null; base = base.next) {
 				if (base.addedToIsland || base.isStatic || base.sleeping) {
-					base = base.next;
 					continue; // ignore
+				}
+				if (base.isLonely()) { // update single body
+					if (base.isDynamic) {
+						base.linearVelocity.x += gravity.x * timeStep;
+						base.linearVelocity.y += gravity.y * timeStep;
+						base.linearVelocity.z += gravity.z * timeStep;
+					}
+					if (calSleep(base)) {
+						base.sleepTime += timeStep;
+						if (base.sleepTime > 0.5) {
+							base.sleep();
+						} else {
+							base.updatePosition(timeStep);
+						}
+					} else {
+						base.sleepTime = 0;
+						base.updatePosition(timeStep);
+					}
+					numIslands++;
+					continue;
 				}
 				var islandNumRigidBodies:uint = 0;
 				var islandNumConstraints:uint = 0;
@@ -453,7 +491,7 @@ package com.element.oimo.physics.dynamics {
 				islandStack[0] = base;
 				base.addedToIsland = true;
 				// build an island
-				while (stackCount > 0) {
+				do {
 					// get rigid body from stack
 					body = islandStack[--stackCount];
 					islandStack[stackCount] = null; // gc
@@ -497,8 +535,7 @@ package com.element.oimo.physics.dynamics {
 						islandStack[stackCount++] = next;
 						next.addedToIsland = true;
 					}
-				}
-				// update the island
+				} while (stackCount != 0);
 				
 				// update velocities
 				var gx:Number = gravity.x * timeStep;
@@ -525,7 +562,7 @@ package com.element.oimo.physics.dynamics {
 				for (j = 0; j < islandNumConstraints; j++) {
 					islandConstraints[j].preSolve(timeStep, invTimeStep); // pre-solve
 				}
-				for (var k:int = 0; k < iteration; k++) {
+				for (var k:int = 0; k < numIterations; k++) {
 					for (j = 0; j < islandNumConstraints; j++) {
 						islandConstraints[j].solve(); // main-solve
 					}
@@ -539,29 +576,14 @@ package com.element.oimo.physics.dynamics {
 				var sleepTime:Number = 10;
 				for (j = 0; j < islandNumRigidBodies; j++) {
 					body = islandRigidBodies[j];
-					if (!body.allowSleep) {
+					if (calSleep(body)) {
+						body.sleepTime += timeStep;
+						if (body.sleepTime < sleepTime) sleepTime = body.sleepTime;
+					} else {
 						body.sleepTime = 0;
 						sleepTime = 0;
 						continue;
 					}
-					var vx:Number = body.linearVelocity.x;
-					var vy:Number = body.linearVelocity.y;
-					var vz:Number = body.linearVelocity.z;
-					if (vx * vx + vy * vy + vz * vz > 0.04) {
-						body.sleepTime = 0;
-						sleepTime = 0;
-						continue;
-					}
-					vx = body.angularVelocity.x;
-					vy = body.angularVelocity.y;
-					vz = body.angularVelocity.z;
-					if (vx * vx + vy * vy + vz * vz > 0.25) {
-						body.sleepTime = 0;
-						sleepTime = 0;
-						continue;
-					}
-					body.sleepTime += timeStep;
-					if (body.sleepTime < sleepTime) sleepTime = body.sleepTime;
 				}
 				if (sleepTime > 0.5) {
 					// sleep the island
@@ -577,7 +599,6 @@ package com.element.oimo.physics.dynamics {
 					}
 				}
 				numIslands++;
-				base = base.next;
 			}
 			var time2:int = getTimer();
 			performance.solvingTime = time2 - time1;

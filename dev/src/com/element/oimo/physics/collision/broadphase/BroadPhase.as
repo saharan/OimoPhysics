@@ -1,40 +1,62 @@
+/* Copyright (c) 2012-2013 EL-EMENT saharan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation  * files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy,  * modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to
+ * whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.element.oimo.physics.collision.broadphase {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.constraint.joint.Joint;
 	import com.element.oimo.physics.constraint.joint.JointLink;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * 広域衝突判定を行うクラスです。
-	 * 広域衝突判定では、詳細な衝突判定の回数を削減するため、
-	 * 詳細な形状の代わりに、近似された単純な形を用いて計算されます。
-	 * 広域衝突判定の後、衝突の可能性がある形状のペアのみに、詳細な衝突判定が行われます。
-	 * @author saharan
+	 * The broad-phase is used for collecting all possible pairs for collision.
 	 */
 	public class BroadPhase {
 		/**
-		 * プロキシが重なった形状のペアの配列です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * Brute force broad-phase algorithm.
+		 */
+		public static const BROAD_PHASE_BRUTE_FORCE:int = 1;
+		
+		/**
+		 * Sweep and prune broad-phase algorithm.
+		 */
+		public static const BROAD_PHASE_SWEEP_AND_PRUNE:int = 2;
+		
+		/**
+		 * Dynamic bounding volume tree broad-phase algorithm.
+		 */
+		public static const BROAD_PHASE_DYNAMIC_BOUNDING_VOLUME_TREE:int = 3;
+		
+		/**
+		 * The pairs whose proxies are overlapping.
 		 */
 		public var pairs:Vector.<Pair>;
 		
 		/**
-		 * プロキシが重なった形状のペアの数です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The number of pairs.
 		 */
 		public var numPairs:uint;
 		
 		/**
-		 * プロキシが重なった形状のペアを検索した回数です。
-		 * アルゴリズムが総当りの場合、この数は形状の数を n とすると n * (n - 1) / 2 と表せます。
+		 * The number of pair checks.
 		 */
 		public var numPairChecks:uint;
 		
 		private var bufferSize:uint;
 		
-		/**
-		 * 新しく BroadPhase オブジェクトを作成します。
-		 * <strong>このコンストラクタは外部から呼び出さないでください。</strong>
-		 */
 		public function BroadPhase() {
 			bufferSize = 256;
 			pairs = new Vector.<Pair>(bufferSize, true);
@@ -44,26 +66,35 @@ package com.element.oimo.physics.collision.broadphase {
 		}
 		
 		/**
-		 * 判定対象のプロキシを追加します。
-		 * @param	proxy 追加するプロキシ
+		 * Create a new proxy.
+		 * @param	shape
+		 * @return
+		 */
+		public function createProxy(shape:Shape):Proxy {
+			throw new Error("Inheritance error.");
+		}
+		
+		/**
+		 * Add the proxy into the broad-phase.
+		 * @param	proxy
 		 */
 		public function addProxy(proxy:Proxy):void {
-			throw new Error("addProxy 関数が継承されていません");
+			throw new Error("Inheritance error.");
 		}
 		
 		/**
-		 * 判定対象のプロキシを削除します。
-		 * @param	proxy 削除するプロキシ
+		 * Remove the proxy from the broad-phase.
+		 * @param	proxy
 		 */
 		public function removeProxy(proxy:Proxy):void {
-			throw new Error("removeProxy 関数が継承されていません");
+			throw new Error("Inheritance error.");
 		}
 		
 		/**
-		 * 指定された形状で構成されるペアが有効であるかどうかを判断します。
-		 * @param	s1 形状1
-		 * @param	s2 形状2
-		 * @return ペアが有効なら true
+		 * Returns whether the pair is available or not.
+		 * @param	s1
+		 * @param	s2
+		 * @return
 		 */
 		public function isAvailablePair(s1:Shape, s2:Shape):Boolean {
 			var b1:RigidBody = s1.parent;
@@ -93,7 +124,7 @@ package com.element.oimo.physics.collision.broadphase {
 		}
 		
 		/**
-		 * 衝突の可能性がある形状のペアを計算します。
+		 * Detect overlapping pairs.
 		 */
 		public function detectPairs():void {
 			while (numPairs > 0) {
@@ -101,11 +132,12 @@ package com.element.oimo.physics.collision.broadphase {
 				pair.shape1 = null;
 				pair.shape2 = null;
 			}
+			numPairChecks = 0;
 			collectPairs();
 		}
 		
 		protected function collectPairs():void {
-			throw new Error("collectPairs 関数が継承されていません");
+			throw new Error("Inheritance error.");
 		}
 		
 		protected function addPair(s1:Shape, s2:Shape):void {

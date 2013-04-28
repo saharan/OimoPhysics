@@ -16,32 +16,26 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.collision.broadphase {
+package com.element.oimo.physics.collision.broadphase.dbvt {
+	import com.element.oimo.physics.collision.broadphase.Proxy;
 	import com.element.oimo.physics.collision.shape.Shape;
 	/**
-	 * A proxy is used for broad-phase collecting pairs that can be colliding.
+	 * A proxy for dynamic bounding volume tree broad-phase.
+	 * @author saharan
 	 */
-	public class Proxy {
+	public class DBVTProxy extends Proxy {
 		/**
-		 * The parent shape.
+		 * The leaf of the proxy.
 		 */
-		public var shape:Shape;
+		public var leaf:DBVTNode;
 		
-		/**
-		 * The axis-aligned bounding box.
-		 */
-		public var aabb:AABB;
-		
-		public function Proxy(shape:Shape) {
-			this.shape = shape;
-			aabb = shape.aabb;
+		public function DBVTProxy(shape:Shape) {
+			super(shape);
+			leaf = new DBVTNode();
+			leaf.proxy = this;
 		}
 		
-		/**
-		 * Update the proxy.
-		 */
-		public function update():void {
-			throw new Error("Inheritance error.");
+		override public function update():void {
 		}
 		
 	}

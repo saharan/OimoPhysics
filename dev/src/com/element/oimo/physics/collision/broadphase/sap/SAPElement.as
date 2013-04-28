@@ -16,32 +16,56 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.collision.broadphase {
-	import com.element.oimo.physics.collision.shape.Shape;
+package com.element.oimo.physics.collision.broadphase.sap {
 	/**
-	 * A proxy is used for broad-phase collecting pairs that can be colliding.
+	 * An element of proxies.
+	 * @author saharan
 	 */
-	public class Proxy {
+	public class SAPElement {
 		/**
-		 * The parent shape.
+		 * The parent proxy.
 		 */
-		public var shape:Shape;
+		public var proxy:SAPProxy;
 		
 		/**
-		 * The axis-aligned bounding box.
+		 * The pair element.
 		 */
-		public var aabb:AABB;
-		
-		public function Proxy(shape:Shape) {
-			this.shape = shape;
-			aabb = shape.aabb;
-		}
+		public var pair:SAPElement;
 		
 		/**
-		 * Update the proxy.
+		 * The value of the element.
 		 */
-		public function update():void {
-			throw new Error("Inheritance error.");
+		public var value:Number;
+		
+		/**
+		 * Whether the element has maximum value or not.
+		 */
+		public var max:Boolean;
+		
+		/**
+		 * The minimum element on other axis.
+		 */
+		public var min1:SAPElement;
+		
+		/**
+		 * The maximum element on other axis.
+		 */
+		public var max1:SAPElement;
+		
+		/**
+		 * The minimum element on other axis.
+		 */
+		public var min2:SAPElement;
+		
+		/**
+		 * The maximum element on other axis.
+		 */
+		public var max2:SAPElement;
+		
+		public function SAPElement(proxy:SAPProxy, max:Boolean) {
+			this.proxy = proxy;
+			this.max = max;
+			value = 0;
 		}
 		
 	}

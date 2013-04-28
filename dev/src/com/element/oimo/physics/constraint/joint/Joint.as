@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -100,6 +100,16 @@ package com.element.oimo.physics.constraint.joint {
 		 * <strong>この変数は外部から変更しないでください。</strong>
 		 */
 		public var anchorPosition2:Vec3;
+		
+		/**
+		 * The previous joint in the world.
+		 */
+		public var prev:Joint;
+		
+		/**
+		 * The next joint in the world.
+		 */
+		public var next:Joint;
 		
 		/**
 		 * 新しい Joint オブジェクトを作成します。

@@ -1,20 +1,39 @@
-package com.element.oimo.physics.collision.broadphase {
+/* Copyright (c) 2012-2013 EL-EMENT saharan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation  * files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy,  * modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to
+ * whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.element.oimo.physics.collision.broadphase.dbvt {
+	import com.element.oimo.physics.collision.broadphase.AABB;
 	/**
 	 * A dynamic bounding volume tree for the broad-phase algorithm.
 	 * @author saharan
 	 */
-	public class DynamicBVTree {
+	public class DBVT {
 		/**
 		 * The root of this tree.
 		 */
-		public var root:DynamicBVTreeNode;
+		public var root:DBVTNode;
 		
-		private var freeNodes:Vector.<DynamicBVTreeNode>;
+		private var freeNodes:Vector.<DBVTNode>;
 		private var numFreeNodes:int;
 		private var aabb:AABB;
 		
-		public function DynamicBVTree() {
-			freeNodes = new Vector.<DynamicBVTreeNode>(16384, true);
+		public function DBVT() {
+			freeNodes = new Vector.<DBVTNode>(16384, true);
 			numFreeNodes = 0;
 			aabb = new AABB();
 		}
@@ -23,7 +42,7 @@ package com.element.oimo.physics.collision.broadphase {
 		 * Move the leaf.
 		 * @param	leaf
 		 */
-		public function moveLeaf(leaf:DynamicBVTreeNode):void {
+		public function moveLeaf(leaf:DBVTNode):void {
 			deleteLeaf(leaf);
 			insertLeaf(leaf);
 		}
@@ -32,18 +51,18 @@ package com.element.oimo.physics.collision.broadphase {
 		 * Insert the leaf to this tree.
 		 * @param	node
 		 */
-		public function insertLeaf(leaf:DynamicBVTreeNode):void {
+		public function insertLeaf(leaf:DBVTNode):void {
 			if (root == null) {
 				root = leaf;
 				return;
 			}
 			var lb:AABB = leaf.aabb;
-			var sibling:DynamicBVTreeNode = root;
+			var sibling:DBVTNode = root;
 			var oldArea:Number;
 			var newArea:Number;
 			while (sibling.proxy == null) { // descend the node to search the best pair
-				var c1:DynamicBVTreeNode = sibling.child1;
-				var c2:DynamicBVTreeNode = sibling.child2;
+				var c1:DBVTNode = sibling.child1;
+				var c2:DBVTNode = sibling.child2;
 				var b:AABB = sibling.aabb;
 				var c1b:AABB = c1.aabb;
 				var c2b:AABB = c2.aabb;
@@ -88,12 +107,12 @@ package com.element.oimo.physics.collision.broadphase {
 					}
 				}
 			}
-			var oldParent:DynamicBVTreeNode = sibling.parent;
-			var newParent:DynamicBVTreeNode;
+			var oldParent:DBVTNode = sibling.parent;
+			var newParent:DBVTNode;
 			if (numFreeNodes > 0) {
 				newParent = freeNodes[--numFreeNodes];
 			} else {
-				newParent = new DynamicBVTreeNode();
+				newParent = new DBVTNode();
 			}
 			newParent.parent = oldParent;
 			newParent.child1 = leaf;
@@ -121,18 +140,18 @@ package com.element.oimo.physics.collision.broadphase {
 			} while (newParent != null);
 		}
 		
-		public function getBalance(node:DynamicBVTreeNode):int {
+		public function getBalance(node:DBVTNode):int {
 			if (node.proxy != null) return 0;
 			return node.child1.height - node.child2.height;
 		}
 		
-		public function print(node:DynamicBVTreeNode, indent:int, text:String):String {
+		public function print(node:DBVTNode, indent:int, text:String):String {
 			var hasChild:Boolean = node.proxy == null;
 			if (hasChild) text = print(node.child1, indent + 1, text);
 			for (var i:int = indent * 2; i >= 0; i--) {
 				text += " ";
 			}
-			text += (hasChild ? getBalance(node) : "[" + node.proxy.minX + "]") + "\n";
+			text += (hasChild ? getBalance(node) : "[" + node.proxy.aabb.minX + "]") + "\n";
 			if (hasChild) text = print(node.child2, indent + 1, text);
 			return text;
 		}
@@ -141,13 +160,13 @@ package com.element.oimo.physics.collision.broadphase {
 		 * Delete the leaf from this tree.
 		 * @param	node
 		 */
-		public function deleteLeaf(leaf:DynamicBVTreeNode):void {
+		public function deleteLeaf(leaf:DBVTNode):void {
 			if (leaf == root) {
 				root = null;
 				return;
 			}
-			var parent:DynamicBVTreeNode = leaf.parent;
-			var sibling:DynamicBVTreeNode;
+			var parent:DBVTNode = leaf.parent;
+			var sibling:DBVTNode;
 			if (parent.child1 == leaf) {
 				sibling = parent.child2;
 			} else {
@@ -158,7 +177,7 @@ package com.element.oimo.physics.collision.broadphase {
 				sibling.parent = null;
 				return;
 			}
-			var grandParent:DynamicBVTreeNode = parent.parent;
+			var grandParent:DBVTNode = parent.parent;
 			sibling.parent = grandParent;
 			if (grandParent.child1 == parent) {
 				grandParent.child1 = sibling;
@@ -175,14 +194,14 @@ package com.element.oimo.physics.collision.broadphase {
 			} while (grandParent != null);
 		}
 		
-		private function balance(node:DynamicBVTreeNode):DynamicBVTreeNode {
+		private function balance(node:DBVTNode):DBVTNode {
 			var nh:int = node.height;
 			if (nh < 2) {
 				return node;
 			}
-			var p:DynamicBVTreeNode = node.parent;
-			var l:DynamicBVTreeNode = node.child1;
-			var r:DynamicBVTreeNode = node.child2;
+			var p:DBVTNode = node.parent;
+			var l:DBVTNode = node.child1;
+			var r:DBVTNode = node.child2;
 			var lh:int = l.height;
 			var rh:int = r.height;
 			var balance:int = lh - rh;
@@ -196,14 +215,13 @@ package com.element.oimo.physics.collision.broadphase {
 			
 			// Is this tree balanced?
 			if (balance > 1) {
-				var ll:DynamicBVTreeNode = l.child1;
-				var lr:DynamicBVTreeNode = l.child2;
+				var ll:DBVTNode = l.child1;
+				var lr:DBVTNode = l.child2;
 				var llh:int = ll.height;
 				var lrh:int = lr.height;
 				
 				// Is L-L higher than L-R?
 				if (llh > lrh) {
-					
 					// set N to L-R
 					l.child2 = node;
 					node.parent = l;
@@ -224,7 +242,6 @@ package com.element.oimo.physics.collision.broadphase {
 					//     / \         / \
 					// [...] [...] [L-R] [ R ]
 					
-					
 					// fix bounds and heights
 					node.aabb.combine(lr.aabb, r.aabb);
 					t = lrh - rh;
@@ -233,9 +250,7 @@ package com.element.oimo.physics.collision.broadphase {
 					l.aabb.combine(ll.aabb, node.aabb);
 					t = llh - nh;
 					l.height = llh - (t & t >> 31) + 1;
-					
 				} else {
-					
 					// set N to L-L
 					l.child1 = node;
 					node.parent = l;
@@ -264,9 +279,7 @@ package com.element.oimo.physics.collision.broadphase {
 					l.aabb.combine(node.aabb, lr.aabb);
 					t = nh - lrh;
 					l.height = nh - (t & t >> 31) + 1;
-					
 				}
-				
 				// set new parent of L
 				if (p != null) {
 					if (p.child1 == node) {
@@ -278,17 +291,15 @@ package com.element.oimo.physics.collision.broadphase {
 					root = l;
 				}
 				l.parent = p;
-				
 				return l;
 			} else if (balance < -1) {
-				var rl:DynamicBVTreeNode = r.child1;
-				var rr:DynamicBVTreeNode = r.child2;
+				var rl:DBVTNode = r.child1;
+				var rr:DBVTNode = r.child2;
 				var rlh:int = rl.height;
 				var rrh:int = rr.height;
 				
 				// Is R-L higher than R-R?
 				if (rlh > rrh) {
-					
 					// set N to R-R
 					r.child2 = node;
 					node.parent = r;
@@ -309,18 +320,14 @@ package com.element.oimo.physics.collision.broadphase {
 					//     / \         / \
 					// [...] [...] [ L ] [R-R]
 					
-					
 					// fix bounds and heights
 					node.aabb.combine(l.aabb, rr.aabb);
 					t = lh - rrh;
 					node.height = lh - (t & t >> 31) + 1;
-					
 					r.aabb.combine(rl.aabb, node.aabb);
 					t = rlh - nh;
 					r.height = rlh - (t & t >> 31) + 1;
-					
 				} else {
-					
 					// set N to R-L
 					r.child1 = node;
 					node.parent = r;
@@ -341,18 +348,14 @@ package com.element.oimo.physics.collision.broadphase {
 					//     / \         / \
 					// [ L ] [R-L] [...] [...]
 					
-					
 					// fix bounds and heights
 					node.aabb.combine(l.aabb, rl.aabb);
 					t = lh - rlh;
 					node.height = lh - (t & t >> 31) + 1;
-					
 					r.aabb.combine(node.aabb, rr.aabb);
 					t = nh - rrh;
 					r.height = nh - (t & t >> 31) + 1;
-					
 				}
-				
 				// set new parent of R
 				if (p != null) {
 					if (p.child1 == node) {
@@ -364,32 +367,14 @@ package com.element.oimo.physics.collision.broadphase {
 					root = r;
 				}
 				r.parent = p;
-				
 				return r;
-				
 			}
 			return node;
 		}
 		
-		private function balance_old(node:DynamicBVTreeNode):DynamicBVTreeNode {
-			var balance:int = getBalance(node);
-			if (balance > 1) {
-				if (getBalance(node.child1) < 0) {
-					node.child1 = rotateLeft(node.child1);
-				}
-				return rotateRight(node);
-			} else if (balance < -1) {
-				if (getBalance(node.child2) > 0) {
-					node.child2 = rotateRight(node.child2);
-				}
-				return rotateLeft(node);
-			}
-			return node;
-		}
-		
-		private function fix(node:DynamicBVTreeNode):void {
-			var c1:DynamicBVTreeNode = node.child1;
-			var c2:DynamicBVTreeNode = node.child2;
+		private function fix(node:DBVTNode):void {
+			var c1:DBVTNode = node.child1;
+			var c2:DBVTNode = node.child2;
 			node.aabb.combine(c1.aabb, c2.aabb);
 			var h1:int = c1.height;
 			var h2:int = c2.height;
@@ -398,44 +383,6 @@ package com.element.oimo.physics.collision.broadphase {
 			} else {
 				node.height = h1 + 1;
 			}
-		}
-		
-		private function rotateRight(node:DynamicBVTreeNode):DynamicBVTreeNode {
-			var p:DynamicBVTreeNode = node.parent;
-			var l:DynamicBVTreeNode = node.child1;
-			var lr:DynamicBVTreeNode = l.child2;
-			(node.child1 = lr).parent = node;
-			fix(node);
-			((l.child2 = node).parent = l).parent = p;
-			fix(l);
-			if (p != null) {
-				if (p.child2 == node) {
-					p.child2 = l;
-				} else {
-					p.child1 = l;
-				}
-				fix(p);
-			} else root = l;
-			return l;
-		}
-		
-		private function rotateLeft(node:DynamicBVTreeNode):DynamicBVTreeNode {
-			var p:DynamicBVTreeNode = node.parent;
-			var r:DynamicBVTreeNode = node.child2;
-			var rl:DynamicBVTreeNode = r.child1;
-			(node.child2 = rl).parent = node;
-			fix(node);
-			((r.child1 = node).parent = r).parent = p;
-			fix(r);
-			if (p != null) {
-				if (p.child1 == node) {
-					p.child1 = r;
-				} else {
-					p.child2 = r;
-				}
-				fix(p);
-			} else root = r;
-			return r;
 		}
 		
 	}

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -35,12 +35,12 @@ package com.element.oimo.physics.dynamics {
 		/**
 		 * 動的な剛体を表す剛体の種類です。
 		 */
-		public static const BODY_DYNAMIC:uint = 0x0;
+		public static const BODY_DYNAMIC:uint = 0x1;
 		
 		/**
 		 * 静的な剛体を表す剛体の種類です。
 		 */
-		public static const BODY_STATIC:uint = 0x1;
+		public static const BODY_STATIC:uint = 0x2;
 		
 		/**
 		 * 一つの剛体に追加できる形状の最大数です。
@@ -279,6 +279,8 @@ package com.element.oimo.physics.dynamics {
 			if (prev != null) prev.next = next;
 			if (next != null) next.prev = prev;
 			if (shapes == remove) shapes = next;
+			remove.prev = null;
+			remove.next = null;
 			remove.parent = null;
 			if (parent) parent.removeShape(remove);
 			numShapes--;
@@ -398,6 +400,9 @@ package com.element.oimo.physics.dynamics {
 				js.body.sleeping = false;
 				js = js.next;
 			}
+			for (var shape:Shape = shapes; shape != null; shape = shape.next) {
+				shape.updateProxy();
+			}
 		}
 		
 		/**
@@ -420,6 +425,17 @@ package com.element.oimo.physics.dynamics {
 			sleepOrientation.z = orientation.z;
 			sleepTime = 0;
 			sleeping = true;
+			for (var shape:Shape = shapes; shape != null; shape = shape.next) {
+				shape.updateProxy();
+			}
+		}
+		
+		/**
+		 * Returns whether the rigid body has not any connection with others.
+		 * @return
+		 */
+		public function isLonely():Boolean {
+			return numJoints == 0 && numContacts == 0;
 		}
 		
 		/**
@@ -429,14 +445,16 @@ package com.element.oimo.physics.dynamics {
 		 * @param	timeStep 時間刻み幅
 		 */
 		public function updatePosition(timeStep:Number):void {
-			if (type == BODY_STATIC) {
+			switch(type) {
+			case BODY_STATIC:
 				linearVelocity.x = 0;
 				linearVelocity.y = 0;
 				linearVelocity.z = 0;
 				angularVelocity.x = 0;
 				angularVelocity.y = 0;
 				angularVelocity.z = 0;
-			} else if (type == BODY_DYNAMIC) {
+				break;
+			case BODY_DYNAMIC:
 				var vx:Number = linearVelocity.x;
 				var vy:Number = linearVelocity.y;
 				var vz:Number = linearVelocity.z;
@@ -475,8 +493,9 @@ package com.element.oimo.physics.dynamics {
 				//var q:Quat = new Quat(cos, vx * sin, vy * sin, vz * sin);
 				//orientation.mul(q, orientation);
 				//orientation.normalize(orientation);
-			} else {
-				throw new Error("未定義の剛体の種類です");
+				break;
+			default:
+				throw new Error("Invalid type.");
 			}
 			syncShapes();
 		}
@@ -576,7 +595,6 @@ package com.element.oimo.physics.dynamics {
 				rot.e21 = r20 * e01 + r21 * e11 + r22 * e21;
 				rot.e22 = r20 * e02 + r21 * e12 + r22 * e22;
 				shape.updateProxy();
-				shape.proxy.sap.update(); // TODO
 			}
 		}
 		

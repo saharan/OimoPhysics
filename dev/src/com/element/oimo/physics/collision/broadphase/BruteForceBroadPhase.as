@@ -1,67 +1,89 @@
+/* Copyright (c) 2012-2013 EL-EMENT saharan
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation  * files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy,  * modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to
+ * whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.element.oimo.physics.collision.broadphase {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	import flash.utils.getTimer;
 	/**
-	 * 総当りアルゴリズムを使用して広域衝突判定を行うクラスです。
-	 * <strong>このアルゴリズムは速度検証以外には非推奨です。</strong>
-	 * 総当り判定は形状の数に対し、常に O(n^2) の計算量を要求するため、
-	 * 形状の増え方に比べ、負荷の増え方が非常に高くなります。
-	 * @author saharan
+	 * A broad-phase algorithm with brute-force search.
+	 * This always checks for all possible pairs.
 	 */
 	public class BruteForceBroadPhase extends BroadPhase {
-		private var proxyPool:Vector.<Proxy>;
-		private var numProxies:uint;
+		private var proxies:Vector.<Proxy>;
+		private var numProxies:int;
+		private var maxProxies:int;
+		
+		public function BruteForceBroadPhase() {
+			maxProxies = 256;
+			proxies = new Vector.<Proxy>(maxProxies, true);
+		}
 		
 		/**
-		 * 新しく BruteForceBroadPhase オブジェクトを作成します。
+		 * @inheritDoc
 		 */
-		public function BruteForceBroadPhase() {
-			proxyPool = new Vector.<Proxy>(World.MAX_SHAPES, true);
+		override public function createProxy(shape:Shape):Proxy {
+			return new BasicProxy(shape);
 		}
 		
 		/**
 		 * @inheritDoc
 		 */
 		override public function addProxy(proxy:Proxy):void {
-			proxyPool[numProxies] = proxy;
-			numProxies++;
+			if (numProxies == maxProxies) {
+				maxProxies <<= 1;
+				var newProxies:Vector.<Proxy> = new Vector.<Proxy>(maxProxies, true);
+				for (var i:int = 0; i < numProxies; i++) {
+					newProxies[i] = proxies[i];
+				}
+				proxies = newProxies;
+			}
+			proxies[numProxies++] = proxy;
 		}
 		
 		/**
 		 * @inheritDoc
 		 */
 		override public function removeProxy(proxy:Proxy):void {
-			var idx:int = -1;
 			for (var i:int = 0; i < numProxies; i++) {
-				if (proxyPool[i] == proxy) {
-					idx = i;
-					break;
+				if (proxies[i] == proxy) {
+					proxies[i] = proxies[--numProxies];
+					proxies[numProxies] = null;
+					return;
 				}
 			}
-			if (idx == -1) {
-				return;
-			}
-			for (var j:int = idx; j < numProxies - 1; j++) {
-				proxyPool[j] = proxyPool[j + 1];
-			}
-			proxyPool[numProxies] = null;
-			numProxies--;
 		}
 		
 		override protected function collectPairs():void {
 			numPairChecks = numProxies * (numProxies - 1) >> 1;
 			for (var i:int = 0; i < numProxies; i++) {
-				var p1:Proxy = proxyPool[i];
-				var s1:Shape = p1.parent;
+				var p1:Proxy = proxies[i];
+				var b1:AABB = p1.aabb;
+				var s1:Shape = p1.shape;
 				for (var j:int = i + 1; j < numProxies; j++) {
-					var p2:Proxy = proxyPool[j];
-					var s2:Shape = p2.parent;
+					var p2:Proxy = proxies[j];
+					var b2:AABB = p2.aabb;
+					var s2:Shape = p2.shape;
 					if (
-						p1.maxX < p2.minX || p1.minX > p2.maxX ||
-						p1.maxY < p2.minY || p1.minY > p2.maxY ||
-						p1.maxZ < p2.minZ || p1.minZ > p2.maxZ ||
+						b1.maxX < b2.minX || b1.minX > b2.maxX ||
+						b1.maxY < b2.minY || b1.minY > b2.maxY ||
+						b1.maxZ < b2.minZ || b1.minZ > b2.maxZ ||
 						!isAvailablePair(s1, s2)
 					) {
 						continue;

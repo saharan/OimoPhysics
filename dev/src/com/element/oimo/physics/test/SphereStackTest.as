@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -61,13 +61,12 @@ package com.element.oimo.physics.test {
 			addChild(debug);
 			tf = new TextField();
 			tf.selectable = false;
-			tf.defaultTextFormat = new TextFormat("_monospace", 12, 0xffffff);
+			tf.defaultTextFormat = new TextFormat("courier new", 12, 0xffffff);
 			tf.x = 0;
 			tf.y = 0;
 			tf.width = 400;
 			tf.height = 400;
 			addChild(tf);
-			trace(OimoPhysics.DESCRIPTION);
 			world = new World();
 			renderer = new DebugDraw(640, 480);
 			renderer.setWorld(world);
@@ -149,6 +148,7 @@ package com.element.oimo.physics.test {
 			tf.text =
 				"Rigid Body Count: " + world.numRigidBodies + "\n" +
 				"Contact Count: " + world.numContacts + "\n" +
+				"Pair Check Count: " + world.broadPhase.numPairChecks + "\n" +
 				"Contact Point Count: " + world.numContactPoints + "\n" +
 				"Island Count: " + world.numIslands + "\n\n" +
 				"Broad Phase Time: " + world.performance.broadPhaseTime + "ms\n" +

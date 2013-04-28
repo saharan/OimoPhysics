@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -17,6 +17,7 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.collision.shape {
+	import com.element.oimo.physics.collision.broadphase.AABB;
 	import com.element.oimo.physics.collision.broadphase.Proxy;
 	import com.element.oimo.physics.constraint.contact.ContactLink;
 	import com.element.oimo.physics.dynamics.RigidBody;
@@ -47,11 +48,6 @@ package com.element.oimo.physics.collision.shape {
 		 * 箱を表す形状の種類です。
 		 */
 		public static const SHAPE_BOX:uint = 0x2;
-		
-		/**
-		 * 円柱を表す形状の種類です。
-		 */
-		public static const SHAPE_CYLINDER:uint = 0x3;
 		
 		public var prev:Shape;
 		public var next:Shape;
@@ -110,6 +106,8 @@ package com.element.oimo.physics.collision.shape {
 		 */
 		public var localInertia:Mat33;
 		
+		public var aabb:AABB;
+		
 		/**
 		 * 広域衝突判定に用いられる単純化された形状です。
 		 * <strong>この変数は外部から変更しないでください。</strong>
@@ -152,8 +150,7 @@ package com.element.oimo.physics.collision.shape {
 			rotation = new Mat33();
 			relativeRotation = new Mat33();
 			localInertia = new Mat33();
-			proxy = new Proxy();
-			proxy.parent = this;
+			aabb = new AABB();
 		}
 		
 		/**

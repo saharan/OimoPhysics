@@ -19,29 +19,19 @@
 package com.element.oimo.physics.collision.broadphase {
 	import com.element.oimo.physics.collision.shape.Shape;
 	/**
-	 * A proxy is used for broad-phase collecting pairs that can be colliding.
+	 * A basic implementation of proxies.
+	 * @author saharan
 	 */
-	public class Proxy {
-		/**
-		 * The parent shape.
-		 */
-		public var shape:Shape;
+	public class BasicProxy extends Proxy {
 		
-		/**
-		 * The axis-aligned bounding box.
-		 */
-		public var aabb:AABB;
-		
-		public function Proxy(shape:Shape) {
-			this.shape = shape;
-			aabb = shape.aabb;
+		public function BasicProxy(shape:Shape) {
+			super(shape);
 		}
 		
 		/**
-		 * Update the proxy.
+		 * @inheritDoc
 		 */
-		public function update():void {
-			throw new Error("Inheritance error.");
+		override public function update():void {
 		}
 		
 	}

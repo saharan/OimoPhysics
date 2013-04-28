@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -53,11 +53,14 @@ package com.element.oimo.physics.collision.shape {
 		 * @inheritDoc
 		 */
 		override public function updateProxy():void {
-			proxy.init(
+			aabb.init(
 				position.x - radius - 0.005, position.x + radius + 0.005,
 				position.y - radius - 0.005, position.y + radius + 0.005,
 				position.z - radius - 0.005, position.z + radius + 0.005
 			);
+			if (proxy != null) {
+				proxy.update();
+			}
 		}
 		
 	}

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -17,10 +17,7 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.test {
-	import com.element.oimo.physics.collision.broadphase.DynamicBVTree;
-	import com.element.oimo.physics.collision.broadphase.DynamicBVTreeBroadPhase;
 	import com.element.oimo.physics.collision.shape.BoxShape;
-	import com.element.oimo.physics.collision.shape.CylinderShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
 	import com.element.oimo.physics.collision.shape.SphereShape;
@@ -60,8 +57,7 @@ package com.element.oimo.physics.test {
 		private var u:Boolean;
 		private var d:Boolean;
 		private var ctr:RigidBody;
-		CylinderTest
-		CylinderTest2
+		BroadPhaseTest
 		JointTest
 		PyramidTest
 		SphereStackTest
@@ -85,7 +81,6 @@ package com.element.oimo.physics.test {
 			tf.width = 400;
 			tf.height = 400;
 			addChild(tf);
-			trace(OimoPhysics.DESCRIPTION);
 			initWorld();
 			fps = 0;
 			
@@ -130,7 +125,6 @@ package com.element.oimo.physics.test {
 		
 		private function initWorld():void {
 			world = new World();
-			world.iteration = 8;
 			if (!renderer) renderer = new DebugDraw(640, 480);
 			renderer.setWorld(world);
 			var rb:RigidBody;
@@ -141,14 +135,14 @@ package com.element.oimo.physics.test {
 			rb = new RigidBody();
 			c.position.init(0, -0.5, 0);
 			c.rotation.init();
-			s = new BoxShape(32, 1, 32, c);
+			s = new BoxShape(128, 1, 128, c);
 			rb.addShape(s);
 			rb.setupMass(RigidBody.BODY_STATIC);
 			world.addRigidBody(rb);
 			c.rotation.init();
-			var width:uint = 9;
-			var height:uint = 9;
-			var depth:uint = 9;
+			var width:uint = 7;
+			var height:uint = 7;
+			var depth:uint = 7;
 			var bw:Number = 0.75;
 			var bh:Number = 0.75;
 			var bd:Number = 0.75;
@@ -156,15 +150,13 @@ package com.element.oimo.physics.test {
 				for (var j:int = 0; j < height; j++) {
 					for (var k:int = 0; k < depth; k++) {
 						rb = new RigidBody();
-						rb.allowSleep = false;
+						//rb.allowSleep = false;
 						c.position.init(
 							(i - (width - 1) * 0.5) * bw,
 							j * (bh * 1.00) + bh * 0.5,
 							(k - (depth - 1) * 0.5) * bd
 						);
 						//if (Math.random() > 0.5) s = new SphereShape((bw + bh + bd) / 6, c); else
-						//if (Math.random() > 0.5) s = new CylinderShape((bw + bd) / 4, bh, c); else
-						//s = new CylinderShape((bw + bd) / 4, bh, c);
 						s = new BoxShape(bw, bh, bd, c);
 						rb.addShape(s);
 						rb.setupMass(RigidBody.BODY_DYNAMIC);
@@ -207,7 +199,6 @@ package com.element.oimo.physics.test {
 			c.density = 10;
 			c.rotation.init();
 			s = new BoxShape(2, 2, 2, c);
-			//s = new CylinderShape(1, 2, c);
 			ctr = new RigidBody();
 			ctr.addShape(s);
 			ctr.setupMass(RigidBody.BODY_DYNAMIC);
@@ -264,10 +255,6 @@ package com.element.oimo.physics.test {
 				"Total Time: " + world.performance.totalTime + "ms\n" +
 				"Physics FPS: " + fps.toFixed(2) + "\n"
 			;
-			//var tree:DynamicBVTree = DynamicBVTreeBroadPhase(world.broadPhase).tree;
-			//if (tree.root != null) {
-				//tf.appendText(tree.print(tree.root, 0, ""));
-			//}
 			renderer.render();
 			var body:RigidBody = world.rigidBodies;
 			while (body != null) {
