@@ -29,14 +29,14 @@ package com.element.oimo.physics.constraint.contact {
 		public var position:Vec3;
 		
 		/**
-		 * The relative position to the first shape.
+		 * The position in the first shape's coordinate.
 		 */
-		public var localRelativePosition1:Vec3;
+		public var localPoint1:Vec3;
 		
 		/**
-		 * The relative position to the second shape.
+		 * The position in the second shape's coordinate.
 		 */
-		public var localRelativePosition2:Vec3;
+		public var localPoint2:Vec3;
 		
 		/**
 		 * The normal vector of this manifold point.
@@ -84,7 +84,7 @@ package com.element.oimo.physics.constraint.contact {
 		public var binormalDenominator:Number;
 		
 		/**
-		 * Whether this manifold point is persisting.
+		 * Whether this manifold point is persisting or not.
 		 */
 		public var warmStarted:Boolean;
 		
@@ -95,8 +95,8 @@ package com.element.oimo.physics.constraint.contact {
 		
 		public function ManifoldPoint() {
 			position = new Vec3();
-			localRelativePosition1 = new Vec3();
-			localRelativePosition2 = new Vec3();
+			localPoint1 = new Vec3();
+			localPoint2 = new Vec3();
 			normal = new Vec3();
 			tangent = new Vec3();
 			binormal = new Vec3();

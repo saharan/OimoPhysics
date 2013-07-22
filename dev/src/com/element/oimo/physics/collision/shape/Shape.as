@@ -24,140 +24,147 @@ package com.element.oimo.physics.collision.shape {
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Vec3;
 	/**
-	 * 剛体に含まれる衝突処理用の形状のクラスです。
+	 * A shape is used to detect collisions of rigid bodies.
 	 * @author saharan
 	 */
 	public class Shape {
 		/**
-		 * 次に生成される形状の ID の作成に使われます。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * Global identification of next shape.
+		 * This will be incremented every time a shape is created.
 		 */
 		public static var nextID:uint = 0;
 		
 		/**
-		 * 定義されていないことを表す形状の種類です。
-		 */
-		public static const SHAPE_NULL:uint = 0x0;
-		
-		/**
-		 * 球体を表す形状の種類です。
+		 * Sphere shape.
 		 */
 		public static const SHAPE_SPHERE:uint = 0x1;
 		
 		/**
-		 * 箱を表す形状の種類です。
+		 * Box shape.
 		 */
 		public static const SHAPE_BOX:uint = 0x2;
 		
+		// TODO: Capsule shape
+		
+		/**
+		 * The previous shape in parent rigid body.
+		 */
 		public var prev:Shape;
+		
+		/**
+		 * The next shape in parent rigid body.
+		 */
 		public var next:Shape;
 		
 		/**
-		 * この形状の固有数値です。
-		 * 通常この値は他の形状とかぶることはありません。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The global identification of the shape.
+		 * This value should be unique to the shape.
 		 */
 		public var id:uint;
 		
 		/**
-		 * 形状の種類を表します。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The type of the shape.
 		 */
 		public var type:uint;
 		
 		/**
-		 * 重心のワールド座標です。
+		 * The center of gravity of the shape in world coordinate system.
 		 */
 		public var position:Vec3;
 		
 		/**
-		 * 剛体に対する相対位置座標です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var relativePosition:Vec3;
-		
-		/**
-		 * 剛体に対する初期状態での相対位置座標です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var localRelativePosition:Vec3;
-		
-		/**
-		 * 回転行列です。
+		 * The rotation matrix of the shape in world coordinate system.
 		 */
 		public var rotation:Mat33;
 		
 		/**
-		 * 剛体に対する相対回転行列です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The position of the shape in parent's coordinate system.
+		 */
+		public var relativePosition:Vec3;
+		
+		/**
+		 * The rotation matrix of the shape in parent's coordinate system.
 		 */
 		public var relativeRotation:Mat33;
 		
 		/**
-		 * 質量です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 * 質量を変更する場合は setDensity メソッドを使用してください。
-		 */
-		public var mass:Number;
-		
-		/**
-		 * 初期状態での慣性テンソルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var localInertia:Mat33;
-		
-		public var aabb:AABB;
-		
-		/**
-		 * 広域衝突判定に用いられる単純化された形状です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var proxy:Proxy;
-		
-		/**
-		 * 摩擦係数です。
+		 * The coefficient of friction of the shape.
 		 */
 		public var friction:Number;
 		
 		/**
-		 * 反発係数です。
+		 * The coefficient of restitution of the shape.
 		 */
 		public var restitution:Number;
 		
 		/**
-		 * 形状の親となる剛体です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The density of the shape.
+		 */
+		public var density:Number;
+		
+		/**
+		 * The axis-aligned bounding box of the shape.
+		 */
+		public var aabb:AABB;
+		
+		/**
+		 * The proxy of the shape.
+		 * This is used for broad-phase collision detection.
+		 */
+		public var proxy:Proxy;
+		
+		/**
+		 * The parent rigid body of the shape.
 		 */
 		public var parent:RigidBody;
 		
+		/**
+		 * The linked list of the contacts with the shape.
+		 */
 		public var contactLink:ContactLink;
 		
 		/**
-		 * 形状の接触点の数です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The number of the contacts with the shape.
 		 */
 		public var numContacts:uint;
 		
 		/**
-		 * 新しい Shape オブジェクトを作成します。
-		 * <strong>このコンストラクタは外部から呼び出さないでください。</strong>
+		 * The bits of the collision groups to which the shape belongs.
 		 */
-		public function Shape() {
+		public var belongsTo:int;
+		
+		/**
+		 * The bits of the collision groups with which the shape collides.
+		 */
+		public var collidesWith:int;
+		
+		public function Shape(config:ShapeConfig) {
 			id = ++nextID;
 			position = new Vec3();
-			relativePosition = new Vec3();
-			localRelativePosition = new Vec3();
+			relativePosition = new Vec3().copy(config.relativePosition);
 			rotation = new Mat33();
-			relativeRotation = new Mat33();
-			localInertia = new Mat33();
+			relativeRotation = new Mat33().copy(config.relativeRotation);
 			aabb = new AABB();
+			density = config.density;
+			friction = config.friction;
+			restitution = config.restitution;
+			belongsTo = config.belongsTo;
+			collidesWith = config.collidesWith;
 		}
 		
 		/**
-		 * この形状のプロキシを更新します。
+		 * Calculate the mass information of the shape.
+		 * @param	out
+		 */
+		public function calculateMassInfo(out:MassInfo):void {
+			throw new Error("Inheritance error.");
+		}
+		
+		/**
+		 * Update the proxy of the shape.
 		 */
 		public function updateProxy():void {
-			throw new Error("updateProxy メソッドが継承されていません");
+			throw new Error("Inheritance error.");
 		}
 		
 	}

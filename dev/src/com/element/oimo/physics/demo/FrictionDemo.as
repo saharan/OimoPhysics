@@ -16,59 +16,44 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.constraint {
+package com.element.oimo.physics.demo {
+	import com.element.oimo.physics.collision.shape.BoxShape;
+	import com.element.oimo.physics.collision.shape.ShapeConfig;
+	import com.element.oimo.physics.collision.shape.SphereShape;
 	import com.element.oimo.physics.dynamics.RigidBody;
-	import com.element.oimo.physics.dynamics.World;
 	/**
-	 * The base class of all type of the constraints.
+	 * ...
 	 * @author saharan
 	 */
-	public class Constraint {
-		/**
-		 * The parent world of the constraint.
-		 */
-		public var parent:World;
+	public class FrictionDemo extends DemoBase {
 		
-		/**
-		 * The first body of the constraint.
-		 */
-		public var body1:RigidBody;
-		
-		/**
-		 * The second body of the constraint.
-		 */
-		public var body2:RigidBody;
-		
-		/**
-		 * Internal
-		 */
-		public var addedToIsland:Boolean;
-		
-		public function Constraint() {
+		public function FrictionDemo() {
+			title = "Varying friction";
 		}
 		
-		/**
-		 * Prepare for solving the constraint.
-		 * @param	timeStep
-		 * @param	invTimeStep
-		 */
-		public function preSolve(timeStep:Number, invTimeStep:Number):void {
-			throw new Error("Inheritance error.");
-		}
-		
-		/**
-		 * Solve the constraint.
-		 * This is usually called iteratively.
-		 */
-		public function solve():void {
-			throw new Error("Inheritance error.");
-		}
-		
-		/**
-		 * Do the post-processing.
-		 */
-		public function postSolve():void {
-			throw new Error("Inheritance error.");
+		override public function reset():void {
+			var sc:ShapeConfig = new ShapeConfig();
+			var body:RigidBody;
+			
+			body = new RigidBody(0, 1, 0, -15 * Math.PI / 180, 0, 0, 1); // 斜めの床を用意
+			body.addShape(new BoxShape(sc, 8, 0.2, 6));
+			body.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(body);
+			
+			for (var i:int = 0; i < 5; i++) {
+				sc.friction = 0.5 - i * 0.1; // 摩擦係数を変更
+				body = new RigidBody(-3, 3, i - 2);
+				body.addShape(new BoxShape(sc, 0.7, 0.5, 0.5));
+				body.setupMass();
+				world.addRigidBody(body);
+			}
+			
+			sc.friction = 2;
+			sc.density = 10;
+			control = new RigidBody(0, 0.75, 6);
+			control.addShape(new SphereShape(sc, 0.75));
+			control.setupMass();
+			world.addRigidBody(control);
 		}
 		
 	}

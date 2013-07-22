@@ -1,38 +1,32 @@
 package com.element.oimo.physics.constraint.joint {
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * ジョイントによる剛体の繋がりを扱うクラスです。
+	 * A link list of joints.
 	 * @author saharan
 	 */
 	public class JointLink {
 		/**
-		 * 前のジョイントの繋がりです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The previous joint link.
 		 */
 		public var prev:JointLink;
 		
 		/**
-		 * 次のジョイントの繋がりです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The next joint link.
 		 */
 		public var next:JointLink;
 		
 		/**
-		 * この繋がりによって繋がれている剛体です。
+		 * The other rigid body connected to the joint.
 		 */
 		public var body:RigidBody;
 		
 		/**
-		 * この繋がりの親となるジョイントです。
+		 * The joint of the link.
 		 */
-		public var parent:Joint;
+		public var joint:Joint;
 		
-		/**
-		 * 新しく JointConnection オブジェクトを作成します。
-		 * @param	parent この繋がりの親となるジョイント
-		 */
-		public function JointLink(parent:Joint) {
-			this.parent = parent;
+		public function JointLink(joint:Joint) {
+			this.joint = joint;
 		}
 		
 	}

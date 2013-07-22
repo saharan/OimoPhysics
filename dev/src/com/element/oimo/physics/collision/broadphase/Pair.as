@@ -19,23 +19,20 @@
 package com.element.oimo.physics.collision.broadphase {
 	import com.element.oimo.physics.collision.shape.Shape;
 	/**
-	 * 衝突の可能性のある形状の対を扱うクラスです。
+	 * A pair of shapes that may collide.
 	 * @author saharan
 	 */
 	public class Pair {
 		/**
-		 * 1つ目の形状です。
+		 * The first shape.
 		 */
 		public var shape1:Shape;
 		
 		/**
-		 * 2つ目の形状です。
+		 * The second shape.
 		 */
 		public var shape2:Shape;
 		
-		/**
-		 * 新しく Pair クラスを作成します。
-		 */
 		public function Pair() {
 		}
 		

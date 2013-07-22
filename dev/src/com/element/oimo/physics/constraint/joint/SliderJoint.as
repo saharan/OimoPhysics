@@ -20,28 +20,35 @@ package com.element.oimo.physics.constraint.joint {
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Quat;
 	import com.element.oimo.math.Vec3;
-	import com.element.oimo.physics.constraint.joint.base.LinearConstraint;
 	import com.element.oimo.physics.constraint.joint.base.Rotational3Constraint;
+	import com.element.oimo.physics.constraint.joint.base.RotationalConstraint;
+	import com.element.oimo.physics.constraint.joint.base.Translational3Constraint;
+	import com.element.oimo.physics.constraint.joint.base.TranslationalConstraint;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * A hinge joint allows only for relative rotation of rigid bodies along the axis.
+	 * A slider joint allows for relative translation and relative rotation between two rigid bodies along the axis.
 	 * @author saharan
 	 */
-	public class HingeJoint extends Joint {
+	public class SliderJoint extends Joint {
 		/**
-		 * The axis in the first body's coordinate system.
+		 * The first axis in local coordinate system.
 		 */
 		public var localAxis1:Vec3;
 		
 		/**
-		 * The axis in the second body's coordinate system.
+		 * The second axis in local coordinate system.
 		 */
 		public var localAxis2:Vec3;
 		
 		/**
-		 * The rotational limit and motor information of the joint.
+		 * The limit and motor for the rotation.
 		 */
-		public var limitMotor:LimitMotor;
+		public var rotationalLimitMotor:LimitMotor;
+		
+		/**
+		 * The limit and motor for the translation.
+		 */
+		public var translationalLimitMotor:LimitMotor;
 		
 		private var localAxis1X:Number;
 		private var localAxis1Y:Number;
@@ -59,14 +66,14 @@ package com.element.oimo.physics.constraint.joint {
 		private var localAngAxis2Y:Number;
 		private var localAngAxis2Z:Number;
 		
-		private var lc:LinearConstraint;
+		private var t3:Translational3Constraint;
 		private var r3:Rotational3Constraint;
 		
 		private var nor:Vec3;
 		private var tan:Vec3;
 		private var bin:Vec3;
 		
-		public function HingeJoint(config:JointConfig, lowerAngleLimit:Number = 1, upperAngleLimit:Number = 0) {
+		public function SliderJoint(config:JointConfig, lowerTranslation:Number, upperTranslation:Number) {
 			super(config);
 			localAxis1 = new Vec3().normalize(config.localAxis1);
 			localAxis2 = new Vec3().normalize(config.localAxis2);
@@ -82,7 +89,6 @@ package com.element.oimo.physics.constraint.joint {
 			localAngAxis1X *= len;
 			localAngAxis1Y *= len;
 			localAngAxis1Z *= len;
-			
 			localAxis2X = localAxis2.x;
 			localAxis2Y = localAxis2.y;
 			localAxis2Z = localAxis2.z;
@@ -93,17 +99,18 @@ package com.element.oimo.physics.constraint.joint {
 			localAngAxis2Y = localAngAxis1X * arc.e10 + localAngAxis1Y * arc.e11 + localAngAxis1Z * arc.e12;
 			localAngAxis2Z = localAngAxis1X * arc.e20 + localAngAxis1Y * arc.e21 + localAngAxis1Z * arc.e22;
 			
-			type = JOINT_HINGE;
+			type = JOINT_SLIDER;
 			
 			nor = new Vec3();
 			tan = new Vec3();
 			bin = new Vec3();
-			limitMotor = new LimitMotor(nor, false);
-			limitMotor.lowerLimit = lowerAngleLimit;
-			limitMotor.upperLimit = upperAngleLimit;
+			rotationalLimitMotor = new LimitMotor(nor, false);
+			r3 = new Rotational3Constraint(this, rotationalLimitMotor, new LimitMotor(tan, true), new LimitMotor(bin, true));
 			
-			lc = new LinearConstraint(this);
-			r3 = new Rotational3Constraint(this, limitMotor, new LimitMotor(tan, true), new LimitMotor(bin, true));
+			translationalLimitMotor = new LimitMotor(nor, true);
+			translationalLimitMotor.lowerLimit = lowerTranslation;
+			translationalLimitMotor.upperLimit = upperTranslation;
+			t3 = new Translational3Constraint(this, translationalLimitMotor, new LimitMotor(tan, true), new LimitMotor(bin, true));
 		}
 		
 		/**
@@ -163,9 +170,9 @@ package com.element.oimo.physics.constraint.joint {
 				ny * (angAxis1Z * angAxis2X - angAxis1X * angAxis2Z) +
 				nz * (angAxis1X * angAxis2Y - angAxis1Y * angAxis2X) < 0 // cross product
 			) {
-				limitMotor.angle = -acosClamp(angAxis1X * angAxis2X + angAxis1Y * angAxis2Y + angAxis1Z * angAxis2Z);
+				rotationalLimitMotor.angle = -acosClamp(angAxis1X * angAxis2X + angAxis1Y * angAxis2Y + angAxis1Z * angAxis2Z);
 			} else {
-				limitMotor.angle = acosClamp(angAxis1X * angAxis2X + angAxis1Y * angAxis2Y + angAxis1Z * angAxis2Z);
+				rotationalLimitMotor.angle = acosClamp(angAxis1X * angAxis2X + angAxis1Y * angAxis2Y + angAxis1Z * angAxis2Z);
 			}
 			
 			// angular error
@@ -177,7 +184,7 @@ package com.element.oimo.physics.constraint.joint {
 			r3.limitMotor3.angle = bx * tmp1X + by * tmp1Y + bz * tmp1Z;
 			
 			r3.preSolve(timeStep, invTimeStep);
-			lc.preSolve(timeStep, invTimeStep);
+			t3.preSolve(timeStep, invTimeStep);
 		}
 		
 		/**
@@ -185,7 +192,7 @@ package com.element.oimo.physics.constraint.joint {
 		 */
 		override public function solve():void {
 			r3.solve();
-			lc.solve();
+			t3.solve();
 		}
 		
 		/**

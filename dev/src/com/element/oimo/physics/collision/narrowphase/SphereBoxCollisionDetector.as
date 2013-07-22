@@ -16,28 +16,19 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.collision.narrow {
+package com.element.oimo.physics.collision.narrowphase {
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.collision.shape.BoxShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.SphereShape;
 	import com.element.oimo.physics.constraint.contact.ContactManifold;
 	/**
-	 * 球体と箱との詳細な衝突判定を行います。
-	 * detectCollision 関数の引数に指定する形状は、
-	 * コンストラクタで flip を true にしていない場合、
-	 * 一つ目が球体、二つ目が箱である必要があります。
+	 * A collision detector which detects collisions between sphere and box.
 	 * @author saharan
 	 */
 	public class SphereBoxCollisionDetector extends CollisionDetector {
-		
-		/**
-		 * 新しく SphereBoxCollisionDetector オブジェクトを作成します。
-		 * @param	flip detectCollision 関数の引数に指定する形状の順序を、反転して受け取る場合は true
-		 */
 		public function SphereBoxCollisionDetector(flip:Boolean) {
 			this.flip = flip;
-			findAllPointsAtOnce = true;
 		}
 		
 		/**
@@ -187,7 +178,7 @@ package com.element.oimo.physics.collision.narrow {
 				cx = pbx + sx * nw.x + sy * nh.x + sz * nd.x;
 				cy = pby + sx * nw.y + sy * nh.y + sz * nd.y;
 				cz = pbz + sx * nw.z + sy * nh.z + sz * nd.z;
-				manifold.addPoint(psx + rad * dx, psy + rad * dy, psz + rad * dz, dx, dy, dz, len, flip);
+				manifold.addPoint(psx + rad * dx, psy + rad * dy, psz + rad * dz, dx, dy, dz, len - rad, flip);
 			} else {
 				// closest
 				cx = pbx + sx * nw.x + sy * nh.x + sz * nd.x;
@@ -203,7 +194,7 @@ package com.element.oimo.physics.collision.narrow {
 					dx *= invLen;
 					dy *= invLen;
 					dz *= invLen;
-					manifold.addPoint(psx + rad * dx, psy + rad * dy, psz + rad * dz, dx, dy, dz, len, flip);
+					manifold.addPoint(psx + rad * dx, psy + rad * dy, psz + rad * dz, dx, dy, dz, len - rad, flip);
 				}
 			}
 		}

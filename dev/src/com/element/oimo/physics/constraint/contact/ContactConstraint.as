@@ -27,8 +27,19 @@ package com.element.oimo.physics.constraint.contact {
 	 * @author saharan
 	 */
 	public class ContactConstraint extends Constraint {
+		/**
+		 * The contact manifold of the constraint.
+		 */
 		public var manifold:ContactManifold;
+		
+		/**
+		 * The coefficient of restitution of the constraint.
+		 */
 		public var restitution:Number;
+		
+		/**
+		 * The coefficient of friction of the constraint.
+		 */
 		public var friction:Number;
 		
 		private var p1:Vec3;
@@ -76,6 +87,9 @@ package com.element.oimo.physics.constraint.contact {
 			cs.next.next.next = new ContactPointDataBuffer();
 		}
 		
+		/**
+		 * Attach the constraint to the bodies.
+		 */
 		public function attach():void {
 			p1 = body1.position;
 			p2 = body2.position;
@@ -87,6 +101,9 @@ package com.element.oimo.physics.constraint.contact {
 			i2 = body2.inverseInertia;
 		}
 		
+		/**
+		 * Detach the constraint from the bodies.
+		 */
 		public function detach():void {
 			p1 = null;
 			p2 = null;

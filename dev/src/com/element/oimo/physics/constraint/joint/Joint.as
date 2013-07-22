@@ -17,89 +17,88 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.constraint.joint {
+	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.constraint.Constraint;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	/**
-	 * 剛体同士を繋ぐジョイントのクラスです。
+	 * Joints are used to constrain the motion between two rigid bodies.
 	 * @author saharan
 	 */
 	public class Joint extends Constraint {
 		/**
-		 * 定義されていないことを表すジョイントの種類です。
-		 */
-		public static const JOINT_NULL:uint = 0x0;
-		
-		/**
-		 * 距離ジョイント表すジョイントの種類です。
+		 * Distance joint
 		 */
 		public static const JOINT_DISTANCE:uint = 0x1;
 		
 		/**
-		 * ボールジョイント表すジョイントの種類です。
+		 * Ball-and-socket joint
 		 */
-		public static const JOINT_BALL:uint = 0x2;
+		public static const JOINT_BALL_AND_SOCKET:uint = 0x2;
 		
 		/**
-		 * ヒンジジョイント表すジョイントの種類です。
+		 * Hinge joint
 		 */
 		public static const JOINT_HINGE:uint = 0x3;
 		
 		/**
-		 * ヒンジ2ジョイント表すジョイントの種類です。
+		 * Wheel joint
 		 */
-		public static const JOINT_HINGE2:uint = 0x4;
+		public static const JOINT_WHEEL:uint = 0x4;
+		
+		/**
+		 * Slider joint
+		 */
+		public static const JOINT_SLIDER:uint = 0x5;
+		
+		/**
+		 * Prismatic joint
+		 */
+		public static const JOINT_PRISMATIC:uint = 0x6;
 		
 		private var b1Link:JointLink;
 		private var b2Link:JointLink;
 		
 		/**
-		 * ジョイントの種類を表します。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The type of the joint.
 		 */
 		public var type:uint;
 		
 		/**
-		 * 接続された剛体同士が衝突するかどうかを表します。
+		 * Whether allow collision between connected rigid bodies or not.
 		 */
 		public var allowCollision:Boolean;
 		
 		/**
-		 * 剛体1に対する初期状態での相対接続位置です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The anchor point on the first rigid body in local coordinate system.
 		 */
-		public var localRelativeAnchorPosition1:Vec3;
+		public var localAnchorPoint1:Vec3;
 		
 		/**
-		 * 剛体2に対する初期状態での相対接続位置です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The anchor point on the second rigid body in local coordinate system.
 		 */
-		public var localRelativeAnchorPosition2:Vec3;
+		public var localAnchorPoint2:Vec3;
 		
 		/**
-		 * 剛体1に対する相対接続位置です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The anchor point on the first rigid body in world coordinate system relative to the body's origin.
 		 */
-		public var relativeAnchorPosition1:Vec3;
+		public var relativeAnchorPoint1:Vec3;
 		
 		/**
-		 * 剛体2に対する相対接続位置です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The anchor point on the second rigid body in world coordinate system relative to the body's origin.
 		 */
-		public var relativeAnchorPosition2:Vec3;
+		public var relativeAnchorPoint2:Vec3;
 		
 		/**
-		 * 剛体1への接続位置です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The anchor point on the first rigid body in world coordinate system.
 		 */
-		public var anchorPosition1:Vec3;
+		public var anchorPoint1:Vec3;
 		
 		/**
-		 * 剛体2への接続位置です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The anchor point on the second rigid body in world coordinate system.
 		 */
-		public var anchorPosition2:Vec3;
+		public var anchorPoint2:Vec3;
 		
 		/**
 		 * The previous joint in the world.
@@ -111,21 +110,63 @@ package com.element.oimo.physics.constraint.joint {
 		 */
 		public var next:Joint;
 		
-		/**
-		 * 新しい Joint オブジェクトを作成します。
-		 * <strong>このコンストラクタは外部から呼び出さないでください。</strong>
-		 */
-		public function Joint() {
-			localRelativeAnchorPosition1 = new Vec3();
-			localRelativeAnchorPosition2 = new Vec3();
-			relativeAnchorPosition1 = new Vec3();
-			relativeAnchorPosition2 = new Vec3();
-			anchorPosition1 = new Vec3();
-			anchorPosition2 = new Vec3();
+		public function Joint(config:JointConfig) {
+			body1 = config.body1;
+			body2 = config.body2;
+			localAnchorPoint1 = new Vec3().copy(config.localAnchorPoint1);
+			localAnchorPoint2 = new Vec3().copy(config.localAnchorPoint2);
+			relativeAnchorPoint1 = new Vec3();
+			relativeAnchorPoint2 = new Vec3();
+			anchorPoint1 = new Vec3();
+			anchorPoint2 = new Vec3();
+			allowCollision = config.allowCollision;
 			b1Link = new JointLink(this);
 			b2Link = new JointLink(this);
 		}
 		
+		/**
+		 * Update all the anchor points.
+		 */
+		public function updateAnchorPoints():void {
+			var p1:Vec3 = body1.position;
+			var p2:Vec3 = body2.position;
+			var r1:Mat33 = body1.rotation;
+			var r2:Mat33 = body2.rotation;
+			var l1x:Number = localAnchorPoint1.x;
+			var l1y:Number = localAnchorPoint1.y;
+			var l1z:Number = localAnchorPoint1.z;
+			var l2x:Number = localAnchorPoint2.x;
+			var l2y:Number = localAnchorPoint2.y;
+			var l2z:Number = localAnchorPoint2.z;
+			var r1x:Number = l1x * r1.e00 + l1y * r1.e01 + l1z * r1.e02;
+			var r1y:Number = l1x * r1.e10 + l1y * r1.e11 + l1z * r1.e12;
+			var r1z:Number = l1x * r1.e20 + l1y * r1.e21 + l1z * r1.e22;
+			var r2x:Number = l2x * r2.e00 + l2y * r2.e01 + l2z * r2.e02;
+			var r2y:Number = l2x * r2.e10 + l2y * r2.e11 + l2z * r2.e12;
+			var r2z:Number = l2x * r2.e20 + l2y * r2.e21 + l2z * r2.e22;
+			relativeAnchorPoint1.x = r1x;
+			relativeAnchorPoint1.y = r1y;
+			relativeAnchorPoint1.z = r1z;
+			relativeAnchorPoint2.x = r2x;
+			relativeAnchorPoint2.y = r2y;
+			relativeAnchorPoint2.z = r2z;
+			var p1x:Number = r1x + p1.x;
+			var p1y:Number = r1y + p1.y;
+			var p1z:Number = r1z + p1.z;
+			var p2x:Number = r2x + p2.x;
+			var p2y:Number = r2y + p2.y;
+			var p2z:Number = r2z + p2.z;
+			anchorPoint1.x = p1x;
+			anchorPoint1.y = p1y;
+			anchorPoint1.z = p1z;
+			anchorPoint2.x = p2x;
+			anchorPoint2.y = p2y;
+			anchorPoint2.z = p2z;
+		}
+		
+		/**
+		 * Attach the joint to the bodies.
+		 */
 		public function attach():void {
 			b1Link.body = body2;
 			b2Link.body = body1;
@@ -141,6 +182,9 @@ package com.element.oimo.physics.constraint.joint {
 			body2.numJoints++;
 		}
 		
+		/**
+		 * Attach the joint from the bodies.
+		 */
 		public function detach():void {
 			var prev:JointLink = b1Link.prev;
 			var next:JointLink = b1Link.next;
@@ -167,7 +211,7 @@ package com.element.oimo.physics.constraint.joint {
 		}
 		
 		/**
-		 * 接続されている剛体をスリープ状態から開放します。
+		 * Awake the bodies.
 		 */
 		public function awake():void {
 			body1.awake();

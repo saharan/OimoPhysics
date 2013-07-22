@@ -27,7 +27,7 @@ package com.element.oimo.physics {
 		public static const VERSION:String = "1.1.0a";
 		
 		public function OimoPhysics() {
-			throw new Error("Do not create an instance of Oimophysics.");
+			throw new Error("Do not create an instance of OimoPhysics.");
 		}
 		
 	}

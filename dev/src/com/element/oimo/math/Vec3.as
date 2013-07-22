@@ -18,32 +18,20 @@
  */
 package com.element.oimo.math {
 	/**
-	 * 3次元のベクトルを扱うクラスです。
-	 * ベクトルは列ベクトルとして扱われます。
-	 * オブジェクトの不要な作成を避けるため、
-	 * 関数ではほとんどの演算結果は自身のオブジェクトに格納されます。
+	 * A 3D vector. This supports three-dimansional vector operations.
 	 * @author saharan
 	 */
 	public class Vec3 {
-		/**
-		 * x 成分です。
-		 */
 		public var x:Number;
-		/**
-		 * y 成分です。
-		 */
 		public var y:Number;
-		/**
-		 * z 成分です。
-		 */
 		public var z:Number;
 		
 		/**
-		 * 新しく Vec3 オブジェクトを作成します。
-		 * 引数を指定しない場合は、全ての値に0が格納されます。
-		 * @param	x 設定する x 成分
-		 * @param	y 設定する y 成分
-		 * @param	z 設定する z 成分
+		 * Constructor.
+		 * If the parameters are empty, the vector will be set to the zero vector.
+		 * @param	x
+		 * @param	y
+		 * @param	z
 		 */
 		public function Vec3(x:Number = 0, y:Number = 0, z:Number = 0) {
 			this.x = x;
@@ -52,12 +40,12 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルの値を指定された値で初期化します。
-		 * 引数を指定しない場合は、全ての値に0が格納されます。
-		 * @param	x 設定する x 成分
-		 * @param	y 設定する y 成分
-		 * @param	z 設定する z 成分
-		 * @return このオブジェクト
+		 * Initialize the vector.
+		 * If the parameters are empty, the vector will be set to the zero vector.
+		 * @param	x
+		 * @param	y
+		 * @param	z
+		 * @return
 		 */
 		public function init(x:Number = 0, y:Number = 0, z:Number = 0):Vec3 {
 			this.x = x;
@@ -67,10 +55,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルを v1 と v2 を加算したベクトルに設定します。
-		 * @param	v1 ベクトル1
-		 * @param	v2 ベクトル2
-		 * @return このオブジェクト
+		 * this = v1 + v2
+		 * @param	v1
+		 * @param	v2
+		 * @return
 		 */
 		public function add(v1:Vec3, v2:Vec3):Vec3 {
 			x = v1.x + v2.x;
@@ -80,10 +68,22 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルを v1 から v2 を減算したベクトルに設定します。
-		 * @param	v1 ベクトル1
-		 * @param	v2 ベクトル2
-		 * @return このオブジェクト
+		 * this = this + v
+		 * @param	v
+		 * @return
+		 */
+		public function addEqual(v:Vec3):Vec3 {
+			x += v.x;
+			y += v.y;
+			z += v.z;
+			return this;
+		}
+		
+		/**
+		 * this = v1 - v2
+		 * @param	v1
+		 * @param	v2
+		 * @return
 		 */
 		public function sub(v1:Vec3, v2:Vec3):Vec3 {
 			x = v1.x - v2.x;
@@ -93,10 +93,22 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルを v を s 倍に拡張したベクトルに設定します。
-		 * @param	v ベクトル
-		 * @param	s スカラー
-		 * @return このオブジェクト
+		 * this = this - v
+		 * @param	v
+		 * @return
+		 */
+		public function subEqual(v:Vec3):Vec3 {
+			x -= v.x;
+			y -= v.y;
+			z -= v.z;
+			return this;
+		}
+		
+		/**
+		 * this = v * s
+		 * @param	v
+		 * @param	s
+		 * @return
 		 */
 		public function scale(v:Vec3, s:Number):Vec3 {
 			x = v.x * s;
@@ -106,19 +118,31 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルと v との内積を返します。
-		 * @param	v ベクトル
-		 * @return 内積
+		 * this = this * s
+		 * @param	s
+		 * @return
+		 */
+		public function scaleEqual(s:Number):Vec3 {
+			x *= s;
+			y *= s;
+			z *= s;
+			return this;
+		}
+		
+		/**
+		 * Get the dot production of this vector and v.
+		 * @param	v
+		 * @return
 		 */
 		public function dot(v:Vec3):Number {
 			return x * v.x + y * v.y + z * v.z;
 		}
 		
 		/**
-		 * このベクトルを v1 と v2 の外積のベクトルに設定します。
-		 * @param	v1 ベクトル1
-		 * @param	v2 ベクトル2
-		 * @return このオブジェクト
+		 * Set this vector to the cross product of v1 and v2.
+		 * @param	v1
+		 * @param	v2
+		 * @return
 		 */
 		public function cross(v1:Vec3, v2:Vec3):Vec3 {
 			var x:Number = v1.y * v2.z - v1.z * v2.y;
@@ -131,10 +155,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルを m で v を変換したベクトルに設定します。
-		 * @param	m 行列
-		 * @param	v ベクトル
-		 * @return このオブジェクト
+		 * this = m * v
+		 * @param	m
+		 * @param	v
+		 * @return
 		 */
 		public function mulMat(m:Mat33, v:Vec3):Vec3 {
 			var x:Number = m.e00 * v.x + m.e01 * v.y + m.e02 * v.z;
@@ -147,9 +171,9 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルを v を正規化したベクトルに設定します。
-		 * @param	v ベクトル
-		 * @return このオブジェクト
+		 * Set this vector to the normalized vector of v.
+		 * @param	v
+		 * @return
 		 */
 		public function normalize(v:Vec3):Vec3 {
 			var length:Number = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
@@ -161,9 +185,9 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルを v を反転したベクトルに設定します。
-		 * @param	v ベクトル
-		 * @return このオブジェクト
+		 * this = -v
+		 * @param	v
+		 * @return
 		 */
 		public function invert(v:Vec3):Vec3 {
 			x = -v.x;
@@ -173,17 +197,17 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このベクトルの大きさを返します。
-		 * @return 大きさ
+		 * Get the length of the vector.
+		 * @return
 		 */
 		public function length():Number {
 			return Math.sqrt(x * x + y * y + z * z);
 		}
 		
 		/**
-		 * このベクトルの値を v からコピーします。
-		 * @param	v ベクトル
-		 * @return このオブジェクト
+		 * this = v
+		 * @param	v
+		 * @return
 		 */
 		public function copy(v:Vec3):Vec3 {
 			x = v.x;
@@ -193,16 +217,16 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この Vec3 オブジェクトを複製します。
-		 * @return 複製された Vec3 オブジェクト
+		 * Get the clone of the vector.
+		 * @return
 		 */
 		public function clone():Vec3 {
 			return new Vec3(x, y, z);
 		}
 		
 		/**
-		 * このベクトルの文字列表現を返します。
-		 * @return このベクトルを表す文字列
+		 * Get the string of the vector.
+		 * @return
 		 */
 		public function toString():String {
 			return "Vec3[" + x.toFixed(4) + ", " + y.toFixed(4) + ", " + z.toFixed(4) + "]";

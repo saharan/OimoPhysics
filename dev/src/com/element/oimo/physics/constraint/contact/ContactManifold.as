@@ -85,16 +85,16 @@ package com.element.oimo.physics.constraint.contact {
 			var rx:Number = x - body1.position.x;
 			var ry:Number = y - body1.position.y;
 			var rz:Number = z - body1.position.z;
-			p.localRelativePosition1.x = rx * r.e00 + ry * r.e10 + rz * r.e20;
-			p.localRelativePosition1.y = rx * r.e01 + ry * r.e11 + rz * r.e21;
-			p.localRelativePosition1.z = rx * r.e02 + ry * r.e12 + rz * r.e22;
+			p.localPoint1.x = rx * r.e00 + ry * r.e10 + rz * r.e20;
+			p.localPoint1.y = rx * r.e01 + ry * r.e11 + rz * r.e21;
+			p.localPoint1.z = rx * r.e02 + ry * r.e12 + rz * r.e22;
 			r = body2.rotation;
 			rx = x - body2.position.x;
 			ry = y - body2.position.y;
 			rz = z - body2.position.z;
-			p.localRelativePosition2.x = rx * r.e00 + ry * r.e10 + rz * r.e20;
-			p.localRelativePosition2.y = rx * r.e01 + ry * r.e11 + rz * r.e21;
-			p.localRelativePosition2.z = rx * r.e02 + ry * r.e12 + rz * r.e22;
+			p.localPoint2.x = rx * r.e00 + ry * r.e10 + rz * r.e20;
+			p.localPoint2.y = rx * r.e01 + ry * r.e11 + rz * r.e21;
+			p.localPoint2.z = rx * r.e02 + ry * r.e12 + rz * r.e22;
 			p.normalImpulse = 0;
 			if (flip) {
 				p.normal.x = -normalX;

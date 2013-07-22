@@ -16,58 +16,29 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.constraint {
-	import com.element.oimo.physics.dynamics.RigidBody;
-	import com.element.oimo.physics.dynamics.World;
+package com.element.oimo.physics.collision.narrowphase {
+	import com.element.oimo.physics.collision.shape.Shape;
+	import com.element.oimo.physics.constraint.contact.ContactManifold;
 	/**
-	 * The base class of all type of the constraints.
+	 * A collision detector detects collisions between two shapes.
 	 * @author saharan
 	 */
-	public class Constraint {
+	public class CollisionDetector {
 		/**
-		 * The parent world of the constraint.
+		 * Whether the collision detector flips two shapes in detectCollision or not.
 		 */
-		public var parent:World;
+		public var flip:Boolean;
 		
-		/**
-		 * The first body of the constraint.
-		 */
-		public var body1:RigidBody;
-		
-		/**
-		 * The second body of the constraint.
-		 */
-		public var body2:RigidBody;
-		
-		/**
-		 * Internal
-		 */
-		public var addedToIsland:Boolean;
-		
-		public function Constraint() {
+		public function CollisionDetector() {
 		}
 		
 		/**
-		 * Prepare for solving the constraint.
-		 * @param	timeStep
-		 * @param	invTimeStep
+		 * Detect collision between two shapes.
+		 * @param	shape1
+		 * @param	shape2
+		 * @param	manifold
 		 */
-		public function preSolve(timeStep:Number, invTimeStep:Number):void {
-			throw new Error("Inheritance error.");
-		}
-		
-		/**
-		 * Solve the constraint.
-		 * This is usually called iteratively.
-		 */
-		public function solve():void {
-			throw new Error("Inheritance error.");
-		}
-		
-		/**
-		 * Do the post-processing.
-		 */
-		public function postSolve():void {
+		public function detectCollision(shape1:Shape, shape2:Shape, manifold:ContactManifold):void {
 			throw new Error("Inheritance error.");
 		}
 		

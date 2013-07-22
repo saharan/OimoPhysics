@@ -26,6 +26,10 @@ package com.element.oimo.glmini {
 	import flash.display3D.VertexBuffer3D;
 	import flash.utils.ByteArray;
 	
+	/**
+	 * A simple 3d engine.
+	 * @author saharan
+	 */
 	public class OimoGLMini {
 		private static const VERTEX_POISITION_INDEX:uint = 0;
 		private static const VERTEX_NORMAL_INDEX:uint = 1;

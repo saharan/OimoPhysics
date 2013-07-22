@@ -16,43 +16,42 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.collision.narrow {
+package com.element.oimo.physics.collision.narrowphase {
+	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.collision.shape.Shape;
+	import com.element.oimo.physics.collision.shape.SphereShape;
 	import com.element.oimo.physics.constraint.contact.ContactManifold;
 	/**
-	 * より詳細な形状の衝突判定を行うクラスです。
+	 * A collision detector which detects collisions between two spheres.
 	 * @author saharan
 	 */
-	public class CollisionDetector {
-		/**
-		 * detectCollision 関数の引数に指定する形状の順序を、
-		 * 反転して受け取るかどうかを表します。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var flip:Boolean;
-		
-		/**
-		 * 一度の判定で全ての接触点を検出するかどうかを示します。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var findAllPointsAtOnce:Boolean;
-		
-		/**
-		 * 新しく CollisionDetector オブジェクトを作成します。
-		 * <strong>このコンストラクタは外部から呼び出さないでください。</strong>
-		 */
-		public function CollisionDetector() {
+	public class SphereSphereCollisionDetector extends CollisionDetector {
+		public function SphereSphereCollisionDetector() {
 		}
 		
 		/**
-		 * 二つの形状の詳細な衝突判定を行います。
-		 * 形状の種類は指定された物である必要があります。
-		 * @param	shape1 形状1
-		 * @param	shape2 形状2
-		 * @param	manifold 接触多様体の出力先
+		 * @inheritDoc
 		 */
-		public function detectCollision(shape1:Shape, shape2:Shape, manifold:ContactManifold):void {
-			throw new Error("detectCollision 関数が継承されていません");
+		override public function detectCollision(shape1:Shape, shape2:Shape, manifold:ContactManifold):void {
+			var s1:SphereShape = SphereShape(shape1);
+			var s2:SphereShape = SphereShape(shape2);
+			var p1:Vec3 = s1.position;
+			var p2:Vec3 = s2.position;
+			var dx:Number = p2.x - p1.x;
+			var dy:Number = p2.y - p1.y;
+			var dz:Number = p2.z - p1.z;
+			var len:Number = dx * dx + dy * dy + dz * dz;
+			var r1:Number = s1.radius;
+			var r2:Number = s2.radius;
+			var rad:Number = r1 + r2;
+			if (len > 0 && len < rad * rad) {
+				len = Math.sqrt(len);
+				var invLen:Number = 1 / len;
+				dx *= invLen;
+				dy *= invLen;
+				dz *= invLen;
+				manifold.addPoint(p1.x + dx * r1, p1.y + dy * r1, p1.z + dz * r1, dx, dy, dz, len - rad, false);
+			}
 		}
 		
 	}

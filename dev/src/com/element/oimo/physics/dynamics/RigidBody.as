@@ -17,13 +17,12 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.dynamics {
-	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Quat;
 	import com.element.oimo.math.Vec3;
-	import com.element.oimo.physics.constraint.Constraint;
+	import com.element.oimo.physics.collision.shape.MassInfo;
+	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.constraint.contact.ContactLink;
-	import com.element.oimo.physics.constraint.joint.Joint;
 	import com.element.oimo.physics.constraint.joint.JointLink;
 	/**
 	 * 剛体のクラスです。
@@ -218,16 +217,21 @@ package com.element.oimo.physics.dynamics {
 		 */
 		public var allowSleep:Boolean;
 		
+		private const massInfo:MassInfo = new MassInfo();
+		
 		/**
 		 * 新しく RigidBody オブジェクトを作成します。
 		 * 回転成分を指定することもできます。
+		 * @param	x
+		 * @param	y
+		 * @param	z
 		 * @param	rad ラジアンでの回転角度
 		 * @param	ax 回転軸の x 成分
 		 * @param	ay 回転軸の y 成分
 		 * @param	az 回転軸の z 成分
 		 */
-		public function RigidBody(rad:Number = 0, ax:Number = 0, ay:Number = 0, az:Number = 0) {
-			position = new Vec3();
+		public function RigidBody(x:Number = 0, y:Number = 0, z:Number = 0, rad:Number = 0, ax:Number = 0, ay:Number = 0, az:Number = 0) {
+			position = new Vec3(x, y, z);
 			var len:Number = ax * ax + ay * ay + az * az;
 			if (len > 0) {
 				len = 1 / Math.sqrt(len);
@@ -287,101 +291,89 @@ package com.element.oimo.physics.dynamics {
 		}
 		
 		/**
-		 * 重心座標・質量・慣性テンソルなどを算出します。
-		 * type に BODY_STATIC を指定すると、この剛体は空間に対して固定されます。
-		 * @param	type 剛体の種類
+		 * Calulates mass datas(center of gravity, mass, moment inertia, etc...).
+		 * If the parameter type is set to BODY_STATIC, the rigid body will be fixed to the space.
+		 * If the parameter adjustPosition is set to true, the shapes' relative positions and
+		 * the rigid body's position will be adjusted to the center of gravity.
+		 * @param	type
+		 * @param	adjustPosition
 		 */
-		public function setupMass(type:uint = BODY_DYNAMIC):void {
+		public function setupMass(type:uint = BODY_DYNAMIC, adjustPosition:Boolean = true):void {
 			this.type = type;
 			isDynamic = type == BODY_DYNAMIC;
 			isStatic = type == BODY_STATIC;
-			position.init();
 			mass = 0;
 			localInertia.init(0, 0, 0, 0, 0, 0, 0, 0, 0);
-			var invRot:Mat33 = new Mat33(); // = rotation ^ -1
-			invRot.transpose(rotation);
 			var tmpM:Mat33 = new Mat33();
 			var tmpV:Vec3 = new Vec3();
-			var denom:Number = 0;
 			for (var shape:Shape = shapes; shape != null; shape = shape.next) {
-				// relativeRotation = (rotation ^ -1) * shape.rotation
-				shape.relativeRotation.mul(invRot, shape.rotation);
-				position.add(position, tmpV.scale(shape.position, shape.mass));
-				denom += shape.mass;
-				mass += shape.mass;
-				// inertia = rotation * localInertia * (rotation ^ -1)
-				tmpM.mul(shape.relativeRotation, tmpM.mul(shape.localInertia, tmpM.transpose(shape.relativeRotation)));
-				localInertia.add(localInertia, tmpM);
+				shape.calculateMassInfo(massInfo);
+				var shapeMass:Number = massInfo.mass;
+				var relX:Number = shape.relativePosition.x;
+				var relY:Number = shape.relativePosition.y;
+				var relZ:Number = shape.relativePosition.z;
+				
+				tmpV.x += relX * shapeMass;
+				tmpV.y += relY * shapeMass;
+				tmpV.z += relZ * shapeMass;
+				mass += shapeMass;
+				
+				rotateInertia(shape.relativeRotation, massInfo.inertia, tmpM);
+				localInertia.addEqual(tmpM);
+				
+				// add offset inertia
+				localInertia.e00 += shapeMass * (relY * relY + relZ * relZ);
+				localInertia.e11 += shapeMass * (relX * relX + relZ * relZ);
+				localInertia.e22 += shapeMass * (relX * relX + relY * relY);
+				var xy:Number = shapeMass * relX * relY;
+				var yz:Number = shapeMass * relY * relZ;
+				var zx:Number = shapeMass * relZ * relX;
+				localInertia.e01 -= xy;
+				localInertia.e10 -= xy;
+				localInertia.e02 -= yz;
+				localInertia.e20 -= yz;
+				localInertia.e12 -= zx;
+				localInertia.e21 -= zx;
 			}
-			position.scale(position, 1 / denom);
 			inverseMass = 1 / mass;
-			var xy:Number = 0;
-			var yz:Number = 0;
-			var zx:Number = 0;
-			for (shape = shapes; shape != null; shape = shape.next) {
-				var relPos:Vec3 = shape.localRelativePosition;
-				relPos.sub(shape.position, position).mulMat(invRot, relPos);
-				shape.updateProxy();
-				localInertia.e00 += shape.mass * (relPos.y * relPos.y + relPos.z * relPos.z);
-				localInertia.e11 += shape.mass * (relPos.x * relPos.x + relPos.z * relPos.z);
-				localInertia.e22 += shape.mass * (relPos.x * relPos.x + relPos.y * relPos.y);
-				xy -= shape.mass * relPos.x * relPos.y;
-				yz -= shape.mass * relPos.y * relPos.z;
-				zx -= shape.mass * relPos.z * relPos.x;
+			tmpV.scaleEqual(inverseMass);
+			
+			if (adjustPosition) {
+				position.addEqual(tmpV);
+				for (shape = shapes; shape != null; shape = shape.next) {
+					shape.relativePosition.subEqual(tmpV);
+				}
+				// subtract offset inertia
+				relX = tmpV.x;
+				relY = tmpV.y;
+				relZ = tmpV.z;
+				localInertia.e00 -= mass * (relY * relY + relZ * relZ);
+				localInertia.e11 -= mass * (relX * relX + relZ * relZ);
+				localInertia.e22 -= mass * (relX * relX + relY * relY);
+				xy = mass * relX * relY;
+				yz = mass * relY * relZ;
+				zx = mass * relZ * relX;
+				localInertia.e01 += xy;
+				localInertia.e10 += xy;
+				localInertia.e02 += yz;
+				localInertia.e20 += yz;
+				localInertia.e12 += zx;
+				localInertia.e21 += zx;
 			}
-			localInertia.e01 = xy;
-			localInertia.e10 = xy;
-			localInertia.e02 = zx;
-			localInertia.e20 = zx;
-			localInertia.e12 = yz;
-			localInertia.e21 = yz;
+			
 			inverseLocalInertia.invert(localInertia);
+			
 			if (type == BODY_STATIC) {
 				inverseMass = 0;
 				inverseLocalInertia.init(0, 0, 0, 0, 0, 0, 0, 0, 0);
 			}
-			var r00:Number = rotation.e00;
-			var r01:Number = rotation.e01;
-			var r02:Number = rotation.e02;
-			var r10:Number = rotation.e10;
-			var r11:Number = rotation.e11;
-			var r12:Number = rotation.e12;
-			var r20:Number = rotation.e20;
-			var r21:Number = rotation.e21;
-			var r22:Number = rotation.e22;
-			var i00:Number = inverseLocalInertia.e00;
-			var i01:Number = inverseLocalInertia.e01;
-			var i02:Number = inverseLocalInertia.e02;
-			var i10:Number = inverseLocalInertia.e10;
-			var i11:Number = inverseLocalInertia.e11;
-			var i12:Number = inverseLocalInertia.e12;
-			var i20:Number = inverseLocalInertia.e20;
-			var i21:Number = inverseLocalInertia.e21;
-			var i22:Number = inverseLocalInertia.e22;
-			var e00:Number = r00 * i00 + r01 * i10 + r02 * i20;
-			var e01:Number = r00 * i01 + r01 * i11 + r02 * i21;
-			var e02:Number = r00 * i02 + r01 * i12 + r02 * i22;
-			var e10:Number = r10 * i00 + r11 * i10 + r12 * i20;
-			var e11:Number = r10 * i01 + r11 * i11 + r12 * i21;
-			var e12:Number = r10 * i02 + r11 * i12 + r12 * i22;
-			var e20:Number = r20 * i00 + r21 * i10 + r22 * i20;
-			var e21:Number = r20 * i01 + r21 * i11 + r22 * i21;
-			var e22:Number = r20 * i02 + r21 * i12 + r22 * i22;
-			inverseInertia.e00 = e00 * r00 + e01 * r01 + e02 * r02;
-			inverseInertia.e01 = e00 * r10 + e01 * r11 + e02 * r12;
-			inverseInertia.e02 = e00 * r20 + e01 * r21 + e02 * r22;
-			inverseInertia.e10 = e10 * r00 + e11 * r01 + e12 * r02;
-			inverseInertia.e11 = e10 * r10 + e11 * r11 + e12 * r12;
-			inverseInertia.e12 = e10 * r20 + e11 * r21 + e12 * r22;
-			inverseInertia.e20 = e20 * r00 + e21 * r01 + e22 * r02;
-			inverseInertia.e21 = e20 * r10 + e21 * r11 + e22 * r12;
-			inverseInertia.e22 = e20 * r20 + e21 * r21 + e22 * r22;
+			
 			syncShapes();
 			awake();
 		}
 		
 		/**
-		 * この剛体をスリープ状態から開放します。
+		 * Awake the rigid body.
 		 */
 		public function awake():void {
 			if (!allowSleep || !sleeping) return;
@@ -406,7 +398,7 @@ package com.element.oimo.physics.dynamics {
 		}
 		
 		/**
-		 * この剛体をスリープさせます。
+		 * Sleep the rigid body.
 		 */
 		public function sleep():void {
 			if (!allowSleep || sleeping) return;
@@ -431,7 +423,7 @@ package com.element.oimo.physics.dynamics {
 		}
 		
 		/**
-		 * Returns whether the rigid body has not any connection with others.
+		 * Get whether the rigid body has not any connection with others.
 		 * @return
 		 */
 		public function isLonely():Boolean {
@@ -500,6 +492,45 @@ package com.element.oimo.physics.dynamics {
 			syncShapes();
 		}
 		
+		private function rotateInertia(rot:Mat33, inertia:Mat33, out:Mat33):void {
+			var r00:Number = rot.e00;
+			var r01:Number = rot.e01;
+			var r02:Number = rot.e02;
+			var r10:Number = rot.e10;
+			var r11:Number = rot.e11;
+			var r12:Number = rot.e12;
+			var r20:Number = rot.e20;
+			var r21:Number = rot.e21;
+			var r22:Number = rot.e22;
+			var i00:Number = inertia.e00;
+			var i01:Number = inertia.e01;
+			var i02:Number = inertia.e02;
+			var i10:Number = inertia.e10;
+			var i11:Number = inertia.e11;
+			var i12:Number = inertia.e12;
+			var i20:Number = inertia.e20;
+			var i21:Number = inertia.e21;
+			var i22:Number = inertia.e22;
+			var e00:Number = r00 * i00 + r01 * i10 + r02 * i20;
+			var e01:Number = r00 * i01 + r01 * i11 + r02 * i21;
+			var e02:Number = r00 * i02 + r01 * i12 + r02 * i22;
+			var e10:Number = r10 * i00 + r11 * i10 + r12 * i20;
+			var e11:Number = r10 * i01 + r11 * i11 + r12 * i21;
+			var e12:Number = r10 * i02 + r11 * i12 + r12 * i22;
+			var e20:Number = r20 * i00 + r21 * i10 + r22 * i20;
+			var e21:Number = r20 * i01 + r21 * i11 + r22 * i21;
+			var e22:Number = r20 * i02 + r21 * i12 + r22 * i22;
+			out.e00 = e00 * r00 + e01 * r01 + e02 * r02;
+			out.e01 = e00 * r10 + e01 * r11 + e02 * r12;
+			out.e02 = e00 * r20 + e01 * r21 + e02 * r22;
+			out.e10 = e10 * r00 + e11 * r01 + e12 * r02;
+			out.e11 = e10 * r10 + e11 * r11 + e12 * r12;
+			out.e12 = e10 * r20 + e11 * r21 + e12 * r22;
+			out.e20 = e20 * r00 + e21 * r01 + e22 * r02;
+			out.e21 = e20 * r10 + e21 * r11 + e22 * r12;
+			out.e22 = e20 * r20 + e21 * r21 + e22 * r22;
+		}
+		
 		private function syncShapes():void {
 			var s:Number = orientation.s;
 			var x:Number = orientation.x;
@@ -535,65 +566,18 @@ package com.element.oimo.physics.dynamics {
 			var r20:Number = rotation.e20;
 			var r21:Number = rotation.e21;
 			var r22:Number = rotation.e22;
-			var i00:Number = inverseLocalInertia.e00;
-			var i01:Number = inverseLocalInertia.e01;
-			var i02:Number = inverseLocalInertia.e02;
-			var i10:Number = inverseLocalInertia.e10;
-			var i11:Number = inverseLocalInertia.e11;
-			var i12:Number = inverseLocalInertia.e12;
-			var i20:Number = inverseLocalInertia.e20;
-			var i21:Number = inverseLocalInertia.e21;
-			var i22:Number = inverseLocalInertia.e22;
-			var e00:Number = r00 * i00 + r01 * i10 + r02 * i20;
-			var e01:Number = r00 * i01 + r01 * i11 + r02 * i21;
-			var e02:Number = r00 * i02 + r01 * i12 + r02 * i22;
-			var e10:Number = r10 * i00 + r11 * i10 + r12 * i20;
-			var e11:Number = r10 * i01 + r11 * i11 + r12 * i21;
-			var e12:Number = r10 * i02 + r11 * i12 + r12 * i22;
-			var e20:Number = r20 * i00 + r21 * i10 + r22 * i20;
-			var e21:Number = r20 * i01 + r21 * i11 + r22 * i21;
-			var e22:Number = r20 * i02 + r21 * i12 + r22 * i22;
-			inverseInertia.e00 = e00 * r00 + e01 * r01 + e02 * r02;
-			inverseInertia.e01 = e00 * r10 + e01 * r11 + e02 * r12;
-			inverseInertia.e02 = e00 * r20 + e01 * r21 + e02 * r22;
-			inverseInertia.e10 = e10 * r00 + e11 * r01 + e12 * r02;
-			inverseInertia.e11 = e10 * r10 + e11 * r11 + e12 * r12;
-			inverseInertia.e12 = e10 * r20 + e11 * r21 + e12 * r22;
-			inverseInertia.e20 = e20 * r00 + e21 * r01 + e22 * r02;
-			inverseInertia.e21 = e20 * r10 + e21 * r11 + e22 * r12;
-			inverseInertia.e22 = e20 * r20 + e21 * r21 + e22 * r22;
+			rotateInertia(rotation, inverseLocalInertia, inverseInertia);
 			for (var shape:Shape = shapes; shape != null; shape = shape.next) {
 				var relPos:Vec3 = shape.relativePosition;
-				var lRelPos:Vec3 = shape.localRelativePosition;
 				var relRot:Mat33 = shape.relativeRotation;
 				var rot:Mat33 = shape.rotation;
-				var lx:Number = lRelPos.x;
-				var ly:Number = lRelPos.y;
-				var lz:Number = lRelPos.z;
-				relPos.x = lx * r00 + ly * r01 + lz * r02;
-				relPos.y = lx * r10 + ly * r11 + lz * r12;
-				relPos.z = lx * r20 + ly * r21 + lz * r22;
-				shape.position.x = position.x + relPos.x;
-				shape.position.y = position.y + relPos.y;
-				shape.position.z = position.z + relPos.z;
-				e00 = relRot.e00;
-				e01 = relRot.e01;
-				e02 = relRot.e02;
-				e10 = relRot.e10;
-				e11 = relRot.e11;
-				e12 = relRot.e12;
-				e20 = relRot.e20;
-				e21 = relRot.e21;
-				e22 = relRot.e22;
-				rot.e00 = r00 * e00 + r01 * e10 + r02 * e20;
-				rot.e01 = r00 * e01 + r01 * e11 + r02 * e21;
-				rot.e02 = r00 * e02 + r01 * e12 + r02 * e22;
-				rot.e10 = r10 * e00 + r11 * e10 + r12 * e20;
-				rot.e11 = r10 * e01 + r11 * e11 + r12 * e21;
-				rot.e12 = r10 * e02 + r11 * e12 + r12 * e22;
-				rot.e20 = r20 * e00 + r21 * e10 + r22 * e20;
-				rot.e21 = r20 * e01 + r21 * e11 + r22 * e21;
-				rot.e22 = r20 * e02 + r21 * e12 + r22 * e22;
+				var lx:Number = relPos.x;
+				var ly:Number = relPos.y;
+				var lz:Number = relPos.z;
+				shape.position.x = position.x + lx * r00 + ly * r01 + lz * r02;
+				shape.position.y = position.y + lx * r10 + ly * r11 + lz * r12;
+				shape.position.z = position.z + lx * r20 + ly * r21 + lz * r22;
+				rot.mul(relRot, rotation);
 				shape.updateProxy();
 			}
 		}

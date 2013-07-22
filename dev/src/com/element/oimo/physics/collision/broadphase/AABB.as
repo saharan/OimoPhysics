@@ -56,7 +56,7 @@ package com.element.oimo.physics.collision.broadphase {
 		}
 		
 		/**
-		 * Combine two AABBs.
+		 * Set this AABB to the combined AABB of aabb1 and aabb2.
 		 * @param	aabb1
 		 * @param	aabb2
 		 */
@@ -111,7 +111,7 @@ package com.element.oimo.physics.collision.broadphase {
 		}
 		
 		/**
-		 * Returns whether the AABB intersects with the point or not.
+		 * Get whether the AABB intersects with the point or not.
 		 * @param	x
 		 * @param	y
 		 * @param	z

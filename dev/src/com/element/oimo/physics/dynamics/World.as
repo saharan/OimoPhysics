@@ -18,22 +18,20 @@
  */
 package com.element.oimo.physics.dynamics {
 	import com.element.oimo.math.Quat;
+	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.collision.broadphase.AABB;
 	import com.element.oimo.physics.collision.broadphase.BroadPhase;
 	import com.element.oimo.physics.collision.broadphase.BruteForceBroadPhase;
 	import com.element.oimo.physics.collision.broadphase.dbvt.DBVTBroadPhase;
 	import com.element.oimo.physics.collision.broadphase.Pair;
-	import com.element.oimo.physics.collision.broadphase.Proxy;
 	import com.element.oimo.physics.collision.broadphase.sap.SAPBroadPhase;
-	import com.element.oimo.physics.collision.narrow.BoxBoxCollisionDetector;
-	import com.element.oimo.physics.collision.narrow.CollisionDetector;
-	import com.element.oimo.physics.collision.narrow.SphereBoxCollisionDetector;
-	import com.element.oimo.physics.collision.narrow.SphereSphereCollisionDetector;
+	import com.element.oimo.physics.collision.narrowphase.BoxBoxCollisionDetector;
+	import com.element.oimo.physics.collision.narrowphase.CollisionDetector;
+	import com.element.oimo.physics.collision.narrowphase.SphereBoxCollisionDetector;
+	import com.element.oimo.physics.collision.narrowphase.SphereSphereCollisionDetector;
 	import com.element.oimo.physics.collision.shape.Shape;
-	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.constraint.Constraint;
 	import com.element.oimo.physics.constraint.contact.Contact;
-	import com.element.oimo.physics.constraint.contact.ContactConstraint;
 	import com.element.oimo.physics.constraint.contact.ContactLink;
 	import com.element.oimo.physics.constraint.joint.Joint;
 	import com.element.oimo.physics.constraint.joint.JointLink;
@@ -93,7 +91,7 @@ package com.element.oimo.physics.dynamics {
 		public var timeStep:Number;
 		
 		/**
-		 * ワールドにかかる重力です。
+		 * The gravity in the world.
 		 */
 		public var gravity:Vec3;
 		
@@ -101,6 +99,11 @@ package com.element.oimo.physics.dynamics {
 		 * The number of iterations for constraint solvers.
 		 */
 		public var numIterations:int;
+		
+		/**
+		 * Whether the constraints randomizer is enabled or not.
+		 */
+		public var enableRandomizer:Boolean;
 		
 		/**
 		 * パフォーマンスの詳細情報です。
@@ -161,12 +164,14 @@ package com.element.oimo.physics.dynamics {
 			islandStack = new Vector.<RigidBody>(maxIslandRigidBodies, true);
 			maxIslandConstraints = 128;
 			islandConstraints = new Vector.<Constraint>(maxIslandConstraints, true);
+			enableRandomizer = true;
 		}
 		
 		/**
-		 * Remove all rigid bodies, shapes, joints and any objects from the world.
+		 * Reset the randomizer and remove all rigid bodies, shapes, joints and any object from the world.
 		 */
 		public function clear():void {
+			randX = 65535;
 			while (joints != null) {
 				removeJoint(joints);
 			}
@@ -208,7 +213,7 @@ package com.element.oimo.physics.dynamics {
 			remove.awake();
 			var js:JointLink = remove.jointLink;
 			while (js != null) {
-				var joint:Joint = js.parent;
+				var joint:Joint = js.joint;
 				js = js.next;
 				removeJoint(joint);
 			}
@@ -347,7 +352,7 @@ package com.element.oimo.physics.dynamics {
 				}
 				var exists:Boolean = false;
 				while (link) {
-					var contact:Contact = link.parent;
+					var contact:Contact = link.contact;
 					if (contact.shape1 == s1 && contact.shape2 == s2) {
 						contact.persisting = true;
 						exists = true; // contact already exists
@@ -503,7 +508,7 @@ package com.element.oimo.physics.dynamics {
 					}
 					// search connections
 					for (var cs:ContactLink = body.contactLink; cs != null; cs = cs.next) {
-						var contact:Contact = cs.parent;
+						var contact:Contact = cs.contact;
 						constraint = contact.constraint;
 						if (constraint.addedToIsland || !contact.touching) {
 							continue; // ignore
@@ -520,7 +525,7 @@ package com.element.oimo.physics.dynamics {
 						next.addedToIsland = true;
 					}
 					for (var js:JointLink = body.jointLink; js != null; js = js.next) {
-						constraint = js.parent;
+						constraint = js.joint;
 						if (constraint.addedToIsland) {
 							continue; // ignore
 						}
@@ -550,12 +555,14 @@ package com.element.oimo.physics.dynamics {
 					}
 				}
 				
-				// randomizing order TODO: it should be able to be disabled by simulation setting
-				for (j = 1; j < islandNumConstraints; j++) {
-					var swap:uint = (randX = (randX * randA + randB & 0x7fffffff)) / 2147483648.0 * j | 0;
-					constraint = islandConstraints[j];
-					islandConstraints[j] = islandConstraints[swap];
-					islandConstraints[swap] = constraint;
+				// randomizing order
+				if (enableRandomizer) {
+					for (j = 1; j < islandNumConstraints; j++) {
+						var swap:uint = (randX = (randX * randA + randB & 0x7fffffff)) / 2147483648.0 * j | 0;
+						constraint = islandConstraints[j];
+						islandConstraints[j] = islandConstraints[swap];
+						islandConstraints[swap] = constraint;
+					}
 				}
 				
 				// solve contraints

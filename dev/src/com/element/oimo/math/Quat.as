@@ -18,37 +18,22 @@
  */
 package com.element.oimo.math {
 	/**
-	 * クォータニオンを扱うクラスです。
-	 * クォータニオンは右手系のクォータニオンとして扱われます。
-	 * オブジェクトの不要な作成を避けるため、
-	 * 関数ではほとんどの演算結果は自身のオブジェクトに格納されます。
+	 * A quaternion. This is used to represent three-dimansional orientations of rigid bodies.
 	 * @author saharan
 	 */
 	public class Quat {
-		/**
-		 * スカラー成分です。
-		 */
 		public var s:Number;
-		/**
-		 * x 成分です。
-		 */
 		public var x:Number;
-		/**
-		 * y 成分です。
-		 */
 		public var y:Number;
-		/**
-		 * z 成分です。
-		 */
 		public var z:Number;
 		
 		/**
-		 * 新しく Quat オブジェクトを作成します。
-		 * 引数を指定しない場合は、単位クォータニオンで初期化されます。
-		 * @param	s スカラー成分
-		 * @param	x x 成分
-		 * @param	y y 成分
-		 * @param	z z 成分
+		 * Constructor.
+		 * If the parameters are empty, the quaternion will be set to the identity quaternion.
+		 * @param	s
+		 * @param	x
+		 * @param	y
+		 * @param	z
 		 */
 		public function Quat(s:Number = 1, x:Number = 0, y:Number = 0, z:Number = 0) {
 			this.s = s;
@@ -58,12 +43,13 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このクォータニオンを指定された値で初期化します。
-		 * 引数を指定しない場合は、単位クォータニオンで初期化されます。
-		 * @param	s スカラー成分
-		 * @param	x x 成分
-		 * @param	y y 成分
-		 * @param	z z 成分
+		 * Initialize the quaternion.
+		 * If the parameters are empty, the quaternion will be set to the identity quaternion.
+		 * @param	s
+		 * @param	x
+		 * @param	y
+		 * @param	z
+		 * @return
 		 */
 		public function init(s:Number = 1, x:Number = 0, y:Number = 0, z:Number = 0):Quat {
 			this.s = s;
@@ -74,10 +60,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このクォータニオンを q1 と q2 を加算したクォータニオンに設定します。
-		 * @param	q1 クォータニオン1
-		 * @param	q2 クォータニオン2
-		 * @return このオブジェクト
+		 * this = q1 + q2
+		 * @param	q1
+		 * @param	q2
+		 * @return
 		 */
 		public function add(q1:Quat, q2:Quat):Quat {
 			s = q1.s + q2.s;
@@ -88,10 +74,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このクォータニオンを q1 から q2 を減算したクォータニオンに設定します。
-		 * @param	q1 クォータニオン1
-		 * @param	q2 クォータニオン2
-		 * @return このオブジェクト
+		 * this = q1 - q2
+		 * @param	q1
+		 * @param	q2
+		 * @return
 		 */
 		public function sub(q1:Quat, q2:Quat):Quat {
 			s = q1.s - q2.s;
@@ -102,10 +88,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このクォータニオンを q を s 倍に拡張したクォータニオンに設定します。
-		 * @param	q クォータニオン
-		 * @param	s スカラー
-		 * @return このオブジェクト
+		 * this = q * s
+		 * @param	q
+		 * @param	s
+		 * @return
 		 */
 		public function scale(q:Quat, s:Number):Quat {
 			this.s = q.s * s;
@@ -116,10 +102,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このクォータニオンを q1 と q2 を合成したクォータニオンに設定します。
-		 * @param	q1 クォータニオン1
-		 * @param	q2 クォータニオン2
-		 * @return このオブジェクト
+		 * this = q1 * q2
+		 * @param	q1
+		 * @param	q2
+		 * @return
 		 */
 		public function mul(q1:Quat, q2:Quat):Quat {
 			var s:Number = q1.s * q2.s - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z;
@@ -134,9 +120,46 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このクォータニオンを q を正規化したクォータニオンに設定します。
-		 * @param	q クォータニオン
-		 * @return このオブジェクト
+		 * Set this quaternion to the shortest arc rotation quaternion.
+		 * Note that v1 and v2 must be normalized.
+		 * @param	v1 from
+		 * @param	v2 to
+		 * @return
+		 */
+		public function arc(v1:Vec3, v2:Vec3):Quat {
+			var x1:Number = v1.x;
+			var y1:Number = v1.y;
+			var z1:Number = v1.z;
+			var x2:Number = v2.x;
+			var y2:Number = v2.y;
+			var z2:Number = v2.z;
+			var d:Number = x1 * x2 + y1 * y2 + z1 * z2; // cos(theta)
+			if (d == -1) { // 180 rotation, set a vector perpendicular to v1
+				x2 = y1 * x1 - z1 * z1;
+				y2 = -z1 * y1 - x1 * x1;
+				z2 = x1 * z1 + y1 * y1;
+				d = 1 / Math.sqrt(x2 * x2 + y2 * y2 + z2 * z2);
+				s = 0;
+				x = x2 * d;
+				y = y2 * d;
+				z = z2 * d;
+				return this;
+			}
+			var cx:Number = y1 * z2 - z1 * y2;
+			var cy:Number = z1 * x2 - x1 * z2;
+			var cz:Number = x1 * y2 - y1 * x2;
+			s = Math.sqrt((1 + d) * 0.5); // cos(theta / 2)
+			d = 0.5 / s; // sin(theta / 2) / sin(theta)
+			x = cx * d;
+			y = cy * d;
+			z = cz * d;
+			return this;
+		}
+		
+		/**
+		 * Set this quaternion to the normalized quaternion of q.
+		 * @param	q
+		 * @return
 		 */
 		public function normalize(q:Quat):Quat {
 			var len:Number = Math.sqrt(q.s * q.s + q.x * q.x + q.y * q.y + q.z * q.z);
@@ -149,12 +172,12 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このクォータニオンを q を反転させたクォータニオンに設定します。
-		 * @param	q クォータニオン
-		 * @return このオブジェクト
+		 * this = -q
+		 * @param	q
+		 * @return
 		 */
 		public function invert(q:Quat):Quat {
-			s = -q.s;
+			s = q.s;
 			x = -q.x;
 			y = -q.y;
 			z = -q.z;
@@ -162,17 +185,17 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * このクォータニオンの大きさを返します。
-		 * @return 大きさ
+		 * Get the length of the quaternion.
+		 * @return
 		 */
 		public function length():Number {
 			return Math.sqrt(s * s + x * x + y * y + z * z);
 		}
 		
 		/**
-		 * このクォータニオンの値を q からコピーします。
-		 * @param	q クォータニオン
-		 * @return このオブジェクト
+		 * this = q
+		 * @param	q
+		 * @return
 		 */
 		public function copy(q:Quat):Quat {
 			s = q.s;
@@ -183,16 +206,16 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この Quat オブジェクトを複製します。
-		 * @return 複製された Quat オブジェクト
+		 * Get the clone of the quaternion.
+		 * @return
 		 */
 		public function clone(q:Quat):Quat {
 			return new Quat(s, x, y, z);
 		}
 		
 		/**
-		 * このクォータニオンの文字列表現を返します。
-		 * @return このクォータニオンを表す文字列
+		 * Get the string of the quaternion.
+		 * @return
 		 */
 		public function toString():String {
 			return "Quat[" + s.toFixed(4) + ", (" + x.toFixed(4) + ", " + y.toFixed(4) + ", " + z.toFixed(4) + ")]";

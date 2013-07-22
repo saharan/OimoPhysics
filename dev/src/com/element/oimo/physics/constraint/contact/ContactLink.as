@@ -20,20 +20,37 @@ package com.element.oimo.physics.constraint.contact {
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * ...
+	 * A link list of contacts.
 	 * @author saharan
 	 */
 	public class ContactLink {
+		/**
+		 * The previous contact link.
+		 */
 		public var prev:ContactLink;
+		
+		/**
+		 * The next contact link.
+		 */
 		public var next:ContactLink;
 		
+		/**
+		 * The shape of the contact.
+		 */
 		public var shape:Shape;
+		
+		/**
+		 * The other rigid body.
+		 */
 		public var body:RigidBody;
 		
-		public var parent:Contact;
+		/**
+		 * The contact of the link.
+		 */
+		public var contact:Contact;
 		
-		public function ContactLink(parent:Contact) {
-			this.parent = parent;
+		public function ContactLink(contact:Contact) {
+			this.contact = contact;
 		}
 		
 	}

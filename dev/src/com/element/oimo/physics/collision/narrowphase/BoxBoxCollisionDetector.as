@@ -16,16 +16,14 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.collision.narrow {
+package com.element.oimo.physics.collision.narrowphase {
 	import com.element.oimo.math.Vec3;
 	import com.element.oimo.physics.collision.shape.BoxShape;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.SphereShape;
 	import com.element.oimo.physics.constraint.contact.ContactManifold;
 	/**
-	 * 箱同士の詳細な衝突判定を行います。
-	 * detectCollision 関数の引数に指定する形状は、
-	 * どちらも箱である必要があります。
+	 * A collision detector which detects collisions between two boxes.
 	 * @author saharan
 	 */
 	public class BoxBoxCollisionDetector extends CollisionDetector {
@@ -34,11 +32,7 @@ package com.element.oimo.physics.collision.narrow {
 		private var used:Vector.<Boolean>;
 		private const INF:Number = 1 / 0;
 		
-		/**
-		 * 新しく BoxBoxCollisionDetector オブジェクトを作成します。
-		 */
 		public function BoxBoxCollisionDetector() {
-			findAllPointsAtOnce = true;
 			clipVertices1 = new Vector.<Number>(24, true); // 8 vertices x,y,z
 			clipVertices2 = new Vector.<Number>(24, true);
 			used = new Vector.<Boolean>(8, true);
@@ -126,10 +120,8 @@ package com.element.oimo.physics.collision.narrow {
 			var d6z:Number = b2.halfDirectionDepth.z;
 			// ----------------------------
 			// 15 separating axes
-			// 1~6 : face
-			// 7~f : edge
-			// ----------------------------
-			// special thanks for
+			// 1~6: face
+			// 7~f: edge
 			// http://marupeke296.com/COL_3D_No13_OBBvsOBB.html
 			// ----------------------------
 			// b1.x

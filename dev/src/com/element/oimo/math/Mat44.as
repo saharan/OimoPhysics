@@ -18,98 +18,46 @@
  */
 package com.element.oimo.math {
 	/**
-	 * 4行4列の要素を持つ行列を扱うクラスです。
-	 * この行列は、ある三次元座標系から別の三次元座標系への、平行移動を含む完全な変換をサポートします。
-	 * 行列は右手系の行列として扱われます。
-	 * オブジェクトの不要な作成を避けるため、
-	 * 関数ではほとんどの演算結果は自身のオブジェクトに格納されます。
+	 * A 4x4 matrix. This supports three-dimentional transformations perfectly.
 	 * @author saharan
 	 */
 	public class Mat44 {
-		/**
-		 * 1行1列目の要素です。
-		 */
 		public var e00:Number;
-		/**
-		 * 1行2列目の要素です。
-		 */
 		public var e01:Number;
-		/**
-		 * 1行3列目の要素です。
-		 */
 		public var e02:Number;
-		/**
-		 * 1行4列目の要素です。
-		 */
 		public var e03:Number;
-		/**
-		 * 2行1列目の要素です。
-		 */
 		public var e10:Number;
-		/**
-		 * 2行2列目の要素です。
-		 */
 		public var e11:Number;
-		/**
-		 * 2行3列目の要素です。
-		 */
 		public var e12:Number;
-		/**
-		 * 2行4列目の要素です。
-		 */
 		public var e13:Number;
-		/**
-		 * 3行1列目の要素です。
-		 */
 		public var e20:Number;
-		/**
-		 * 3行2列目の要素です。
-		 */
 		public var e21:Number;
-		/**
-		 * 3行3列目の要素です。
-		 */
 		public var e22:Number;
-		/**
-		 * 3行4列目の要素です。
-		 */
 		public var e23:Number;
-		/**
-		 * 4行1列目の要素です。
-		 */
 		public var e30:Number;
-		/**
-		 * 4行2列目の要素です。
-		 */
 		public var e31:Number;
-		/**
-		 * 4行3列目の要素です。
-		 */
 		public var e32:Number;
-		/**
-		 * 4行4列目の要素です。
-		 */
 		public var e33:Number;
 		
 		/**
-		 * 新しく Mat44 オブジェクトを作成します。
-		 * 引数を指定しない場合は、単位行列で初期化されます。
-		 * @param	e00 設定する1行1列目の要素
-		 * @param	e01 設定する1行2列目の要素
-		 * @param	e02 設定する1行3列目の要素
-		 * @param	e03 設定する1行4列目の要素
-		 * @param	e10 設定する2行1列目の要素
-		 * @param	e11 設定する2行2列目の要素
-		 * @param	e12 設定する2行3列目の要素
-		 * @param	e13 設定する2行4列目の要素
-		 * @param	e20 設定する3行1列目の要素
-		 * @param	e21 設定する3行2列目の要素
-		 * @param	e22 設定する3行3列目の要素
-		 * @param	e23 設定する3行4列目の要素
-		 * @param	e30 設定する4行1列目の要素
-		 * @param	e31 設定する4行2列目の要素
-		 * @param	e32 設定する4行3列目の要素
-		 * @param	e33 設定する4行4列目の要素
+		 * Constructor.
+		 * If the parameters are empty, the matrix will be set to the identity matrix.
+		 * @param	e00
+		 * @param	e01
+		 * @param	e02
+		 * @param	e03
+		 * @param	e10
+		 * @param	e11
+		 * @param	e12
+		 * @param	e13
+		 * @param	e20
+		 * @param	e21
+		 * @param	e22
+		 * @param	e23
+		 * @param	e30
+		 * @param	e31
+		 * @param	e32
+		 * @param	e33
 		 */
 		public function Mat44(
 			e00:Number = 1, e01:Number = 0, e02:Number = 0, e03:Number = 0,
@@ -136,25 +84,25 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を指定された値で初期化します。
-		 * 引数を指定しない場合は、単位行列で初期化されます。
-		 * @param	e00 設定する1行1列目の要素
-		 * @param	e01 設定する1行2列目の要素
-		 * @param	e02 設定する1行3列目の要素
-		 * @param	e03 設定する1行4列目の要素
-		 * @param	e10 設定する2行1列目の要素
-		 * @param	e11 設定する2行2列目の要素
-		 * @param	e12 設定する2行3列目の要素
-		 * @param	e13 設定する2行4列目の要素
-		 * @param	e20 設定する3行1列目の要素
-		 * @param	e21 設定する3行2列目の要素
-		 * @param	e22 設定する3行3列目の要素
-		 * @param	e23 設定する3行4列目の要素
-		 * @param	e30 設定する4行1列目の要素
-		 * @param	e31 設定する4行2列目の要素
-		 * @param	e32 設定する4行3列目の要素
-		 * @param	e33 設定する4行4列目の要素
-		 * @return このオブジェクト
+		 * Initialize the matrix.
+		 * If the parameters are empty, the matrix will be set to the identity matrix.
+		 * @param	e00
+		 * @param	e01
+		 * @param	e02
+		 * @param	e03
+		 * @param	e10
+		 * @param	e11
+		 * @param	e12
+		 * @param	e13
+		 * @param	e20
+		 * @param	e21
+		 * @param	e22
+		 * @param	e23
+		 * @param	e30
+		 * @param	e31
+		 * @param	e32
+		 * @param	e33
+		 * @return
 		 */
 		public function init(
 			e00:Number = 1, e01:Number = 0, e02:Number = 0, e03:Number = 0,
@@ -182,10 +130,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m1 と m2 を加算した行列に設定します。
-		 * @param	m1 行列1
-		 * @param	m2 行列2
-		 * @return このオブジェクト
+		 * this = m1 + m2
+		 * @param	m1
+		 * @param	m2
+		 * @return
 		 */
 		public function add(m1:Mat44, m2:Mat44):Mat44 {
 			e00 = m1.e00 + m2.e00;
@@ -208,10 +156,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m1 から m2 を減算した行列に設定します。
-		 * @param	m1 行列1
-		 * @param	m2 行列2
-		 * @return このオブジェクト
+		 * this = m1 - m2
+		 * @param	m1
+		 * @param	m2
+		 * @return
 		 */
 		public function sub(m1:Mat44, m2:Mat44):Mat44 {
 			e00 = m1.e00 - m2.e00;
@@ -234,10 +182,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m を s 倍に拡張した行列に設定します。
-		 * @param	m 行列
-		 * @param	s スカラー
-		 * @return このオブジェクト
+		 * this = m * s
+		 * @param	m
+		 * @param	s
+		 * @return
 		 */
 		public function scale(m:Mat44, s:Number):Mat44 {
 			e00 = m.e00 * s;
@@ -260,10 +208,10 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m1 と m2 を合成した行列に設定します。
-		 * @param	m1 行列1
-		 * @param	m2 行列2
-		 * @return このオブジェクト
+		 * this = m1 * m2
+		 * @param	m1
+		 * @param	m2
+		 * @return
 		 */
 		public function mul(m1:Mat44, m2:Mat44):Mat44 {
 			var e00:Number = m1.e00 * m2.e00 + m1.e01 * m2.e10 + m1.e02 * m2.e20 + m1.e03 * m2.e30;
@@ -302,13 +250,15 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m と拡大縮小行列を合成したものに設定します。
-		 * @param	m 行列
-		 * @param	sx x 方向の拡大率
-		 * @param	sy　y 方向の拡大率
-		 * @param	sz　z 方向の拡大率
-		 * @param	prepend 合成順序を逆にする場合は true
-		 * @return このオブジェクト
+		 * Set this matrix to the multiplication of m and scaling matrix.
+		 * this = [scaling matrix] * m (prepend == true)
+		 * this = m * [scaling matrix] (prepend == false)
+		 * @param	m
+		 * @param	sx 
+		 * @param	sy
+		 * @param	sz
+		 * @param	prepend
+		 * @return
 		 */
 		public function mulScale(m:Mat44, sx:Number, sy:Number, sz:Number, prepend:Boolean = false):Mat44 {
 			var e00:Number;
@@ -398,14 +348,16 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m と回転行列を合成したものに設定します。
-		 * @param	m 行列
-		 * @param	rad ラジアンでの回転角度
-		 * @param	ax 回転軸の x 成分
-		 * @param	ay 回転軸の y 成分
-		 * @param	az 回転軸の z 成分
-		 * @param	prepend 合成順序を逆にする場合は true
-		 * @return このオブジェクト
+		 * Set this matrix to the multiplication of m and rotation matrix.
+		 * this = [rotation matrix] * m (prepend == true)
+		 * this = m * [rotation matrix] (prepend == false)
+		 * @param	m
+		 * @param	rad
+		 * @param	ax
+		 * @param	ay
+		 * @param	az
+		 * @param	prepend
+		 * @return
 		 */
 		public function mulRotate(m:Mat44, rad:Number, ax:Number, ay:Number, az:Number, prepend:Boolean = false):Mat44 {
 			var s:Number = Math.sin(rad);
@@ -507,13 +459,15 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m と平行移動行列を合成したものに設定します。
-		 * @param	m 行列
-		 * @param	tx x 方向の平行移動成分
-		 * @param	ty y 方向の平行移動成分
-		 * @param	tz z 方向の平行移動成分
-		 * @param	prepend 合成順序を逆にする場合は true
-		 * @return このオブジェクト
+		 * Set this matrix to the multiplication of m and translation matrix.
+		 * this = [translation matrix] * m (prepend == true)
+		 * this = m * [translation matrix] (prepend == false)
+		 * @param	m
+		 * @param	tx
+		 * @param	ty
+		 * @param	tz
+		 * @param	prepend
+		 * @return
 		 */
 		public function mulTranslate(m:Mat44, tx:Number, ty:Number, tz:Number, prepend:Boolean = false):Mat44 {
 			var e00:Number;
@@ -603,9 +557,9 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m の転置行列に設定します。
-		 * @param	m 行列
-		 * @return このオブジェクト
+		 * Set this matrix to the transposed matrix of m.
+		 * @param	m
+		 * @return
 		 */
 		public function transpose(m:Mat44):Mat44 {
 			var e01:Number = m.e10;
@@ -640,9 +594,9 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を q で表される回転行列に設定します。
-		 * @param	q クォータニオン
-		 * @return このオブジェクト
+		 * Set this matrix to the rotation matrix of q.
+		 * @param	q
+		 * @return
 		 */
 		public function setQuat(q:Quat):Mat44 {
 			var x2:Number = 2 * q.x;
@@ -677,9 +631,9 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を m の逆行列に設定します。
-		 * @param	m 行列
-		 * @return このオブジェクト
+		 * this = m ^ -1
+		 * @param	m
+		 * @return
 		 */
 		public function invert(m:Mat44):Mat44 {
 			var e1021_1120:Number = m.e10 * m.e21 - m.e11 * m.e20;
@@ -747,17 +701,17 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を指定された値を元に作られるビュー変換行列に設定します。
-		 * @param	eyeX 視点の x 座標
-		 * @param	eyeY 視点の y 座標
-		 * @param	eyeZ 視点の z 座標
-		 * @param	atX 注視点の x 座標
-		 * @param	atY 注視点の y 座標
-		 * @param	atZ 注視点の z 座標
-		 * @param	upX 上方向のベクトルの x 成分
-		 * @param	upY 上方向のベクトルの y 成分
-		 * @param	upZ 上方向のベクトルの z 成分
-		 * @return このオブジェクト
+		 * Set the matrix to right-handed view matrix.
+		 * @param	eyeX
+		 * @param	eyeY
+		 * @param	eyeZ
+		 * @param	atX 
+		 * @param	atY
+		 * @param	atZ
+		 * @param	upX
+		 * @param	upY
+		 * @param	upZ
+		 * @return
 		 */
 		public function lookAt(
 			eyeX:Number, eyeY:Number, eyeZ:Number,
@@ -801,12 +755,12 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を指定された値を元に作られる透視投影変換行列に設定します。
-		 * @param	fovY y 方向の視野角
-		 * @param	aspect アスペクト比
-		 * @param	near ニアクリップ面の距離
-		 * @param	far ファークリップ面の距離
-		 * @return このオブジェクト
+		 * Set the matrix to the right-handed perspective projection matrix.
+		 * @param	fovY
+		 * @param	aspect
+		 * @param	near
+		 * @param	far
+		 * @return
 		 */
 		public function perspective(fovY:Number, aspect:Number, near:Number, far:Number):Mat44 {
 			var h:Number = 1 / Math.tan(fovY * 0.5);
@@ -831,12 +785,12 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列を指定された値を元に作られる平行投影変換行列に設定します。
-		 * @param	width 画面の幅
-		 * @param	height 画面の高さ
-		 * @param	near ニアクリップ面の距離
-		 * @param	far ファークリップ面の距離
-		 * @return このオブジェクト
+		 * Set the matrix to the right-handed orthogonal projection matrix.
+		 * @param	width
+		 * @param	height
+		 * @param	near
+		 * @param	far
+		 * @return
 		 */
 		public function ortho(width:Number, height:Number, near:Number, far:Number):Mat44 {
 			var nf:Number = 1 / (near - far);
@@ -860,9 +814,9 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列の値を m からコピーします。
-		 * @param	m 行列
-		 * @return このオブジェクト
+		 * this = m
+		 * @param	m
+		 * @return
 		 */
 		public function copy(m:Mat44):Mat44 {
 			e00 = m.e00;
@@ -885,10 +839,9 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列の値を3行3列の要素を持つ行列 m からコピーします。
-		 * 4行目および4列目の値は単位行列からコピーされます。
-		 * @param	m 3行3列の要素を持つ行列
-		 * @return このオブジェクト
+		 * this = m
+		 * @param	m
+		 * @return
 		 */
 		public function copyMat33(m:Mat33):Mat44 {
 			e00 = m.e00;
@@ -911,8 +864,8 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この Mat44 オブジェクトを複製します。
-		 * @return 複製された Mat44 オブジェクト
+		 * Get the clone of the matrix.
+		 * @return
 		 */
 		public function clone():Mat44 {
 			return new Mat44(
@@ -924,8 +877,8 @@ package com.element.oimo.math {
 		}
 		
 		/**
-		 * この行列の文字列表現を返します。
-		 * @return この行列を表す文字列
+		 * Get the string of the matrix.
+		 * @return
 		 */
 		public function toString():String {
 			var text:String =

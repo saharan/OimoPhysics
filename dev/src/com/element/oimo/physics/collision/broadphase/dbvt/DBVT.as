@@ -24,7 +24,7 @@ package com.element.oimo.physics.collision.broadphase.dbvt {
 	 */
 	public class DBVT {
 		/**
-		 * The root of this tree.
+		 * The root of the tree.
 		 */
 		public var root:DBVTNode;
 		
@@ -39,7 +39,7 @@ package com.element.oimo.physics.collision.broadphase.dbvt {
 		}
 		
 		/**
-		 * Move the leaf.
+		 * Move a leaf.
 		 * @param	leaf
 		 */
 		public function moveLeaf(leaf:DBVTNode):void {
@@ -48,7 +48,7 @@ package com.element.oimo.physics.collision.broadphase.dbvt {
 		}
 		
 		/**
-		 * Insert the leaf to this tree.
+		 * Insert a leaf to the tree.
 		 * @param	node
 		 */
 		public function insertLeaf(leaf:DBVTNode):void {
@@ -157,7 +157,7 @@ package com.element.oimo.physics.collision.broadphase.dbvt {
 		}
 		
 		/**
-		 * Delete the leaf from this tree.
+		 * Delete a leaf from the tree.
 		 * @param	node
 		 */
 		public function deleteLeaf(leaf:DBVTNode):void {
@@ -213,7 +213,7 @@ package com.element.oimo.physics.collision.broadphase.dbvt {
 			//     / \         / \
 			// [L-L] [L-R] [R-L] [R-R]
 			
-			// Is this tree balanced?
+			// Is the tree balanced?
 			if (balance > 1) {
 				var ll:DBVTNode = l.child1;
 				var lr:DBVTNode = l.child2;

@@ -19,47 +19,56 @@
 package com.element.oimo.physics.constraint.joint {
 	import com.element.oimo.math.Mat33;
 	import com.element.oimo.math.Vec3;
+	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * ジョイントの初期化時に使われる共通設定のクラスです。
-	 * このクラスの変数はコピーして使われ、直接参照を持たれることはありません。
+	 * A joint configuration holds all configuration data for constructing a joint.
+	 * Joint configurations can be reused safely.
 	 * @author saharan
 	 */
 	public class JointConfig {
 		/**
-		 * 剛体1に対する初期状態での相対接続位置です。
+		 * The first rigid body of the joint.
 		 */
-		public var localRelativeAnchorPosition1:Vec3;
+		public var body1:RigidBody;
 		
 		/**
-		 * 剛体2に対する初期状態での相対接続位置です。
+		 * The second rigid body of the joint.
 		 */
-		public var localRelativeAnchorPosition2:Vec3;
+		public var body2:RigidBody;
 		
 		/**
-		 * 剛体1に対する初期状態での回転軸です。
-		 * このオプションは一部のジョイントにおいてのみ有効です。
+		 * The anchor point on the first rigid body in local coordinate system.
+		 */
+		public var localAnchorPoint1:Vec3;
+		
+		/**
+		 * The anchor point on the second rigid body in local coordinate system.
+		 */
+		public var localAnchorPoint2:Vec3;
+		
+		/**
+		 * The axis in the first body's coordinate system.
+		 * This property is available in some joints.
 		 */
 		public var localAxis1:Vec3;
 		
 		/**
-		 * 剛体2に対する初期状態での回転軸です。
-		 * このオプションは一部のジョイントにおいてのみ有効です。
+		 * The axis in the second body's coordinate system.
+		 * This property is available in some joints.
 		 */
 		public var localAxis2:Vec3;
 		
 		/**
-		 * 接続された剛体同士が衝突するかどうかを表します。
+		 * Whether allow collision between connected rigid bodies or not.
 		 */
 		public var allowCollision:Boolean;
 		
-		/**
-		 * 新しく JointConfig オブジェクトを作成します。
-		 */
 		public function JointConfig() {
-			localRelativeAnchorPosition1 = new Vec3();
-			localRelativeAnchorPosition2 = new Vec3();
+			localAnchorPoint1 = new Vec3();
+			localAnchorPoint2 = new Vec3();
 			localAxis1 = new Vec3();
 			localAxis2 = new Vec3();
+			allowCollision = false;
 		}
 		
 	}

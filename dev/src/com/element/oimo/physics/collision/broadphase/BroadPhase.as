@@ -101,8 +101,9 @@ package com.element.oimo.physics.collision.broadphase {
 			var b2:RigidBody = s2.parent;
 			if (
 				b1 == b2 || // same parents
-				(b1.type == RigidBody.BODY_STATIC) &&
-				(b2.type == RigidBody.BODY_STATIC) // static objects
+				(!b1.isDynamic && !b2.isDynamic) || // static or kinematic objects
+				(s1.belongsTo & s2.collidesWith) == 0 ||
+				(s2.belongsTo & s1.collidesWith) == 0 // collision filtering
 			) {
 				return false;
 			}
@@ -110,7 +111,7 @@ package com.element.oimo.physics.collision.broadphase {
 			if (b1.numJoints < b2.numJoints) js = b1.jointLink;
 			else js = b2.jointLink;
 			while (js != null) {
-				var joint:Joint = js.parent;
+				var joint:Joint = js.joint;
 				if (
 					!joint.allowCollision &&
 					(joint.body1 == b1 && joint.body2 == b2 ||

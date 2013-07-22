@@ -16,46 +16,47 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.test {
+package com.element.oimo.physics.demo {
 	import com.element.oimo.physics.collision.shape.BoxShape;
-	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.collision.shape.ShapeConfig;
-	import com.element.oimo.physics.collision.shape.SphereShape;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
-	import com.element.oimo.math.Mat33;
-	import com.element.oimo.math.Quat;
-	import com.element.oimo.math.Vec3;
-	import com.element.oimo.physics.OimoPhysics;
 	import com.element.oimo.physics.util.DebugDraw;
 	import flash.display.Sprite;
 	import flash.display.Stage3D;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.ui.Keyboard;
 	import net.hires.debug.Stats;
 	/**
-	 * 動作テスト
+	 * OimoPhysics demos.
 	 * @author saharan
 	 */
 	[SWF(width = "640", height = "480", frameRate = "60")]
-	public class PyramidTest extends Sprite {
+	public class OimoPhysicsDemos extends Sprite {
 		private var s3d:Stage3D;
 		private var world:World;
-		private var renderer:DebugDraw;
+		private var draw:DebugDraw;
 		private var rigid:RigidBody;
 		private var count:uint;
 		private var tf:TextField;
 		private var fps:Number;
-		private var l:Boolean;
-		private var r:Boolean;
-		private var u:Boolean;
-		private var d:Boolean;
-		private var ctr:RigidBody;
+		private var left:int;
+		private var right:int;
+		private var up:int;
+		private var down:int;
+		private var rotX:Number;
+		private var rotY:Number;
+		private var pmouseX:Number;
+		private var pmouseY:Number;
+		private var press:Boolean;
+		private var control:RigidBody;
+		private var demo:DemoBase;
 		
-		public function PyramidTest() {
+		public function OimoPhysicsDemos() {
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -69,161 +70,205 @@ package com.element.oimo.physics.test {
 			tf = new TextField();
 			tf.selectable = false;
 			tf.defaultTextFormat = new TextFormat("courier new", 12, 0xffffff);
-			tf.x = 0;
-			tf.y = 0;
+			tf.x = 4;
+			tf.y = 4;
 			tf.width = 400;
 			tf.height = 400;
 			addChild(tf);
-			initWorld();
 			fps = 0;
+			pmouseX = 0;
+			pmouseY = 0;
 			
 			s3d = stage.stage3Ds[0];
 			s3d.addEventListener(Event.CONTEXT3D_CREATE, onContext3DCreated);
 			s3d.requestContext3D();
+			stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void {
+				press = true;
+			});
+			stage.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
+				press = false;
+			});
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, function(e:KeyboardEvent):void {
 				var code:uint = e.keyCode;
+				if (code == Keyboard.Q) {
+					prevDemo();
+				}
+				if (code == Keyboard.E) {
+					nextDemo();
+				}
 				if (code == Keyboard.W) {
-					u = true;
+					up |= 1;
 				}
 				if (code == Keyboard.S) {
-					d = true;
+					down |= 1;
 				}
 				if (code == Keyboard.A) {
-					l = true;
+					left |= 1;
 				}
 				if (code == Keyboard.D) {
-					r = true;
+					right |= 1;
+				}
+				if (code == Keyboard.UP) {
+					up |= 3;
+				}
+				if (code == Keyboard.DOWN) {
+					down |= 3;
+				}
+				if (code == Keyboard.LEFT) {
+					left |= 3;
+				}
+				if (code == Keyboard.RIGHT) {
+					right |= 3;
 				}
 				if (code == Keyboard.SPACE) {
-					initWorld();
+					reset();
 				}
 			});
 			stage.addEventListener(KeyboardEvent.KEY_UP, function(e:KeyboardEvent):void {
 				var code:uint = e.keyCode;
 				if (code == Keyboard.W) {
-					u = false;
+					up &= ~1;
 				}
 				if (code == Keyboard.S) {
-					d = false;
+					down &= ~1;
 				}
 				if (code == Keyboard.A) {
-					l = false;
+					left &= ~1;
 				}
 				if (code == Keyboard.D) {
-					r = false;
+					right &= ~1;
+				}
+				if (code == Keyboard.UP) {
+					up &= ~3;
+				}
+				if (code == Keyboard.DOWN) {
+					down &= ~3;
+				}
+				if (code == Keyboard.LEFT) {
+					left &= ~3;
+				}
+				if (code == Keyboard.RIGHT) {
+					right &= ~3;
 				}
 			});
+			
+			world = new World();
+			draw = new DebugDraw(640, 480);
+			draw.setWorld(world);
+			draw.drawJoints = true;
+			
+			registerDemos(
+				new BasicDemo(),
+				new ShapesDemo(),
+				new FrictionDemo(),
+				new RestitutionDemo(),
+				new CollisionFilteringDemo(),
+				new DistanceJointDemo(),
+				new BallAndSocketJointDemo(),
+				new HingeJointDemo(),
+				new PyramidDemo(),
+				new BridgeDemo(),
+				new VehicleDemo()
+			);
+			
+			reset();
 			addEventListener(Event.ENTER_FRAME, frame);
 		}
 		
-		private function initWorld():void {
-			if (world) world.clear();
-			else world = new World();
-			if (!renderer) renderer = new DebugDraw(640, 480);
-			renderer.setWorld(world);
-			var rb:RigidBody;
-			var s:Shape;
-			var c:ShapeConfig = new ShapeConfig();
-			// c.restitution = 0;
-			rb = new RigidBody();
-			c.position.init(0, -0.5, 0);
-			c.rotation.init();
-			s = new BoxShape(32, 1, 50, c);
-			rb.addShape(s);
-			rb.setupMass(RigidBody.BODY_STATIC);
-			world.addRigidBody(rb);
-			
-			c.rotation.init();
-			var width:uint = 15;
-			var height:uint = 5;
-			var depth:uint = 3;
-			var bw:Number = 0.75;
-			var bh:Number = 0.5;
-			var bd:Number = 0.6;
-			for (var i:int = 0; i < width; i++) {
-				for (var j:int = i; j < width; j++) {
-					for (var k:int = 0; k < depth; k++) {
-						rb = new RigidBody();
-						c.position.init(
-							(j - i * 0.5 - (width - 1) * 0.5) * (bw * 1.05),
-							i * (bh + 0.1) + bh * 0.6,
-							(k - (depth - 1) * 0.5) * 5
-						);
-						s = new BoxShape(bw, bh, bd, c);
-						rb.addShape(s);
-						rb.setupMass(RigidBody.BODY_DYNAMIC);
-						world.addRigidBody(rb);
-					}
-				}
+		private function registerDemos(...demos:Array):void {
+			var len:int = demos.length;
+			for (var i:int = 0; i < len; i++) {
+				var demo:DemoBase = DemoBase(demos[i]);
+				demo.world = world;
+				demo.draw = draw;
+				demo.prev = DemoBase(demos[(i - 1 + len) % len]);
+				demo.next = DemoBase(demos[(i + 1) % len]);
 			}
-			
-			c.friction = 2;
-			c.position.init(0, 1.5, 20);
-			c.density = 10;
-			c.rotation.init();
-			s = new SphereShape(1.5, c);
-			ctr = new RigidBody();
-			ctr.linearVelocity.z = -20;
-			ctr.addShape(s);
-			ctr.setupMass(RigidBody.BODY_DYNAMIC);
-			world.addRigidBody(ctr);
+			this.demo = DemoBase(demos[0]);
+		}
+		
+		private function prevDemo():void {
+			demo = demo.prev;
+			reset();
+		}
+		
+		private function nextDemo():void {
+			demo = demo.next;
+			reset();
+		}
+		
+		private function reset():void {
+			rotX = Math.PI * 0.5;
+			rotY = Math.PI * 0.42;
+			world.clear();
+			draw.clearIgnoredShapes();
+			var sc:ShapeConfig = new ShapeConfig();
+			var ground:RigidBody = new RigidBody(0, -0.5, 0);
+			ground.addShape(new BoxShape(sc, 128, 1, 128));
+			sc.relativePosition.init(0, 1, 64);
+			ground.addShape(new BoxShape(sc, 128, 2, 1));
+			sc.relativePosition.init(0, 1, -64);
+			ground.addShape(new BoxShape(sc, 128, 2, 1));
+			sc.relativePosition.init(64, 1, 0);
+			ground.addShape(new BoxShape(sc, 1, 2, 128));
+			sc.relativePosition.init(-64, 1, 0);
+			ground.addShape(new BoxShape(sc, 1, 2, 128));
+			ground.setupMass(RigidBody.BODY_STATIC);
+			world.addRigidBody(ground);
+			demo.reset();
+			control = demo.control;
+			control.allowSleep = false;
 		}
 		
 		private function onContext3DCreated(e:Event = null):void {
-			renderer.setContext3D(s3d.context3D);
-			renderer.camera(0, 2, 4);
+			draw.setContext3D(s3d.context3D);
+			draw.camera(0, 2, 4);
 		}
 		
 		private function frame(e:Event = null):void {
 			count++;
-			var ang:Number = (320 - mouseX) * 0.01 + Math.PI * 0.5;
-			renderer.camera(
-				ctr.position.x + Math.cos(ang) * 8,
-				ctr.position.y + (240 - mouseY) * 0.1,
-				ctr.position.z + Math.sin(ang) * 8,
-				ctr.position.x, ctr.position.y, ctr.position.z
-			);
-			if (l) {
-				ctr.linearVelocity.x -= Math.cos(ang - Math.PI * 0.5) * 0.8;
-				ctr.linearVelocity.z -= Math.sin(ang - Math.PI * 0.5) * 0.8;
+			if (press) {
+				rotX -= (mouseX - pmouseX) * 0.01;
+				rotY += (mouseY - pmouseY) * 0.005;
+				if (rotY < 0.1) rotY = 0.1;
+				else if (rotY > Math.PI * 0.5 - 0.1) rotY = Math.PI * 0.5 - 0.1;
 			}
-			if (r) {
-				ctr.linearVelocity.x -= Math.cos(ang + Math.PI * 0.5) * 0.8;
-				ctr.linearVelocity.z -= Math.sin(ang + Math.PI * 0.5) * 0.8;
-			}
-			if (u) {
-				ctr.linearVelocity.x -= Math.cos(ang) * 0.8;
-				ctr.linearVelocity.z -= Math.sin(ang) * 0.8;
-			}
-			if (d) {
-				ctr.linearVelocity.x += Math.cos(ang) * 0.8;
-				ctr.linearVelocity.z += Math.sin(ang) * 0.8;
-			}
+			demo.update();
+			pmouseX = mouseX;
+			pmouseY = mouseY;
 			world.step();
+			demo.cameraControl(rotX, rotY);
+			demo.userControl(up != 0, down != 0, left != 0, right != 0, rotX, rotY);
 			fps += (1000 / world.performance.totalTime - fps) * 0.5;
 			if (fps > 1000 || fps != fps) {
 				fps = 1000;
 			}
 			tf.text =
+				" --- " + demo.title + " --- \n\n" +
+				"  [Q]: previous demo\n" +
+				"  [E]: next demo\n" +
+				"  [WASD or Arrows]: move around\n" +
+				"  [SPACE]: reset\n\n" +
 				"Rigid Body Count: " + world.numRigidBodies + "\n" +
 				"Contact Count: " + world.numContacts + "\n" +
 				"Pair Check Count: " + world.broadPhase.numPairChecks + "\n" +
 				"Contact Point Count: " + world.numContactPoints + "\n" +
 				"Island Count: " + world.numIslands + "\n\n" +
-				"Broad Phase Time: " + world.performance.broadPhaseTime + "ms\n" +
-				"Narrow Phase Time: " + world.performance.narrowPhaseTime + "ms\n" +
+				"Broad-Phase Time: " + world.performance.broadPhaseTime + "ms\n" +
+				"Narrow-Phase Time: " + world.performance.narrowPhaseTime + "ms\n" +
 				"Solving Time: " + world.performance.solvingTime + "ms\n" +
 				"Updating Time: " + world.performance.updatingTime + "ms\n" +
 				"Total Time: " + world.performance.totalTime + "ms\n" +
 				"Physics FPS: " + fps.toFixed(2) + "\n"
 			;
-			renderer.render();
+			draw.render();
 			var body:RigidBody = world.rigidBodies;
 			while (body != null) {
 				if (body.position.y < -12) {
 					body.position.init(Math.random() * 8 - 4, Math.random() * 4 + 8, Math.random() * 8 - 4);
-					body.linearVelocity.x *= 0.8;
-					body.linearVelocity.z *= 0.8;
+					body.linearVelocity.x *= 0.75;
+					body.linearVelocity.y *= 0.75;
+					body.linearVelocity.z *= 0.75;
 				}
 				body = body.next;
 			}

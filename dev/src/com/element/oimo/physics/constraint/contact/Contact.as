@@ -17,12 +17,11 @@
  * SOFTWARE.
  */
 package com.element.oimo.physics.constraint.contact {
-	import com.element.oimo.math.Vec3;
-	import com.element.oimo.physics.collision.narrow.CollisionDetector;
+	import com.element.oimo.physics.collision.narrowphase.CollisionDetector;
 	import com.element.oimo.physics.collision.shape.Shape;
 	import com.element.oimo.physics.dynamics.RigidBody;
 	/**
-	 * ...
+	 * A contact is a pair of shapes whose axis-aligned bounding boxes are overlapping.
 	 * @author saharan
 	 */
 	public class Contact {
@@ -31,23 +30,64 @@ package com.element.oimo.physics.constraint.contact {
 		private var s1Link:ContactLink;
 		private var s2Link:ContactLink;
 		
+		/**
+		 * The first shape.
+		 */
 		public var shape1:Shape;
+		
+		/**
+		 * The second shape.
+		 */
 		public var shape2:Shape;
 		
+		/**
+		 * The first rigid body.
+		 */
 		public var body1:RigidBody;
+		
+		/**
+		 * The second rigid body.
+		 */
 		public var body2:RigidBody;
 		
+		/**
+		 * The previous contact in the world.
+		 */
 		public var prev:Contact;
+		
+		/**
+		 * The next contact in the world.
+		 */
 		public var next:Contact;
 		
+		/**
+		 * Internal
+		 */
 		public var persisting:Boolean;
+		
+		/**
+		 * Whether both the rigid bodies are sleeping or not.
+		 */
 		public var sleeping:Boolean;
 		
+		/**
+		 * The collision detector between two shapes.
+		 */
 		public var detector:CollisionDetector;
 		
+		/**
+		 * The contact manifold of the contact.
+		 */
 		public var manifold:ContactManifold;
+		
+		/**
+		 * The contact constraint of the contact.
+		 */
 		public var constraint:ContactConstraint;
 		
+		/**
+		 * Whether the shapes are touching or not.
+		 */
 		public var touching:Boolean;
 		
 		private var buffer:Vector.<ImpulseDataBuffer>;
@@ -76,6 +116,9 @@ package com.element.oimo.physics.constraint.contact {
 			return Math.sqrt(friction1 * friction2);
 		}
 		
+		/**
+		 * Update the contact manifold.
+		 */
 		public function updateManifold():void {
 			constraint.restitution = mixRestitution(shape1.restitution, shape2.restitution);
 			constraint.friction = mixFriction(shape1.friction, shape2.friction);
@@ -84,12 +127,12 @@ package com.element.oimo.physics.constraint.contact {
 			for (var i:int = 0; i < numBuffers; i++) {
 				var b:ImpulseDataBuffer = buffer[i];
 				var p:ManifoldPoint = points[i];
-				b.lrp1X = p.localRelativePosition1.x;
-				b.lrp1Y = p.localRelativePosition1.y;
-				b.lrp1Z = p.localRelativePosition1.z;
-				b.lrp2X = p.localRelativePosition2.x;
-				b.lrp2Y = p.localRelativePosition2.y;
-				b.lrp2Z = p.localRelativePosition2.z;
+				b.lp1X = p.localPoint1.x;
+				b.lp1Y = p.localPoint1.y;
+				b.lp1Z = p.localPoint1.z;
+				b.lp2X = p.localPoint2.x;
+				b.lp2Y = p.localPoint2.y;
+				b.lp2Z = p.localPoint2.z;
 				b.impulse = p.normalImpulse;
 			}
 			manifold.numPoints = 0;
@@ -102,23 +145,23 @@ package com.element.oimo.physics.constraint.contact {
 			touching = true;
 			for (i = 0; i < num; i++) {
 				p = points[i];
-				var lrp1x:Number = p.localRelativePosition1.x;
-				var lrp1y:Number = p.localRelativePosition1.y;
-				var lrp1z:Number = p.localRelativePosition1.z;
-				var lrp2x:Number = p.localRelativePosition2.x;
-				var lrp2y:Number = p.localRelativePosition2.y;
-				var lrp2z:Number = p.localRelativePosition2.z;
+				var lp1x:Number = p.localPoint1.x;
+				var lp1y:Number = p.localPoint1.y;
+				var lp1z:Number = p.localPoint1.z;
+				var lp2x:Number = p.localPoint2.x;
+				var lp2y:Number = p.localPoint2.y;
+				var lp2z:Number = p.localPoint2.z;
 				var index:int = -1;
 				var minDistance:Number = 0.0004; // 2cm
 				for (var j:int = 0; j < numBuffers; j++) {
 					b = buffer[j];
-					var dx:Number = b.lrp1X - lrp1x;
-					var dy:Number = b.lrp1Y - lrp1y;
-					var dz:Number = b.lrp1Z - lrp1z;
+					var dx:Number = b.lp1X - lp1x;
+					var dy:Number = b.lp1Y - lp1y;
+					var dz:Number = b.lp1Z - lp1z;
 					var distance1:Number = dx * dx + dy * dy + dz * dz;
-					dx = b.lrp2X - lrp2x;
-					dy = b.lrp2Y - lrp2y;
-					dz = b.lrp2Z - lrp2z;
+					dx = b.lp2X - lp2x;
+					dy = b.lp2Y - lp2y;
+					dz = b.lp2Z - lp2z;
 					var distance2:Number = dx * dx + dy * dy + dz * dz;
 					if (distance1 < distance2) {
 						if (distance1 < minDistance) {
@@ -145,6 +188,11 @@ package com.element.oimo.physics.constraint.contact {
 			}
 		}
 		
+		/**
+		 * Attach the contact to the shapes.
+		 * @param	shape1
+		 * @param	shape2
+		 */
 		public function attach(shape1:Shape, shape2:Shape):void {
 			this.shape1 = shape1;
 			this.shape2 = shape2;
@@ -192,8 +240,12 @@ package com.element.oimo.physics.constraint.contact {
 			
 			persisting = true;
 			sleeping = body1.sleeping && body2.sleeping;
+			manifold.numPoints = 0;
 		}
 		
+		/**
+		 * Detach the contact from the shapes.
+		 */
 		public function detach():void {
 			var prev:ContactLink = s1Link.prev;
 			var next:ContactLink = s1Link.next;

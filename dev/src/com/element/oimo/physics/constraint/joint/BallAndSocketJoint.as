@@ -16,59 +16,42 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.element.oimo.physics.constraint {
-	import com.element.oimo.physics.dynamics.RigidBody;
-	import com.element.oimo.physics.dynamics.World;
+package com.element.oimo.physics.constraint.joint {
+	import com.element.oimo.physics.constraint.joint.base.LinearConstraint;
+	import com.element.oimo.physics.constraint.joint.Joint;
+	import com.element.oimo.physics.constraint.joint.JointConfig;
 	/**
-	 * The base class of all type of the constraints.
+	 * A ball-and-socket joint limits relative translation on two anchor points on rigid bodies.
 	 * @author saharan
 	 */
-	public class Constraint {
-		/**
-		 * The parent world of the constraint.
-		 */
-		public var parent:World;
+	public class BallAndSocketJoint extends Joint {
+		private var lc:LinearConstraint;
 		
-		/**
-		 * The first body of the constraint.
-		 */
-		public var body1:RigidBody;
-		
-		/**
-		 * The second body of the constraint.
-		 */
-		public var body2:RigidBody;
-		
-		/**
-		 * Internal
-		 */
-		public var addedToIsland:Boolean;
-		
-		public function Constraint() {
+		public function BallAndSocketJoint(config:JointConfig) {
+			super(config);
+			type = JOINT_BALL_AND_SOCKET;
+			lc = new LinearConstraint(this);
 		}
 		
 		/**
-		 * Prepare for solving the constraint.
-		 * @param	timeStep
-		 * @param	invTimeStep
+		 * @inheritDoc
 		 */
-		public function preSolve(timeStep:Number, invTimeStep:Number):void {
-			throw new Error("Inheritance error.");
+		override public function preSolve(timeStep:Number, invTimeStep:Number):void {
+			updateAnchorPoints();
+			lc.preSolve(timeStep, invTimeStep);
 		}
 		
 		/**
-		 * Solve the constraint.
-		 * This is usually called iteratively.
+		 * @inheritDoc
 		 */
-		public function solve():void {
-			throw new Error("Inheritance error.");
+		override public function solve():void {
+			lc.solve();
 		}
 		
 		/**
-		 * Do the post-processing.
+		 * @inheritDoc
 		 */
-		public function postSolve():void {
-			throw new Error("Inheritance error.");
+		override public function postSolve():void {
 		}
 		
 	}
