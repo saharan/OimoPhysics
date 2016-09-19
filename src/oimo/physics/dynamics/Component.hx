@@ -1,11 +1,9 @@
 package oimo.physics.dynamics;
-import oimo.m.B;
-import oimo.m.IAABB;
-import oimo.m.IMat3;
 import oimo.m.ITransform;
+import oimo.m.IVec3;
 import oimo.m.M;
-import oimo.math.Vec3;
 import oimo.physics.collision.PairLink;
+import oimo.physics.collision.broadphase.BroadPhase;
 import oimo.physics.collision.broadphase.Proxy;
 import oimo.physics.collision.shape.AABB;
 import oimo.physics.collision.shape.Shape;
@@ -20,7 +18,7 @@ class Component {
 
 	public var _prev:Component;
 	public var _next:Component;
-	public var _body:RigidBody;
+	public var _rigidBody:RigidBody;
 	public var _shape:Shape;
 
 	public var _localTransform:ITransform;
@@ -57,6 +55,27 @@ class Component {
 		_aabb = new AABB();
 
 		_proxy = null;
+	}
+
+	@:extern
+	public inline function _sync(tf1:ITransform, tf2:ITransform):Void {
+		M.transform_mul(_ptransform, _localTransform, tf1);
+		M.transform_mul(_transform, _localTransform, tf2);
+
+		var min:IVec3;
+		var max:IVec3;
+
+		M.call(_shape._computeAABB(_aabb, _ptransform));
+		M.vec3_assign(min, _aabb._min);
+		M.vec3_assign(max, _aabb._max);
+
+		M.call(_shape._computeAABB(_aabb, _transform));
+		M.vec3_min(_aabb._min, min, _aabb._min);
+		M.vec3_max(_aabb._max, max, _aabb._max);
+
+		if (_proxy != null) {
+			_rigidBody._world._broadPhase.moveProxy(_proxy, _aabb);
+		}
 	}
 
 }

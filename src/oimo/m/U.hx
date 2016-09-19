@@ -1,11 +1,9 @@
-
 package oimo.m;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.Access;
 import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.Field;
-import haxe.macro.Expr.Position;
 import haxe.macro.Type;
 import oimo.m.IMat3;
 import oimo.m.ITransform;
@@ -40,10 +38,6 @@ class U {
 		return vec3Names(base).concat(mat3Names(base));
 	}
 
-	public static function aabbNames(base:String) {
-		return appendSuffixes(base, ["MinX", "MinY", "MinZ", "MaxX", "MaxY", "MaxZ"]);
-	}
-
 	public static function appendSuffixes(base:String, suffixes:Array<String>) {
 		return suffixes.map(function(s) {
 			return base + s;
@@ -65,7 +59,6 @@ class U {
 		if (type == (macro:oimo.m.IMat3).toType().toString()) return mat3Names(base);
 		if (type == (macro:oimo.m.ITransform).toType().toString()) return transformNames(base);
 		if (type == (macro:oimo.m.IQuat).toType().toString()) return quatNames(base);
-		if (type == (macro:oimo.m.IAABB).toType().toString()) return aabbNames(base);
 		return null;
 	}
 

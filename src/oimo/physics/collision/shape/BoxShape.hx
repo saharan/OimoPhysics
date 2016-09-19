@@ -31,7 +31,7 @@ class BoxShape extends Shape {
 		);
 	}
 
-	override public function _computeAABB(aabb:AABB, tf1:ITransform, tf2:ITransform):Void {
+	override public function _computeAABB(aabb:AABB, tf:ITransform):Void {
 		var x:IVec3;
 		var y:IVec3;
 		var z:IVec3;
@@ -39,45 +39,21 @@ class BoxShape extends Shape {
 		M.vec3_set(y, 0, M.vec3_get(_halfExtents, 1), 0);
 		M.vec3_set(z, 0, 0, M.vec3_get(_halfExtents, 2));
 
-		var tf1x:IVec3;
-		var tf1y:IVec3;
-		var tf1z:IVec3;
-		M.vec3_mulMat3(tf1x, x, tf1);
-		M.vec3_mulMat3(tf1y, y, tf1);
-		M.vec3_mulMat3(tf1z, z, tf1);
-		M.vec3_abs(tf1x, tf1x);
-		M.vec3_abs(tf1y, tf1y);
-		M.vec3_abs(tf1z, tf1z);
-		var tf1s:IVec3;
-		M.vec3_add(tf1s, tf1x, tf1y);
-		M.vec3_add(tf1s, tf1s, tf1z);
+		var tfx:IVec3;
+		var tfy:IVec3;
+		var tfz:IVec3;
+		M.vec3_mulMat3(tfx, x, tf);
+		M.vec3_mulMat3(tfy, y, tf);
+		M.vec3_mulMat3(tfz, z, tf);
+		M.vec3_abs(tfx, tfx);
+		M.vec3_abs(tfy, tfy);
+		M.vec3_abs(tfz, tfz);
+		var tfs:IVec3;
+		M.vec3_add(tfs, tfx, tfy);
+		M.vec3_add(tfs, tfs, tfz);
 
-		var tf2x:IVec3;
-		var tf2y:IVec3;
-		var tf2z:IVec3;
-		M.vec3_mulMat3(tf2x, x, tf2);
-		M.vec3_mulMat3(tf2y, y, tf2);
-		M.vec3_mulMat3(tf2z, z, tf2);
-		M.vec3_abs(tf2x, tf2x);
-		M.vec3_abs(tf2y, tf2y);
-		M.vec3_abs(tf2z, tf2z);
-		var tf2s:IVec3;
-		M.vec3_add(tf2s, tf2x, tf2y);
-		M.vec3_add(tf2s, tf2s, tf2z);
-
-		var max:IVec3;
-		var min:IVec3;
-
-		var min1:IVec3;
-		var min2:IVec3;
-		var max1:IVec3;
-		var max2:IVec3;
-		M.vec3_sub(min1, tf1, tf1s);
-		M.vec3_add(max1, tf1, tf1s);
-		M.vec3_sub(min2, tf2, tf2s);
-		M.vec3_add(max2, tf2, tf2s);
-		M.vec3_min(aabb._min, min1, min2);
-		M.vec3_max(aabb._max, max1, max2);
+		M.vec3_sub(aabb._min, tf, tfs);
+		M.vec3_add(aabb._max, tf, tfs);
 	}
 
 }

@@ -18,22 +18,24 @@ class Pair {
 	public var _link2:PairLink;
 	public var _manifold:Manifold;
 
-	public var _persistent:Bool;
+	public var _latest:Bool;
+	public var _shouldBeSkipped:Bool;
 
 	public function new() {
 		_link1 = new PairLink();
 		_link2 = new PairLink();
 		_manifold = new Manifold();
-		_persistent = false;
+		_latest = false;
+		_shouldBeSkipped = false;
 	}
 
-	public function _setFromProxyPair(proxyPair:ProxyPair):Void {
-		_c1 = proxyPair._p1._component;
-		_c2 = proxyPair._p2._component;
+	public function _attach(c1:Component, c2:Component):Void {
+		_c1 = c1;
+		_c2 = c2;
 		attachLinks();
 	}
 
-	public function _clear():Void {
+	public function _detach():Void {
 		detachLinks();
 		_c1 = null;
 		_c2 = null;

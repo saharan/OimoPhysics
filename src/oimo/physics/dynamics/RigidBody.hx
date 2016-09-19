@@ -31,6 +31,8 @@ class RigidBody {
 
 	public var _type:RigidBodyType;
 
+	public var _sleeping:Bool;
+
 	public var _invMass:Float;
 	public var _invLocalInertia:IMat3;
 	public var _invInertia:IMat3;
@@ -194,31 +196,42 @@ class RigidBody {
 		}
 	}
 
+	@:extern
 	public inline function _syncComponents():Void {
 		var c:Component = _componentList;
 		M.list_foreach(c, _next, {
-			M.transform_mul(c._ptransform, c._localTransform, _ptransform);
-			M.transform_mul(c._transform, c._localTransform, _transform);
-			M.call(c._shape._computeAABB(c._aabb, c._ptransform, c._transform)); // TODO: saharan
+			M.call(c._sync(_ptransform, _transform));
 		});
 	}
 
 	// --- public ---
 
 	public function addComponent(component:Component):Void {
+		// first, add the component to the linked list so that it will be considered
 		M.list_push(_componentList, _componentListLast, _prev, _next, component);
+		component._rigidBody = this;
+
+		// then add the component to the world
 		if (_world != null) {
 			_world._addComponent(component);
 		}
+
+		// finally, update mass data and synchronize the components
 		_updateMass();
 		_syncComponents();
 	}
 
 	public function removeComponent(component:Component):Void {
+		// first, remove the component from the linked list so that it will be ignored
 		M.list_remove(_componentList, _componentListLast, _prev, _next, component);
+		component._rigidBody = null;
+
+		// then remove the component from the world
 		if (_world != null) {
 			_world._removeComponent(component);
 		}
+
+		// finally, update mass data and synchronize the components
 		_updateMass();
 		_syncComponents();
 	}

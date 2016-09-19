@@ -19,7 +19,7 @@ class Shape {
 	public function _updateMass():Void {
 	}
 
-	public function _computeAABB(aabb:AABB, tf1:ITransform, tf2:ITransform):Void {
+	public function _computeAABB(aabb:AABB, tf:ITransform):Void {
 	}
 
 }

@@ -231,33 +231,33 @@ class Quat {
 		var t:Float = e00 + e11 + e22;
 		var s:Float;
 		if (t > 0) {
-		  s = MathUtil.sqrt(t + 1);
-		  w = 0.5 * s;
-		  s = 0.5 / s;
-		  x = (m.e21 - m.e12) * s;
-		  y = (m.e02 - m.e20) * s;
-		  z = (m.e10 - m.e01) * s;
+			s = MathUtil.sqrt(t + 1);
+			w = 0.5 * s;
+			s = 0.5 / s;
+			x = (m.e21 - m.e12) * s;
+			y = (m.e02 - m.e20) * s;
+			z = (m.e10 - m.e01) * s;
 		} else if (e00 > e11 && e00 > e22) { // e00 is the largest
-		  s = MathUtil.sqrt(e00 - e11 - e22 + 1);
-		  x = 0.5 * s;
-		  s = 0.5 / s;
-		  y = (m.e01 + m.e10) * s;
-		  z = (m.e02 + m.e20) * s;
-		  w = (m.e21 - m.e12) * s;
+			s = MathUtil.sqrt(e00 - e11 - e22 + 1);
+			x = 0.5 * s;
+			s = 0.5 / s;
+			y = (m.e01 + m.e10) * s;
+			z = (m.e02 + m.e20) * s;
+			w = (m.e21 - m.e12) * s;
 		} else if (e11 > e22) { // e11 is the largest
-		  s = MathUtil.sqrt(e11 - e22 - e00 + 1);
-		  y = 0.5 * s;
-		  s = 0.5 / s;
-		  x = (m.e01 + m.e10) * s;
-		  z = (m.e12 + m.e21) * s;
-		  w = (m.e02 - m.e20) * s;
+			s = MathUtil.sqrt(e11 - e22 - e00 + 1);
+			y = 0.5 * s;
+			s = 0.5 / s;
+			x = (m.e01 + m.e10) * s;
+			z = (m.e12 + m.e21) * s;
+			w = (m.e02 - m.e20) * s;
 		} else { // e22 is the largest
-		  s = MathUtil.sqrt(e22 - e00 - e11 + 1);
-		  z = 0.5 * s;
-		  s = 0.5 / s;
-		  x = (m.e02 + m.e20) * s;
-		  y = (m.e12 + m.e21) * s;
-		  w = (m.e10 - m.e01) * s;
+			s = MathUtil.sqrt(e22 - e00 - e11 + 1);
+			z = 0.5 * s;
+			s = 0.5 / s;
+			x = (m.e02 + m.e20) * s;
+			y = (m.e12 + m.e21) * s;
+			w = (m.e10 - m.e01) * s;
 		}
 		return this;
 	}

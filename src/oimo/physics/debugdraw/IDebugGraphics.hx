@@ -33,6 +33,11 @@ interface IDebugGraphics {
 	public function drawWireframeBox(transform:Mat4, halfExtents:Vec3):Void;
 
 	/**
+	 * Draws a line from `from` to `to`.
+	 */
+	public function drawLine(from:Vec3, to:Vec3):Void;
+
+	/**
 	 * Sets the color of objects drawn after to `color`.
 	 */
 	public function color(color:Vec3):Void;

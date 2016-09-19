@@ -4,6 +4,7 @@ import oimo.m.IVec3;
 import oimo.m.M;
 import oimo.math.Mat4;
 import oimo.math.Vec3;
+import oimo.physics.collision.Pair;
 import oimo.physics.collision.shape.AABB;
 import oimo.physics.collision.shape.BoxShape;
 import oimo.physics.collision.shape.Shape;
@@ -18,38 +19,44 @@ import oimo.physics.dynamics.World;
 @:expose("OIMO.DebugDrawer")
 @:build(oimo.m.B.build())
 class DebugDrawer {
-	public var drawAABB:Bool;
+	public var drawShapes:Bool;
+	public var drawAABBs:Bool;
+	public var drawPairs:Bool;
 
-	var debugGraphics:IDebugGraphics;
+	var g:IDebugGraphics;
 	var world:World;
 
 	var componentTransform:Mat4;
 	var aabbTransform:Mat4;
-	var tmpVec3:Vec3;
+	var tmpVec1:Vec3;
+	var tmpVec2:Vec3;
 
 	var viewMat:Mat4;
 	var projMat:Mat4;
 
 	public function new(world:World, debugGraphics:IDebugGraphics) {
 		this.world = world;
-		this.debugGraphics = debugGraphics;
+		this.g = debugGraphics;
 
 		componentTransform = new Mat4();
 		aabbTransform = new Mat4();
-		tmpVec3 = new Vec3();
+		tmpVec1 = new Vec3();
+		tmpVec2 = new Vec3();
 
 		viewMat = new Mat4();
 		projMat = new Mat4();
 
-		drawAABB = true;
+		drawShapes = true;
+		drawAABBs = false;
+		drawPairs = false;
 	}
 
 	public function draw():Void {
-		debugGraphics.begin(Settings.debugDrawBackgroundColor);
-		debugGraphics.setViewMatrix(viewMat);
-		debugGraphics.setProjectionMatrix(projMat);
-		_drawRigidBodies(debugGraphics);
-		debugGraphics.end();
+		g.begin(Settings.debugDrawBackgroundColor);
+		g.setViewMatrix(viewMat);
+		g.setProjectionMatrix(projMat);
+		_drawRigidBodies();
+		g.end();
 	}
 
 	public function camera(eye:Vec3, at:Vec3, up:Vec3):Void {
@@ -61,7 +68,7 @@ class DebugDrawer {
 	}
 
 	@:extern
-	inline function _drawRigidBodies(debugDrawer:IDebugGraphics):Void {
+	inline function _drawRigidBodies():Void {
 		var r:RigidBody = world._rigidBodyList;
 		M.list_foreach(r, _next, {
 			var shapeColor:Vec3;
@@ -75,37 +82,48 @@ class DebugDrawer {
 				if (isDynamic) {
 					shapeColor = (c._id & 1) == 0 ? Settings.debugDrawShapeColor1 : Settings.debugDrawShapeColor2;
 				}
-				debugDrawer.color(shapeColor);
-				_drawShape(c._shape, debugDrawer);
-				debugDrawer.color(Settings.debugDrawAABBColor);
-				_drawAABB(c._aabb, debugDrawer);
+				if (drawShapes) {
+					g.color(shapeColor);
+					_drawShape(c._shape);
+				}
+				if (drawAABBs) {
+					g.color(Settings.debugDrawAABBColor);
+					_drawAABB(c._aabb);
+				}
 			});
 		});
-	}
-
-	@:extern
-	inline function _drawShape(shape:Shape, debugDrawer:IDebugGraphics):Void {
-		switch(shape._type) {
-		case Sphere:
-			_drawSphere(cast shape, debugDrawer);
-		case Box:
-			_drawBox(cast shape, debugDrawer);
+		if (drawPairs) {
+			var p:Pair = world._pairManager._pairList;
+			g.color(Settings.debugDrawPairColor);
+			M.list_foreach(p, _next, {
+				_drawPair(p);
+			});
 		}
 	}
 
 	@:extern
-	inline function _drawSphere(sphere:SphereShape, debugDrawer:IDebugGraphics):Void {
-		debugDrawer.drawSphere(componentTransform, sphere._radius);
+	inline function _drawShape(shape:Shape):Void {
+		switch(shape._type) {
+		case Sphere:
+			_drawSphere(cast shape);
+		case Box:
+			_drawBox(cast shape);
+		}
 	}
 
 	@:extern
-	inline function _drawBox(box:BoxShape, debugDrawer:IDebugGraphics):Void {
-		M.vec3_toVec3(tmpVec3, box._halfExtents);
-		debugDrawer.drawBox(componentTransform, tmpVec3);
+	inline function _drawSphere(sphere:SphereShape):Void {
+		g.drawSphere(componentTransform, sphere._radius);
 	}
 
 	@:extern
-	inline function _drawAABB(aabb:AABB, debugDrawer:IDebugGraphics):Void {
+	inline function _drawBox(box:BoxShape):Void {
+		M.vec3_toVec3(tmpVec1, box._halfExtents);
+		g.drawBox(componentTransform, tmpVec1);
+	}
+
+	@:extern
+	inline function _drawAABB(aabb:AABB):Void {
 		var min:IVec3;
 		var max:IVec3;
 		var halfExtents:IVec3;
@@ -115,13 +133,22 @@ class DebugDrawer {
 		M.vec3_assign(max, aabb._max);
 		M.vec3_sub(halfExtents, max, min);
 		M.vec3_scale(halfExtents, halfExtents, 0.5);
-		M.vec3_toVec3(tmpVec3, halfExtents);
+		M.vec3_toVec3(tmpVec1, halfExtents);
 		M.vec3_add(center, max, min);
 		M.vec3_scale(center, center, 0.5);
 		M.transform_id(tf);
 		M.vec3_assign(tf, center);
 		M.transform_toMat4(aabbTransform, tf);
-		debugDrawer.drawWireframeBox(aabbTransform, tmpVec3);
+		g.drawWireframeBox(aabbTransform, tmpVec1);
+	}
+
+	@:extern
+	inline function _drawPair(pair:Pair):Void {
+		var c1:Component = pair._c1;
+		var c2:Component = pair._c2;
+		M.vec3_toVec3(tmpVec1, c1._transform);
+		M.vec3_toVec3(tmpVec2, c2._transform);
+		g.drawLine(tmpVec1, tmpVec2);
 	}
 
 }

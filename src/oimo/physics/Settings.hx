@@ -45,8 +45,8 @@ class Settings {
 	public static var debugDrawShapeColor1:Vec3 = new Vec3(0.7, 0.2, 0.4);
 	public static var debugDrawShapeColor2:Vec3 = new Vec3(1.0, 0.8, 0.1);
 	public static var debugDrawStaticShapeColor:Vec3 = new Vec3(0.7, 0.7, 0.7);
-
 	public static var debugDrawAABBColor:Vec3 = new Vec3(1.0, 0.1, 0.1);
+	public static var debugDrawPairColor:Vec3 = new Vec3(1.0, 1.0, 0.1);
 
 	public static var allClasses(default, never):Array<Dynamic> = [
 		// physics.collision.broadphase.bruteforce

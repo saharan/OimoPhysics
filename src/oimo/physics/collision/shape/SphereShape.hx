@@ -1,11 +1,8 @@
 package oimo.physics.collision.shape;
-import haxe.macro.Expr;
 import oimo.m.ITransform;
 import oimo.m.IVec3;
 import oimo.m.M;
 import oimo.math.MathUtil;
-import oimo.physics.Settings;
-import oimo.physics.collision.broadphase.Proxy;
 
 /**
  * Sphere shape
@@ -29,15 +26,11 @@ class SphereShape extends Shape {
 		);
 	}
 
-	override public function _computeAABB(aabb:AABB, tf1:ITransform, tf2:ITransform):Void {
-		var min:IVec3;
-		var max:IVec3;
+	override public function _computeAABB(aabb:AABB, tf:ITransform):Void {
 		var radVec:IVec3;
 		M.vec3_set(radVec, _radius, _radius, _radius);
-		M.vec3_min(min, tf1, tf2);
-		M.vec3_max(max, tf1, tf2);
-		M.vec3_sub(aabb._min, min, radVec);
-		M.vec3_add(aabb._max, max, radVec);
+		M.vec3_sub(aabb._min, tf, radVec);
+		M.vec3_add(aabb._max, tf, radVec);
 	}
 
 }

@@ -1,6 +1,7 @@
 package oimo.physics.dynamics;
 import oimo.m.M;
 import oimo.physics.collision.Pair;
+import oimo.physics.collision.PairLink;
 import oimo.physics.collision.PairManager;
 import oimo.physics.collision.broadphase.BroadPhase;
 import oimo.physics.collision.broadphase.BroadPhaseType;
@@ -34,9 +35,10 @@ class World {
 		_componentIdCount = 0;
 	}
 
+	@:extern
 	inline function _updateContacts():Void {
 		// update pairs
-		_pairManager.updatePairs();
+		_pairManager._updatePairs();
 		var p:Pair = _pairManager._pairList;
 		M.list_foreach(p, _next, {
 			// TODO: narrowphase
@@ -47,14 +49,25 @@ class World {
 		// TODO: saharan
 	}
 
+	@:extern
 	public inline function _addComponent(component:Component):Void {
+		component._proxy = _broadPhase.createProxy(component, component._aabb);
 		component._id = _componentIdCount++;
-		_broadPhase._addComponent(component);
 	}
 
+	@:extern
 	public inline function _removeComponent(component:Component):Void {
-		_broadPhase._removeComponent(component);
+		_broadPhase.destroyProxy(component._proxy);
+		component._proxy = null;
 		component._id = -1;
+
+		// destroy linked pairs
+		var pl:PairLink = component._pairLink;
+		M.list_foreach(pl, _next, {
+			_pairManager._destroyPair(pl._pair);
+		});
+		M.assert(component._numPairs == 0);
+		M.assert(component._pairLink == null);
 	}
 
 	/**
@@ -77,7 +90,11 @@ class World {
 	}
 
 	public function addRigidBody(rigidBody:RigidBody):Void {
+		// first, add the rigid body to the world
 		M.list_push(_rigidBodyList, _rigidBodyListLast, _prev, _next, rigidBody);
+		rigidBody._world = this;
+
+		// then add the components to the world
 		var c:Component = rigidBody._componentList;
 		M.list_foreach(c, _next, {
 			_addComponent(c);
@@ -85,7 +102,11 @@ class World {
 	}
 
 	public function removeRigidBody(rigidBody:RigidBody):Void {
+		// first, remove the rigid body from the world
 		M.list_remove(_rigidBodyList, _rigidBodyListLast, _prev, _next, rigidBody);
+		rigidBody._world = null;
+
+		// then remove the components from the world
 		var c:Component = rigidBody._componentList;
 		M.list_foreach(c, _next, {
 			_removeComponent(c);
