@@ -1,5 +1,6 @@
 package oimo.physics.collision.shape;
 import oimo.m.IMat3;
+import oimo.m.ITransform;
 
 /**
  * Collision shape.
@@ -16,6 +17,9 @@ class Shape {
 	}
 
 	public function _updateMass():Void {
+	}
+
+	public function _computeAABB(aabb:AABB, tf1:ITransform, tf2:ITransform):Void {
 	}
 
 }

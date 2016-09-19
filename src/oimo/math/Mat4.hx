@@ -188,7 +188,7 @@ class Mat4 {
 	}
 
 	/**
-	 * Sets this matrix to identity and returns `this`.
+	 * Sets this matrix to identity matrix and returns `this`.
 	 */
 	public inline function identity():Mat4 {
 		initi(

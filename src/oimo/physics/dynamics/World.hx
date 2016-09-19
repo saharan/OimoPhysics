@@ -1,38 +1,60 @@
 package oimo.physics.dynamics;
-import oimo.m.ITransform;
 import oimo.m.M;
-import oimo.math.Mat4;
-import oimo.math.Vec3;
-import oimo.physics.collision.shape.BoxShape;
-import oimo.physics.collision.shape.Shape;
-import oimo.physics.collision.shape.SphereShape;
-import oimo.physics.debugdraw.IDebugDrawer;
+import oimo.physics.collision.Pair;
+import oimo.physics.collision.PairManager;
+import oimo.physics.collision.broadphase.BroadPhase;
+import oimo.physics.collision.broadphase.BroadPhaseType;
+import oimo.physics.collision.broadphase.bruteforce.BruteForceBroadPhase;
 
 /**
  * Physics world.
  */
 @:expose("OIMO.World")
+@:build(oimo.m.B.build())
 class World {
 	public var _rigidBodyList:RigidBody;
 	public var _rigidBodyListLast:RigidBody;
 
-	var tmpMat4:Mat4;
-	var tmpVec3:Vec3;
+	public var _pairManager:PairManager;
 
-	public function new() {
+	public var _broadPhase:BroadPhase;
+
+	var _componentIdCount:Int;
+
+	public function new(?broadPhaseType:BroadPhaseType) {
+		if (broadPhaseType == null) broadPhaseType = BruteForce;
+		switch(broadPhaseType) {
+		case BruteForce:
+			_broadPhase = new BruteForceBroadPhase();
+		}
+		_pairManager = new PairManager(_broadPhase);
 		_rigidBodyList = null;
 		_rigidBodyListLast = null;
 
-		tmpMat4 = new Mat4();
-		tmpVec3 = new Vec3();
+		_componentIdCount = 0;
 	}
 
 	inline function _updateContacts():Void {
-		// TODO: saharan
+		// update pairs
+		_pairManager.updatePairs();
+		var p:Pair = _pairManager._pairList;
+		M.list_foreach(p, _next, {
+			// TODO: narrowphase
+		});
 	}
 
 	inline function _solveIslands():Void {
 		// TODO: saharan
+	}
+
+	public inline function _addComponent(component:Component):Void {
+		component._id = _componentIdCount++;
+		_broadPhase._addComponent(component);
+	}
+
+	public inline function _removeComponent(component:Component):Void {
+		_broadPhase._removeComponent(component);
+		component._id = -1;
 	}
 
 	/**
@@ -46,67 +68,28 @@ class World {
 		});
 	}
 
-	@:extern
-	inline function _drawRigidBodies(debugDrawer:IDebugDrawer):Void {
-		var r:RigidBody = _rigidBodyList;
-		M.list_foreach(r, _next, {
-			var color:Vec3;
-			var isDynamic:Bool = r._type == Dynamic;
-			if (!isDynamic) {
-				color = Settings.debugDrawStaticShapeColor;
-				debugDrawer.color(color.x, color.y, color.z);
-			}
-			var c:Component = r._componentList;
-			M.list_foreach(c, _next, {
-				M.transform_toMat4(tmpMat4, c._transform);
-				if (isDynamic) {
-					color = (c._id & 1) == 0 ? Settings.debugDrawShapeColor1 : Settings.debugDrawShapeColor2;
-					debugDrawer.color(color.x, color.y, color.z);
-				}
-				_drawShape(c._shape, debugDrawer);
-			});
-		});
-	}
-
-	@:extern
-	inline function _drawShape(shape:Shape, debugDrawer:IDebugDrawer):Void {
-		switch(shape._type) {
-		case Sphere:
-			_drawSphere(cast shape, debugDrawer);
-		case Box:
-			_drawBox(cast shape, debugDrawer);
-		}
-	}
-
-	@:extern
-	inline function _drawSphere(sphere:SphereShape, debugDrawer:IDebugDrawer):Void {
-		debugDrawer.drawSphere(tmpMat4, sphere._radius);
-	}
-
-	@:extern
-	inline function _drawBox(box:BoxShape, debugDrawer:IDebugDrawer):Void {
-		M.vec3_toVec3(tmpVec3, box._halfExtents);
-		debugDrawer.drawBox(tmpMat4, tmpVec3);
-	}
-
 	// --- public ---
 
 	public function step(timeStep:Float):Void {
-		//_updateContacts();
+		_updateContacts();
 		//_solveIslands(timeStep);
 		_integrate(timeStep);
 	}
 
-	public function debugDraw(debugDrawer:IDebugDrawer):Void {
-		_drawRigidBodies(debugDrawer);
-	}
-
 	public function addRigidBody(rigidBody:RigidBody):Void {
 		M.list_push(_rigidBodyList, _rigidBodyListLast, _prev, _next, rigidBody);
+		var c:Component = rigidBody._componentList;
+		M.list_foreach(c, _next, {
+			_addComponent(c);
+		});
 	}
 
 	public function removeRigidBody(rigidBody:RigidBody):Void {
 		M.list_remove(_rigidBodyList, _rigidBodyListLast, _prev, _next, rigidBody);
+		var c:Component = rigidBody._componentList;
+		M.list_foreach(c, _next, {
+			_removeComponent(c);
+		});
 	}
 
 }

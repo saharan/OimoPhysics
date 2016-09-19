@@ -31,6 +31,15 @@ class Transform {
 	}
 
 	/**
+	 * Sets this transformation to identity transformation and returns `this`.
+	 */
+	public function identity():Transform {
+		this.origin.zero();
+		this.rotation.identity();
+		return this;
+	}
+
+	/**
 	 * Copies values from `t` and returns `this`.
 	 */
 	public inline function copyFrom(t:Transform):Transform {

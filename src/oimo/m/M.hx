@@ -21,6 +21,20 @@ using haxe.macro.TypeTools;
 class M {
 
 	// ---------------------------------------------------------------------
+	// Util
+	// ---------------------------------------------------------------------
+
+	public static function zip<A1, A2, A3>(a1:Array<A1>, a2:Array<A2>, f:A1 -> A2 -> A3):Array<A3> {
+		var res:Array<A3> = [];
+		assert(a1.length == a2.length);
+		var num:Int = a1.length;
+		for (i in 0...num) {
+			res.push(f(a1[i], a2[i]));
+		}
+		return res;
+	}
+
+	// ---------------------------------------------------------------------
 	// Float
 	// ---------------------------------------------------------------------
 
@@ -50,6 +64,14 @@ class M {
 		return macro $x < -M.EPS;
 	}
 
+	public static macro function min(x:ExprOf<Float>, y:ExprOf<Float>) {
+		return macro $x < $y ? $x : $y;
+	}
+
+	public static macro function max(x:ExprOf<Float>, y:ExprOf<Float>) {
+		return macro $x < $y ? $x : $y;
+	}
+
 	// ---------------------------------------------------------------------
 	// List
 	// ---------------------------------------------------------------------
@@ -58,8 +80,9 @@ class M {
 		var n:String = next.s();
 		return macro {
 			while ($base != null) {
+				var n = $base.$n;
 				$loop;
-				$base = $base.$n;
+				$base = n;
 			}
 		}
 	}
@@ -75,6 +98,21 @@ class M {
 				$last.$n = $e;
 				$e.$p = $last;
 				$last = $e;
+			}
+		}
+	}
+
+	public static macro function list_addFirst(first:Expr, last:Expr, prev:Expr, next:Expr, e:Expr) {
+		var p:String = prev.s();
+		var n:String = next.s();
+		return macro {
+			if ($first == null) {
+				$first = $e;
+				$last = $e;
+			} else {
+				$first.$p = $e;
+				$e.$n = $first;
+				$first = $e;
 			}
 		}
 	}
@@ -99,6 +137,40 @@ class M {
 			}
 			$e.$n = null;
 			$e.$p = null;
+		}
+	}
+
+	public static macro function singleList_addFirst(first:Expr, next:Expr, e:Expr) {
+		var n:String = next.s();
+		return macro {
+			if ($first == null) {
+				$first = $e;
+			} else {
+				$e.$n = $first;
+				$first = $e;
+			}
+		}
+	}
+
+	public static macro function singleList_pick(first:Expr, next:Expr, newInstance:Expr) {
+		var n:String = next.s();
+		return macro {
+			var first = $first;
+			if (first != null) {
+				$first = first.$n;
+				first.$n = null;
+			} else {
+				first = $newInstance;
+			}
+			first;
+		}
+	}
+
+	public static macro function singleList_pool(first:Expr, next:Expr, e:Expr) {
+		var n:String = next.s();
+		return macro {
+			$e.$n = $first;
+			$first = $e;
 		}
 	}
 
@@ -172,6 +244,28 @@ class M {
 
 	public static macro function vec3_scale(dst:Expr, src1:Expr, src2:ExprOf<Float>) {
 		return binOpVars(dst.s().vec3Names(), src1.s().vec3Names(), [src2, src2, src2], OpMult);
+	}
+
+	public static macro function vec3_abs(dst:Expr, src:Expr) {
+		return assignVars(dst.s().vec3Names(), src.s().vec3Names().map(f).map(function(e1) {
+			return macro $e1 < 0 ? -$e1 : $e1;
+		}));
+	}
+
+	public static macro function vec3_min(dst:Expr, src1:Expr, src2:Expr) {
+		var as = src1.s().vec3Names().map(f);
+		var bs = src2.s().vec3Names().map(f);
+		return assignVars(dst.s().vec3Names(), zip(as, bs, function(e1, e2) {
+			return macro $e1 < $e2 ? $e1 : $e2;
+		}));
+	}
+
+	public static macro function vec3_max(dst:Expr, src1:Expr, src2:Expr) {
+		var as = src1.s().vec3Names().map(f);
+		var bs = src2.s().vec3Names().map(f);
+		return assignVars(dst.s().vec3Names(), zip(as, bs, function(e1, e2) {
+			return macro $e1 > $e2 ? $e1 : $e2;
+		}));
 	}
 
 	public static macro function vec3_dot(src1:Expr, src2:Expr) {
@@ -618,13 +712,28 @@ class M {
 	}
 
 	// ---------------------------------------------------------------------
+	// AABB
+	// ---------------------------------------------------------------------
+
+	public static macro function aabb_isOverlapped(min1:Expr, max1:Expr, min2:Expr, max2:Expr) {
+		var mi1:Array<String> = min1.s().vec3Names();
+		var ma1:Array<String> = max1.s().vec3Names();
+		var mi2:Array<String> = min2.s().vec3Names();
+		var ma2:Array<String> = max2.s().vec3Names();
+		return macro
+			${mi1[0].f()} < ${ma2[0].f()} && ${ma1[0].f()} > ${mi2[0].f()} &&
+			${mi1[1].f()} < ${ma2[1].f()} && ${ma1[1].f()} > ${mi2[1].f()} &&
+			${mi1[2].f()} < ${ma2[2].f()} && ${ma1[2].f()} > ${mi2[2].f()}
+		;
+	}
+
+	// ---------------------------------------------------------------------
 	// Call
 	// ---------------------------------------------------------------------
 
 	public static macro function call(e:Expr) {
 		switch(e.expr) {
 		case ECall(func, params):
-			var funcType:Type = func.t();
 			var newParams:Array<Expr> = [];
 			for (param in params) {
 				var names:Array<String> = U.namesE(param);

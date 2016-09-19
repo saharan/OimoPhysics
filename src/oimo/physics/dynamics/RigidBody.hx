@@ -26,6 +26,7 @@ class RigidBody {
 	public var _linearVel:IVec3;
 	public var _angularVel:IVec3;
 
+	public var _ptransform:ITransform;
 	public var _transform:ITransform;
 
 	public var _type:RigidBodyType;
@@ -35,6 +36,8 @@ class RigidBody {
 	public var _invInertia:IMat3;
 
 	public var _rotationFactor:IVec3;
+
+	public var _world:World;
 
 	public function new(config:RigidBodyConfig) {
 		_next = null;
@@ -46,6 +49,7 @@ class RigidBody {
 		M.vec3_fromVec3(_linearVel, config.linearVelocity);
 		M.vec3_fromVec3(_angularVel, config.angularVelocity);
 
+		M.transform_fromTransform(_ptransform, config.transform);
 		M.transform_fromTransform(_transform, config.transform);
 
 		_type = Dynamic;
@@ -55,6 +59,8 @@ class RigidBody {
 		M.mat3_zero(_invInertia);
 
 		M.vec3_set(_rotationFactor, 1, 1, 1);
+
+		_world = null;
 	}
 
 	inline function _updateMass():Void {
@@ -89,21 +95,31 @@ class RigidBody {
 		});
 
 		if (totalMass > MathUtil.EPS && _type == Dynamic) {
+			// set mass and inertia
 			_invMass = 1 / totalMass;
 			M.mat3_inv(_invLocalInertia, totalInertia);
 			M.mat3_scaleRowsVec3(_invLocalInertia, _invLocalInertia, _rotationFactor);
 
+			// set transformed inertia
 			M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform);
 		} else {
+			// set mass and inertia
 			_invMass = 0;
 			M.mat3_zero(_invLocalInertia);
 
+			// set transformaed inertia
 			M.mat3_zero(_invInertia);
+
+			// force body type to be static or kinematic
+			if (_type == Dynamic) {
+				_type = Static;
+			}
 		}
 	}
 
 	@:extern
 	public inline function _integrate(timeStep:Float):Void {
+		M.transform_assign(_ptransform, _transform);
 		switch (_type) {
 		case Dynamic:
 			var translation:IVec3;
@@ -181,7 +197,9 @@ class RigidBody {
 	public inline function _syncComponents():Void {
 		var c:Component = _componentList;
 		M.list_foreach(c, _next, {
+			M.transform_mul(c._ptransform, c._localTransform, _ptransform);
 			M.transform_mul(c._transform, c._localTransform, _transform);
+			M.call(c._shape._computeAABB(c._aabb, c._ptransform, c._transform)); // TODO: saharan
 		});
 	}
 
@@ -189,12 +207,20 @@ class RigidBody {
 
 	public function addComponent(component:Component):Void {
 		M.list_push(_componentList, _componentListLast, _prev, _next, component);
+		if (_world != null) {
+			_world._addComponent(component);
+		}
 		_updateMass();
+		_syncComponents();
 	}
 
 	public function removeComponent(component:Component):Void {
 		M.list_remove(_componentList, _componentListLast, _prev, _next, component);
+		if (_world != null) {
+			_world._removeComponent(component);
+		}
 		_updateMass();
+		_syncComponents();
 	}
 
 	/**

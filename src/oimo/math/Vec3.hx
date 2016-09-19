@@ -42,6 +42,13 @@ class Vec3 {
 		return this;
 	}
 
+	/**
+	 * Sets this vector to zero vector and returns `this`.
+	 */
+	public function zero():Vec3 {
+		return initi(0, 0, 0);
+	}
+
 	@:extern
 	inline function initi(x:Float, y:Float, z:Float):Vec3 {
 		var tx:Float = x;

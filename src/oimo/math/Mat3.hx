@@ -122,7 +122,7 @@ class Mat3 {
 	}
 
 	/**
-	 * Sets this matrix to identity and returns `this`.
+	 * Sets this matrix to identity matrix and returns `this`.
 	 */
 	public inline function identity():Mat3 {
 		initi(

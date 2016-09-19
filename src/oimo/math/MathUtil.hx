@@ -5,6 +5,8 @@ package oimo.math;
  */
 class MathUtil {
 	public static inline var PI:Float = 3.14159265358979;
+	public static inline var TO_RADIANS:Float = PI / 180;
+	public static inline var TO_DEGREES:Float = 180 / PI;
 	public static inline var EPS:Float = 1e-5;
 
 	public static inline function sin(x:Float):Float {
@@ -37,5 +39,13 @@ class MathUtil {
 
 	public static inline function sqrt(x:Float):Float {
 		return Math.sqrt(x);
+	}
+
+	public static inline function rand():Float {
+		return Math.random();
+	}
+
+	public static inline function randIn(min:Float, max:Float):Float {
+		return min + rand() * (max - min);
 	}
 }
