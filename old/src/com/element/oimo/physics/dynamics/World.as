@@ -382,7 +382,7 @@ package com.element.oimo.physics.dynamics {
 				var tmpB:RigidBody = rigidBodies[i];
 				if (tmpB.sleeping) {
 					var lv:Vec3 = tmpB.linearVelocity;
-					var av:Vec3 = tmpB.linearVelocity;
+					var av:Vec3 = tmpB.angularVelocity;
 					var p:Vec3 = tmpB.position;
 					var sp:Vec3 = tmpB.sleepPosition;
 					var o:Quat = tmpB.orientation;

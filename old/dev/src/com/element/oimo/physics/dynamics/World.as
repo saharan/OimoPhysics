@@ -304,7 +304,7 @@ package com.element.oimo.physics.dynamics {
 				body.addedToIsland = false;
 				if (body.sleeping) {
 					var lv:Vec3 = body.linearVelocity;
-					var av:Vec3 = body.linearVelocity;
+					var av:Vec3 = body.angularVelocity;
 					var p:Vec3 = body.position;
 					var sp:Vec3 = body.sleepPosition;
 					var o:Quat = body.orientation;
