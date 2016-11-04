@@ -23,6 +23,11 @@ interface IDebugGraphics {
 	public function drawSphere(transform:Mat4, radius:Float):Void;
 
 	/**
+	 * Draws a wireframed sphere of radius `radius` transformed by the matrix `transform`.
+	 */
+	public function drawWireframeSphere(transform:Mat4, radius:Float):Void;
+
+	/**
 	 * Draws a box of half-extents `halfExtents` transformed by the matrix `transform`.
 	 */
 	public function drawBox(transform:Mat4, halfExtents:Vec3):Void;
@@ -31,6 +36,16 @@ interface IDebugGraphics {
 	 * Draws a wireframed box of half-extents `halfExtents` transformed by the matrix `transform`.
 	 */
 	public function drawWireframeBox(transform:Mat4, halfExtents:Vec3):Void;
+
+	/**
+	 * Disables lighting and just uses the color set by `color` function.
+	 */
+	public function disableLighting():Void;
+
+	/**
+	 * Enables lighting.
+	 */
+	public function enableLighting():Void;
 
 	/**
 	 * Draws a line from `from` to `to`.

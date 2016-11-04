@@ -1,14 +1,13 @@
 package oimo.m;
 import haxe.ds.Vector;
-import haxe.macro.ComplexTypeTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 import oimo.math.Mat3;
 import oimo.math.Mat4;
 import oimo.math.MathUtil;
-import oimo.math.Transform;
 import oimo.math.Vec3;
+import oimo.physics.collision.shape.Transform;
 using Lambda;
 using oimo.m.M;
 using oimo.m.U;
@@ -34,6 +33,76 @@ class M {
 		return res;
 	}
 
+	public static macro function profile(main:Expr) {
+		return macro {
+			var st:Float = haxe.Timer.stamp();
+			$main;
+			var en:Float = haxe.Timer.stamp();
+			(en - st) * 1000; // in ms
+		};
+	}
+
+	public static macro function compare3min(a:ExprOf<Float>, b:ExprOf<Float>, c:ExprOf<Float>, doA:Expr, doB:Expr, doC:Expr) {
+		return macro {
+			if ($a < $b) {
+				if ($a < $c) {
+					// a < b, c
+					$doA;
+				} else {
+					// c < a < b
+					$doC;
+				}
+			} else {
+				if ($b < $c) {
+					// b < a, c
+					$doB;
+				} else {
+					// c < b < a
+					$doC;
+				}
+			}
+		};
+	}
+
+	public static macro function compare3max(a:ExprOf<Float>, b:ExprOf<Float>, c:ExprOf<Float>, doA:Expr, doB:Expr, doC:Expr) {
+		return macro {
+			if ($a > $b) {
+				if ($a > $c) {
+					// a > b, c
+					$doA;
+				} else {
+					// c > a > b
+					$doC;
+				}
+			} else {
+				if ($b > $c) {
+					// b > a, c
+					$doB;
+				} else {
+					// c > b > a
+					$doC;
+				}
+			}
+		};
+	}
+
+	public static macro function trace(expr:Expr) {
+		var names = U.namesE(expr);
+		var es = [];
+		for (name in names) {
+			if (es.empty()) {
+				es.push(macro s += $v{name} + " = " + M.toFixed8(${name.f()}));
+			} else {
+				es.push(macro s += ", " + $v{name} + " = " + M.toFixed8(${name.f()}));
+			}
+		}
+		return macro {
+			var s:String = "";
+			$b{es};
+			trace(s);
+		};
+	}
+
 	// ---------------------------------------------------------------------
 	// Float
 	// ---------------------------------------------------------------------
@@ -42,6 +111,10 @@ class M {
 
 	public static macro function toFixed4(x:ExprOf<Float>) {
 		return macro $x > 0 ? Std.int($x * 1000 + 0.5) / 1000 : Std.int($x * 1000 - 0.5) / 1000;
+	}
+
+	public static macro function toFixed8(x:ExprOf<Float>) {
+		return macro $x > 0 ? Std.int($x * 10000000 + 0.5) / 10000000 : Std.int($x * 10000000 - 0.5) / 10000000;
 	}
 
 	public static macro function round(x:ExprOf<Float>) {
@@ -69,12 +142,25 @@ class M {
 	}
 
 	public static macro function max(x:ExprOf<Float>, y:ExprOf<Float>) {
-		return macro $x < $y ? $x : $y;
+		return macro $x > $y ? $x : $y;
 	}
 
 	// ---------------------------------------------------------------------
 	// List
 	// ---------------------------------------------------------------------
+
+	public static macro function array_expand<T>(oldArray:ExprOf<Vector<T>>, oldLength:ExprOf<Int>) {
+		var tp:TypePath = oldArray.t().toComplexType().getParameters()[0];
+		return macro {
+			var newLength:Int = $oldLength << 1;
+			var newArray = new $tp(newLength);
+			for (i in 0...$oldLength) {
+				newArray[i] = $oldArray[i];
+				$oldArray[i] = null;
+			}
+			$oldArray = newArray;
+		}
+	}
 
 	public static macro function list_foreach(base:Expr, next:Expr, loop:Expr) {
 		var n:String = next.s();
@@ -218,6 +304,16 @@ class M {
 		]);
 	}
 
+	public static macro function vec3_mulMat3Transposed(dst:Expr, src1:Expr, src2:Expr) {
+		var v = src1.s().vec3Names();
+		var m = src2.s().mat3Names();
+		return assignVars(dst.s().vec3Names(), [
+			macro ${m[0].f()} * ${v[0].f()} + ${m[3].f()} * ${v[1].f()} + ${m[6].f()} * ${v[2].f()},
+			macro ${m[1].f()} * ${v[0].f()} + ${m[4].f()} * ${v[1].f()} + ${m[7].f()} * ${v[2].f()},
+			macro ${m[2].f()} * ${v[0].f()} + ${m[5].f()} * ${v[1].f()} + ${m[8].f()} * ${v[2].f()}
+		]);
+	}
+
 	public static macro function vec3_zero(dst:Expr) {
 		return assignVars(dst.s().vec3Names(), [macro 0, macro 0, macro 0]);
 	}
@@ -246,10 +342,21 @@ class M {
 		return binOpVars(dst.s().vec3Names(), src1.s().vec3Names(), [src2, src2, src2], OpMult);
 	}
 
+	public static macro function vec3_negate(dst:Expr, src:Expr) {
+		return unOpVars(dst.s().vec3Names(), src.s().vec3Names(), OpNeg);
+	}
+
 	public static macro function vec3_abs(dst:Expr, src:Expr) {
 		return assignVars(dst.s().vec3Names(), src.s().vec3Names().map(f).map(function(e1) {
 			return macro $e1 < 0 ? -$e1 : $e1;
 		}));
+	}
+
+	public static macro function vec3_clamp(dst:Expr, src:Expr, min:Expr, max:Expr) {
+		return macro {
+			M.vec3_min($dst, $src, $max);
+			M.vec3_max($dst, $dst, $min);
+		};
 	}
 
 	public static macro function vec3_min(dst:Expr, src1:Expr, src2:Expr) {
@@ -272,6 +379,10 @@ class M {
 		var as = src1.s().vec3Names();
 		var bs = src2.s().vec3Names();
 		return macro ${as[0].f()} * ${bs[0].f()} + ${as[1].f()} * ${bs[1].f()} + ${as[2].f()} * ${bs[2].f()};
+	}
+
+	public static macro function vec3_compWiseMul(dst:Expr, src1:Expr, src2:Expr) {
+		return binOpVars(dst.s().vec3Names(), src1.s().vec3Names(), src2.s().vec3Names(), OpMult);
 	}
 
 	public static macro function vec3_addHorizontal(src:Expr) {
@@ -300,6 +411,15 @@ class M {
 		return macro oimo.math.MathUtil.sqrt(M.vec3_dot($src, $src));
 	}
 
+	public static macro function vec3_normalize(dst:Expr, src:Expr) {
+		var as = src.s().vec3Names();
+		return macro {
+			var l:Float = M.vec3_dot($src, $src);
+			if (!M.eq0(l)) l = 1 / oimo.math.MathUtil.sqrt(l);
+			M.vec3_scale($dst, $src, l);
+		}
+	}
+
 	public static macro function vec3_cross(dst:Expr, src1:Expr, src2:Expr) {
 		var as = src1.s().vec3Names();
 		var bs = src2.s().vec3Names();
@@ -307,6 +427,15 @@ class M {
 			macro ${as[1].f()} * ${bs[2].f()} - ${as[2].f()} * ${bs[1].f()},
 			macro ${as[2].f()} * ${bs[0].f()} - ${as[0].f()} * ${bs[2].f()},
 			macro ${as[0].f()} * ${bs[1].f()} - ${as[1].f()} * ${bs[0].f()}
+		]);
+	}
+
+	public static macro function vec3_toCrossMatrix(dst:Expr, src:Expr) {
+		var as = src.s().vec3Names();
+		return assignVars(dst.s().mat3Names(), [
+			macro 0, macro -${as[2].f()}, macro ${as[1].f()},
+			macro ${as[2].f()}, macro 0, macro -${as[0].f()},
+			macro -${as[1].f()}, macro ${as[0].f()}, macro 0
 		]);
 	}
 
@@ -328,6 +457,35 @@ class M {
 				macro m.e21,
 				macro m.e22
 			])};
+		}
+	}
+
+	public static macro function mat3_getCol(dst:Expr, src:Expr, index:ExprOf<Int>) {
+		var as:Array<String> = src.s().mat3Names();
+		var i = 0;
+		switch (index.expr) {
+		case EConst(CInt(v)):
+			i = Std.parseInt(v);
+		case _:
+			Context.error("invalid index: " + index.expr, U.pos());
+		}
+		return assignVars(dst.s().vec3Names(), [as[i], as[3 + i], as[6 + i]]);
+	}
+
+	public static macro function mat3_toMat3(dst:ExprOf<Mat3>, src:Expr) {
+		return macro {
+			var m:oimo.math.Mat3 = cast $dst;
+			${assignVars([
+				macro m.e00,
+				macro m.e01,
+				macro m.e02,
+				macro m.e10,
+				macro m.e11,
+				macro m.e12,
+				macro m.e20,
+				macro m.e21,
+				macro m.e22
+			], src.s().mat3Names())};
 		}
 	}
 
@@ -390,6 +548,15 @@ class M {
 
 	public static macro function mat3_assign(dst:Expr, src:Expr) {
 		return assignVars(dst.s().mat3Names(), src.s().mat3Names());
+	}
+
+	public static macro function mat3_transpose(dst:Expr, src:Expr) {
+		var as = src.s().mat3Names();
+		return assignVars(dst.s().mat3Names(), [
+			as[0], as[3], as[6],
+			as[1], as[4], as[7],
+			as[2], as[5], as[8]
+		]);
 	}
 
 	public static macro function mat3_add(dst:Expr, src1:Expr, src2:Expr) {
@@ -534,11 +701,11 @@ class M {
 		}
 	}
 
-	public static macro function mat3_transformInertia(dst:Expr, inertia:Expr, transform:Expr) {
+	public static macro function mat3_transformInertia(dst:Expr, inertia:Expr, rotation:Expr) {
 		return macro {
-			M.mat3_mul($dst, $transform, $inertia);
-			M.mat3_mulRhsTransposed($dst, $dst, $transform);
-		}
+			M.mat3_mul($dst, $rotation, $inertia);
+			M.mat3_mulRhsTransposed($dst, $dst, $rotation);
+		};
 	}
 
 	public static macro function mat3_inv(dst:Expr, src:Expr) {
@@ -573,60 +740,47 @@ class M {
 	// Transform
 	// ---------------------------------------------------------------------
 
-	public static macro function transform_fromTransform(dst:Expr, src:ExprOf<Transform>) {
+	public static macro function transform_assign(dst:ExprOf<Transform>, src:ExprOf<Transform>) {
 		return macro {
-			var t:oimo.math.Transform = cast $src;
-			var v:oimo.math.Vec3 = t.origin;
-			var m:oimo.math.Mat3 = t.rotation;
-			${assignVars(dst.s().transformNames(), [
-				macro v.x,
-				macro v.y,
-				macro v.z,
-				macro m.e00,
-				macro m.e01,
-				macro m.e02,
-				macro m.e10,
-				macro m.e11,
-				macro m.e12,
-				macro m.e20,
-				macro m.e21,
-				macro m.e22
-			])};
+			var dst:oimo.physics.collision.shape.Transform = cast $dst;
+			var src:oimo.physics.collision.shape.Transform = cast $src;
+			M.vec3_assign(dst._origin, src._origin);
+			M.mat3_assign(dst._rotation, src._rotation);
 		}
 	}
 
-	public static macro function transform_assign(dst:Expr, src:Expr) {
-		return assignVars(dst.s().transformNames(), src.s().transformNames());
-	}
-
 	public static macro function transform_id(dst:Expr) {
-		return assignVars(dst.s().transformNames(), [
-			macro 0, macro 0, macro 0,
-			macro 1, macro 0, macro 0,
-			macro 0, macro 1, macro 0,
-			macro 0, macro 0, macro 1
-		]);
+		return macro {
+			var dst:oimo.physics.collision.shape.Transform = cast $dst;
+			M.vec3_zero(dst._origin);
+			M.mat3_id(dst._rotation);
+		}
 	}
 
-	public static macro function transform_toMat4(dst:Expr, src:Expr) {
+	public static macro function transform_toMat4(dst:Expr, srcOrigin:Expr, srcRotation:Expr) {
 		return macro {
 			var m:oimo.math.Mat4 = cast $dst;
 			${assignVars([
-				macro m.e03, macro m.e13, macro m.e23,
 				macro m.e00, macro m.e01, macro m.e02,
 				macro m.e10, macro m.e11, macro m.e12,
 				macro m.e20, macro m.e21, macro m.e22
-			], src.s().transformNames())};
+			], srcRotation.s().mat3Names())};
+			${assignVars([
+				macro m.e03, macro m.e13, macro m.e23
+			], srcOrigin.s().vec3Names())};
 			${assignVars([macro m.e30, macro m.e31, macro m.e32, macro m.e33], [macro 0, macro 0, macro 0, macro 1])};
 		}
 	}
 
-	public static macro function transform_mul(dst:Expr, src1:Expr, src2:Expr) {
+	public static macro function transform_mul(dst:ExprOf<Transform>, src1:ExprOf<Transform>, src2:ExprOf<Transform>) {
 		return macro {
-			${macro M.mat3_mul($dst, $src1, $src2)};
-			${macro M.vec3_mulMat3($dst, $src1, $src2)};
-			${macro M.vec3_add($dst, $dst, $src2)};
-		}
+			var dst:Transform = $dst;
+			var src1:Transform = $src1;
+			var src2:Transform = $src2;
+			M.mat3_mul(dst._rotation, src1._rotation, src2._rotation);
+			M.vec3_mulMat3(dst._origin, src1._origin, src2._rotation);
+			M.vec3_add(dst._origin, dst._origin, src2._origin);
+		};
 	}
 
 	// ---------------------------------------------------------------------
@@ -715,7 +869,7 @@ class M {
 	// AABB
 	// ---------------------------------------------------------------------
 
-	public static macro function aabb_isOverlapped(min1:Expr, max1:Expr, min2:Expr, max2:Expr) {
+	public static macro function aabb_intersects(min1:Expr, max1:Expr, min2:Expr, max2:Expr) {
 		var mi1:Array<String> = min1.s().vec3Names();
 		var ma1:Array<String> = max1.s().vec3Names();
 		var mi2:Array<String> = min2.s().vec3Names();
@@ -725,6 +879,47 @@ class M {
 			${mi1[1].f()} < ${ma2[1].f()} && ${ma1[1].f()} > ${mi2[1].f()} &&
 			${mi1[2].f()} < ${ma2[2].f()} && ${ma1[2].f()} > ${mi2[2].f()}
 		;
+	}
+
+	public static macro function aabb_contains(min1:Expr, max1:Expr, min2:Expr, max2:Expr) {
+		var mi1:Array<String> = min1.s().vec3Names();
+		var ma1:Array<String> = max1.s().vec3Names();
+		var mi2:Array<String> = min2.s().vec3Names();
+		var ma2:Array<String> = max2.s().vec3Names();
+		return macro
+			${mi1[0].f()} <= ${mi2[0].f()} && ${ma1[0].f()} >= ${ma2[0].f()} &&
+			${mi1[1].f()} <= ${mi2[1].f()} && ${ma1[1].f()} >= ${ma2[1].f()} &&
+			${mi1[2].f()} <= ${mi2[2].f()} && ${ma1[2].f()} >= ${ma2[2].f()}
+		;
+	}
+
+	public static macro function aabb_surfaceArea(min:Expr, max:Expr) {
+		var mi:Array<String> = min.s().vec3Names();
+		var ma:Array<String> = max.s().vec3Names();
+		return macro {
+			var ex:Float = ${ma[0].f()} - ${mi[0].f()};
+			var ey:Float = ${ma[1].f()} - ${mi[1].f()};
+			var ez:Float = ${ma[2].f()} - ${mi[2].f()};
+			(ex * (ey + ez) + ey * ez) * 2;
+		};
+	}
+
+	public static macro function aabb_volume(min:Expr, max:Expr) {
+		var mi:Array<String> = min.s().vec3Names();
+		var ma:Array<String> = max.s().vec3Names();
+		return macro {
+			var ex:Float = ${ma[0].f()} - ${mi[0].f()};
+			var ey:Float = ${ma[1].f()} - ${mi[1].f()};
+			var ez:Float = ${ma[2].f()} - ${mi[2].f()};
+			ex * ey * ez;
+		};
+	}
+
+	public static macro function aabb_combine(dstMin:Expr, dstMax:Expr, src1Min:Expr, src1Max:Expr, src2Min:Expr, src2Max:Expr) {
+		return macro {
+			M.vec3_min($dstMin, $src1Min, $src2Min);
+			M.vec3_max($dstMax, $src1Max, $src2Max);
+		}
 	}
 
 	// ---------------------------------------------------------------------
@@ -803,6 +998,22 @@ class M {
 		var num:Int = lhs.length;
 		for (i in 0...num) {
 			es.push(macro ${lhs[i]} = ${rhs[i]});
+		}
+		return macro $b{es};
+	}
+
+	static function unOpVars(dst:Array<Dynamic>, src:Array<Dynamic>, op:Unop) {
+		return unOpVarsExpr(dst.toExprArray(), src.toExprArray(), op);
+	}
+
+	/**
+	 * dst = op src
+	 */
+	static function unOpVarsExpr(dst:Array<Expr>, src:Array<Expr>, op:Unop) {
+		var es:Array<Expr> = [];
+		var num:Int = dst.length;
+		for (i in 0...num) {
+			es.push(macro ${dst[i]} = ${EUnop(op, false, src[i]).toExpr()});
 		}
 		return macro $b{es};
 	}

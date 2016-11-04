@@ -1,4 +1,4 @@
-package oimo.physics.dynamics;
+package oimo.physics.dynamics.rigidbody;
 
 /**
  * Rigid body types

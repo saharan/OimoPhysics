@@ -1,9 +1,11 @@
 package oimo.physics.collision;
 import oimo.m.M;
-import oimo.physics.collision.broadphase.ProxyPair;
 import oimo.physics.collision.PairLink;
-import oimo.physics.dynamics.Component;
-import oimo.physics.dynamics.contact.Manifold;
+import oimo.physics.collision.narrowphase.CachedDetectorData;
+import oimo.physics.collision.narrowphase.Detector;
+import oimo.physics.collision.narrowphase.Manifold;
+import oimo.physics.dynamics.constraint.contact.ContactConstraint;
+import oimo.physics.dynamics.rigidbody.Component;
 
 /**
  * Cached overlapping component pairs.
@@ -16,7 +18,12 @@ class Pair {
 	public var _c2:Component;
 	public var _link1:PairLink;
 	public var _link2:PairLink;
-	public var _manifold:Manifold;
+	public var _manifoldInfo:Manifold;
+	public var _contactConstraint:ContactConstraint;
+	public var _touching:Bool;
+
+	public var _detector:Detector;
+	public var _cachedDetectorData:CachedDetectorData;
 
 	public var _latest:Bool;
 	public var _shouldBeSkipped:Bool;
@@ -24,21 +31,50 @@ class Pair {
 	public function new() {
 		_link1 = new PairLink();
 		_link2 = new PairLink();
-		_manifold = new Manifold();
+		_manifoldInfo = new Manifold();
+		_contactConstraint = new ContactConstraint();
+
+		_detector = null;
+		_cachedDetectorData = new CachedDetectorData();
+
 		_latest = false;
 		_shouldBeSkipped = false;
 	}
 
-	public function _attach(c1:Component, c2:Component):Void {
+	@:extern
+	public inline function _attach(c1:Component, c2:Component, detector:Detector):Void {
 		_c1 = c1;
 		_c2 = c2;
 		attachLinks();
+
+		_detector = detector;
+
+		_contactConstraint._attach(c1, c2);
 	}
 
-	public function _detach():Void {
+	@:extern
+	public inline function _detach():Void {
 		detachLinks();
 		_c1 = null;
 		_c2 = null;
+
+		_detector = null;
+		_cachedDetectorData.clear();
+
+		_contactConstraint._clear();
+		_contactConstraint._detach();
+	}
+
+	@:extern
+	public inline function _updateManifold():Void {
+		if (_detector == null) return;
+		_detector.detect(_manifoldInfo, _c1._shape, _c2._shape, _c1._transform, _c2._transform, _cachedDetectorData);
+		_touching = _manifoldInfo._numPoints > 0;
+		if (_touching) {
+			_contactConstraint._update(_manifoldInfo);
+		} else {
+			_contactConstraint._clear();
+		}
 	}
 
 	@:extern

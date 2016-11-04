@@ -7,7 +7,7 @@ import oimo.physics.collision.shape.AABB;
  * Broad-phase proxy.
  */
 @:expose("OIMO.Proxy")
-@:build(oimo.m.B.build())
+@:build(oimo.m.B.bu())
 class Proxy {
 	public var _prev:Proxy;
 	public var _next:Proxy;
@@ -17,11 +17,18 @@ class Proxy {
 	public var _aabbMin:IVec3;
 	public var _aabbMax:IVec3;
 
+	public var _lastCenter:IVec3;
+
 	public var _id:Int;
 
 	public function new(userData:Dynamic, id:Int) {
 		_userData = userData;
 		_id = id;
+		_prev = null;
+		_next = null;
+		M.vec3_zero(_aabbMin);
+		M.vec3_zero(_aabbMax);
+		M.vec3_zero(_lastCenter);
 	}
 
 	@:extern

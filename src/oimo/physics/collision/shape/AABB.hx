@@ -7,7 +7,7 @@ import oimo.math.Vec3;
  * Axis-Aligned Bounding Box.
  */
 @:expose("OIMO.AABB")
-@:build(oimo.m.B.build())
+@:build(oimo.m.B.bu())
 class AABB {
 	public var _min:IVec3;
 	public var _max:IVec3;

@@ -2,10 +2,6 @@ package oimo.m;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
-import haxe.macro.Type;
-import oimo.m.IMat3;
-import oimo.m.ITransform;
-import oimo.m.IVec3;
 using haxe.macro.ComplexTypeTools;
 using oimo.m.B;
 using oimo.m.U;
@@ -17,7 +13,7 @@ class B {
 
 #if macro
 
-	public static function build() {
+	public static function bu() {
 		return filter();
 	}
 

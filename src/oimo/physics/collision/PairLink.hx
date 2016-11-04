@@ -1,6 +1,6 @@
 package oimo.physics.collision;
 import oimo.physics.collision.Pair;
-import oimo.physics.dynamics.Component;
+import oimo.physics.dynamics.rigidbody.Component;
 
 /**
  * Pair link.

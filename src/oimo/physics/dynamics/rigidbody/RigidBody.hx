@@ -1,21 +1,18 @@
-package oimo.physics.dynamics;
-import oimo.m.B;
+package oimo.physics.dynamics.rigidbody;
 import oimo.m.IMat3;
 import oimo.m.IQuat;
-import oimo.m.ITransform;
 import oimo.m.IVec3;
 import oimo.m.M;
 import oimo.math.MathUtil;
-import oimo.math.Quat;
-import oimo.math.Transform;
-import oimo.math.Vec3;
 import oimo.physics.collision.shape.Shape;
+import oimo.physics.collision.shape.Transform;
+import oimo.physics.dynamics.rigidbody.Component;
 
 /**
  * Rigid body.
  */
 @:expose("OIMO.RigidBody")
-@:build(oimo.m.B.build())
+@:build(oimo.m.B.bu())
 class RigidBody {
 	public var _next:RigidBody;
 	public var _prev:RigidBody;
@@ -26,8 +23,8 @@ class RigidBody {
 	public var _linearVel:IVec3;
 	public var _angularVel:IVec3;
 
-	public var _ptransform:ITransform;
-	public var _transform:ITransform;
+	public var _ptransform:Transform;
+	public var _transform:Transform;
 
 	public var _type:RigidBodyType;
 
@@ -51,10 +48,13 @@ class RigidBody {
 		M.vec3_fromVec3(_linearVel, config.linearVelocity);
 		M.vec3_fromVec3(_angularVel, config.angularVelocity);
 
-		M.transform_fromTransform(_ptransform, config.transform);
-		M.transform_fromTransform(_transform, config.transform);
+		_ptransform = new Transform();
+		_transform = new Transform();
+		M.vec3_fromVec3(_ptransform._origin, config.position);
+		M.mat3_fromMat3(_ptransform._rotation, config.rotation);
+		M.transform_assign(_transform, _ptransform);
 
-		_type = Dynamic;
+		_type = config.type;
 
 		_invMass = 0;
 		M.mat3_zero(_invLocalInertia);
@@ -80,7 +80,7 @@ class RigidBody {
 			var inertia:IMat3;
 
 			// I_transformed = (R * I_localCoeff * R^T) * mass
-			M.mat3_transformInertia(inertia, s._inertiaCoeff, c._localTransform);
+			M.mat3_transformInertia(inertia, s._inertiaCoeff, c._localTransform._rotation);
 			M.mat3_scale(inertia, inertia, mass);
 
 			// I_cog = [ x*x, -x*y, -x*z;
@@ -88,7 +88,7 @@ class RigidBody {
 			//          -x*z, -y*z,  z*z]
 			// I = I_transformed + I_cog
 			var cogInertia:IMat3;
-			M.mat3_inertiaFromCOG(cogInertia, c._localTransform);
+			M.mat3_inertiaFromCOG(cogInertia, c._localTransform._origin);
 			M.mat3_addRhsScaled(inertia, inertia, cogInertia, mass);
 
 			// add mass data
@@ -103,7 +103,7 @@ class RigidBody {
 			M.mat3_scaleRowsVec3(_invLocalInertia, _invLocalInertia, _rotationFactor);
 
 			// set transformed inertia
-			M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform);
+			M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
 		} else {
 			// set mass and inertia
 			_invMass = 0;
@@ -145,7 +145,7 @@ class RigidBody {
 			}
 
 			// integrate position
-			M.vec3_addRhsScaled(_transform, _transform, _linearVel, timeStep);
+			M.vec3_addRhsScaled(_transform._origin, _transform._origin, _linearVel, timeStep);
 
 			// compute derivative of the quaternion
 			var angVelLength:Float = M.vec3_length(_angularVel);
@@ -170,8 +170,8 @@ class RigidBody {
 				//     --------------------------------------------------------
 
 				var ha2:Float = halfAng * halfAng;
-				angVelToAxisFactor = timeStep * 0.5 * (1 - ha2 / 6 + ha2 * ha2 / 120);
-				cosHalfAng = 1 - ha2 / 2 + ha2 * ha2 / 24;
+				angVelToAxisFactor = timeStep * 0.5 * (1 - ha2 * (1 / 6) + ha2 * ha2 * (1 / 120));
+				cosHalfAng = 1 - ha2 * (1 / 2) + ha2 * ha2 * (1 / 24);
 			} else {
 				angVelToAxisFactor = MathUtil.sin(halfAng) / angVelLength;
 				cosHalfAng = MathUtil.cos(halfAng);
@@ -183,12 +183,12 @@ class RigidBody {
 
 			// integrate quaternion
 			var q:IQuat;
-			M.quat_fromMat3(q, _transform);
+			M.quat_fromMat3(q, _transform._rotation);
 			M.quat_mul(q, dq, q);
 			M.quat_normalize(q, q);
 
 			// update rotation
-			M.mat3_fromQuat(_transform, q);
+			M.mat3_fromQuat(_transform._rotation, q);
 
 		case Static, Kinematic:
 			M.vec3_zero(_linearVel);
@@ -236,6 +236,11 @@ class RigidBody {
 		_syncComponents();
 	}
 
+	public function setType(type:RigidBodyType):Void {
+		_type = type;
+		_updateMass();
+	}
+
 	/**
 	 * The next rigid body in the world.
 	 */
@@ -244,6 +249,5 @@ class RigidBody {
 	inline function get_next():RigidBody {
 		return _next;
 	}
-
 
 }

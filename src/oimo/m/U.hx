@@ -6,7 +6,6 @@ import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.Field;
 import haxe.macro.Type;
 import oimo.m.IMat3;
-import oimo.m.ITransform;
 import oimo.m.IVec3;
 using oimo.m.U;
 using haxe.macro.ExprTools;
@@ -34,10 +33,6 @@ class U {
 		return [m[0], m[4], m[8]];
 	}
 
-	public static function transformNames(base:String) {
-		return vec3Names(base).concat(mat3Names(base));
-	}
-
 	public static function appendSuffixes(base:String, suffixes:Array<String>) {
 		return suffixes.map(function(s) {
 			return base + s;
@@ -57,7 +52,6 @@ class U {
 		var type:String = t.s1();
 		if (type == (macro:oimo.m.IVec3).toType().toString()) return vec3Names(base);
 		if (type == (macro:oimo.m.IMat3).toType().toString()) return mat3Names(base);
-		if (type == (macro:oimo.m.ITransform).toType().toString()) return transformNames(base);
 		if (type == (macro:oimo.m.IQuat).toType().toString()) return quatNames(base);
 		return null;
 	}

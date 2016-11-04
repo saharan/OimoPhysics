@@ -1,5 +1,4 @@
 package oimo.physics.collision.shape;
-import oimo.m.ITransform;
 import oimo.m.IVec3;
 import oimo.m.M;
 import oimo.math.MathUtil;
@@ -8,7 +7,7 @@ import oimo.math.MathUtil;
  * Sphere shape
  */
 @:expose("OIMO.SphereShape")
-@:build(oimo.m.B.build())
+@:build(oimo.m.B.bu())
 class SphereShape extends Shape {
 	public var _radius:Float;
 
@@ -26,11 +25,11 @@ class SphereShape extends Shape {
 		);
 	}
 
-	override public function _computeAABB(aabb:AABB, tf:ITransform):Void {
+	override public function _computeAABB(aabb:AABB, tf:Transform):Void {
 		var radVec:IVec3;
 		M.vec3_set(radVec, _radius, _radius, _radius);
-		M.vec3_sub(aabb._min, tf, radVec);
-		M.vec3_add(aabb._max, tf, radVec);
+		M.vec3_sub(aabb._min, tf._origin, radVec);
+		M.vec3_add(aabb._max, tf._origin, radVec);
 	}
 
 }

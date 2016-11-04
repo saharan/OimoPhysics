@@ -1,5 +1,7 @@
-package oimo.physics.dynamics;
-import oimo.math.Transform;
+package oimo.physics.dynamics.rigidbody;
+import oimo.math.Mat3;
+import oimo.math.Vec3;
+import oimo.physics.collision.shape.Transform;
 import oimo.physics.Settings;
 import oimo.physics.collision.shape.Shape;
 
@@ -8,14 +10,16 @@ import oimo.physics.collision.shape.Shape;
  */
 @:expose("OIMO.ComponentConfig")
 class ComponentConfig {
-	public var transform:Transform;
+	public var position:Vec3;
+	public var rotation:Mat3;
 	public var friction:Float;
 	public var restitution:Float;
 	public var density:Float;
 	public var shape:Shape;
 
 	public function new() {
-		transform = new Transform();
+		position = new Vec3();
+		rotation = new Mat3();
 		friction = Settings.defaultFriction;
 		restitution = Settings.defaultRestitution;
 		density = Settings.defaultDensity;

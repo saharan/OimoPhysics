@@ -10,7 +10,7 @@ import oimo.physics.collision.broadphase.BroadPhaseType;
 import oimo.physics.collision.broadphase.Proxy;
 import oimo.physics.collision.broadphase.ProxyPair;
 import oimo.physics.collision.broadphase.bruteforce.BruteForceBroadPhase;
-import oimo.physics.collision.narrowphase.ManifoldInfo;
+import oimo.physics.collision.narrowphase.Manifold;
 import oimo.physics.collision.shape.AABB;
 import oimo.physics.collision.shape.BoxShape;
 import oimo.physics.collision.shape.Shape;
@@ -18,13 +18,15 @@ import oimo.physics.collision.shape.ShapeType;
 import oimo.physics.collision.shape.SphereShape;
 import oimo.physics.debugdraw.DebugDrawer;
 import oimo.physics.debugdraw.IDebugGraphics;
-import oimo.physics.dynamics.Component;
-import oimo.physics.dynamics.ComponentConfig;
-import oimo.physics.dynamics.RigidBody;
-import oimo.physics.dynamics.RigidBodyConfig;
-import oimo.physics.dynamics.RigidBodyType;
 import oimo.physics.dynamics.World;
-import oimo.physics.dynamics.contact.Manifold;
+import oimo.physics.dynamics.constraint.Constraint;
+import oimo.physics.dynamics.constraint.contact.ContactConstraint;
+import oimo.physics.dynamics.constraint.contact.ContactPoint;
+import oimo.physics.dynamics.rigidbody.Component;
+import oimo.physics.dynamics.rigidbody.ComponentConfig;
+import oimo.physics.dynamics.rigidbody.RigidBody;
+import oimo.physics.dynamics.rigidbody.RigidBodyConfig;
+import oimo.physics.dynamics.rigidbody.RigidBodyType;
 
 /**
  * Settings class has parameters used by the physics simulation.
@@ -40,13 +42,28 @@ class Settings {
 	public static var maxTranslationPerStepSq(get, null):Float;
 	public static var maxRotationPerStepSq(get, null):Float;
 
+	public static var bvhProxyPadding:Float = 0.1;
+	public static var bvhIncrementalCollisionThreshold:Float = 0.45;
+
+	public static var maxManifoldPoints:Int = 4;
+
+	public static var contactBounceThreshold:Float = 0.5;
+
 	public static var debugDrawBackgroundColor:Vec3 = new Vec3(0.1, 0.1, 0.1);
 
 	public static var debugDrawShapeColor1:Vec3 = new Vec3(0.7, 0.2, 0.4);
 	public static var debugDrawShapeColor2:Vec3 = new Vec3(1.0, 0.8, 0.1);
 	public static var debugDrawStaticShapeColor:Vec3 = new Vec3(0.7, 0.7, 0.7);
 	public static var debugDrawAABBColor:Vec3 = new Vec3(1.0, 0.1, 0.1);
+	public static var debugDrawBVHNodeColor:Vec3 = new Vec3(0.4, 0.4, 0.4);
 	public static var debugDrawPairColor:Vec3 = new Vec3(1.0, 1.0, 0.1);
+	public static var debugDrawContactColor:Vec3 = new Vec3(1.0, 0.1, 0.1);
+	public static var debugDrawContactNormalColor:Vec3 = new Vec3(1.0, 0.1, 0.1);
+	public static var debugDrawContactTangentColor:Vec3 = new Vec3(0.1, 0.8, 0.1);
+	public static var debugDrawContactBinormalColor:Vec3 = new Vec3(0.2, 0.2, 1.0);
+	public static var debugDrawContactNormalLength:Float = 0.5;
+	public static var debugDrawContactTangentLength:Float = 0.5;
+	public static var debugDrawContactBinormalLength:Float = 0.5;
 
 	public static var allClasses(default, never):Array<Dynamic> = [
 		// physics.collision.broadphase.bruteforce
@@ -59,7 +76,7 @@ class Settings {
 		ProxyPair,
 
 		// physics.collision.narrowphase
-		ManifoldInfo,
+		Manifold,
 
 		// physics.collision.shape
 		AABB,
@@ -77,18 +94,25 @@ class Settings {
 		DebugDrawer,
 		IDebugGraphics,
 
-		// physics.dynamics.contact
-		Manifold,
+		// physics.dynamics.constraint
+		Constraint,
+
+		// physics.dynamics.constraint.contact
+		ContactConstraint,
+		ContactPoint,
 
 		// physics.dynamics
+		World,
+
+		// physics.dynamics.rigidbody
 		Component,
 		ComponentConfig,
 		RigidBody,
 		RigidBodyConfig,
 		RigidBodyType,
-		World,
 
 		// physics
+		Profile,
 		Settings
 	];
 

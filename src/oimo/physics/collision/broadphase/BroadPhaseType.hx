@@ -6,4 +6,5 @@ package oimo.physics.collision.broadphase;
 @:expose("OIMO.BroadPhaseType")
 enum BroadPhaseType {
 	BruteForce;
+	BVH;
 }

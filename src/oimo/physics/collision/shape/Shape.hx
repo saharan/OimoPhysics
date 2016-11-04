@@ -1,12 +1,11 @@
 package oimo.physics.collision.shape;
 import oimo.m.IMat3;
-import oimo.m.ITransform;
 
 /**
  * Collision shape.
  */
 @:expose("OIMO.Shape")
-@:build(oimo.m.B.build())
+@:build(oimo.m.B.bu())
 class Shape {
 	public var _type:ShapeType;
 	public var _volume:Float;
@@ -19,7 +18,7 @@ class Shape {
 	public function _updateMass():Void {
 	}
 
-	public function _computeAABB(aabb:AABB, tf:ITransform):Void {
+	public function _computeAABB(aabb:AABB, tf:Transform):Void {
 	}
 
 }
