@@ -5,6 +5,9 @@ A lightweight 3D physics engine.
 
 ## [API Documentation](https://saharan.github.io/OimoPhysics/)
 
+## [Demos](http://el-ement.com/etc/oimo/demos/)
+<a href="http://el-ement.com/etc/oimo/demos/"><img src="http://el-ement.com/etc/oimo/demos/thumbs.png"></a>
+
 ## Features
 * Written in Haxe
 * Exported as JavaScript (see [bin/js/](./bin/js))
@@ -42,7 +45,7 @@ A lightweight 3D physics engine.
 	* ray casting
 	* convex casting
 
-## How to compile JavaScript demos in Haxe
+## Compile JavaScript demos in Haxe
 * Use Haxe 4.0.0 or later
 * main class: `demo.js.DemoJS`
 * Try enabling compiler options if fails
