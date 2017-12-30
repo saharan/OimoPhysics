@@ -630,7 +630,11 @@ class RigidBody {
 	 * Sets the linear velocity of the rigid body.
 	 */
 	public inline function setLinearVelocity(linearVelocity:Vec3):Void {
-		M.vec3_fromVec3(_vel, linearVelocity);
+		if (_type == RigidBodyType._STATIC) {
+			M.vec3_zero(_vel);
+		} else {
+			M.vec3_fromVec3(_vel, linearVelocity);
+		}
 		wakeUp();
 	}
 
@@ -656,7 +660,11 @@ class RigidBody {
 	 * Sets the angular velocity of the rigid body.
 	 */
 	public inline function setAngularVelocity(angularVelocity:Vec3):Void {
-		M.vec3_fromVec3(_angVel, angularVelocity);
+		if (_type == RigidBodyType._STATIC) {
+			M.vec3_zero(_angVel);
+		} else {
+			M.vec3_fromVec3(_angVel, angularVelocity);
+		}
 		wakeUp();
 	}
 
@@ -664,9 +672,11 @@ class RigidBody {
 	 * Adds `linearVelocityChange` to the linear velcity of the rigid body.
 	 */
 	public inline function addLinearVelocity(linearVelocityChange:Vec3):Void {
-		var d:IVec3;
-		M.vec3_fromVec3(d, linearVelocityChange);
-		M.vec3_add(_vel, _vel, d);
+		if (_type != RigidBodyType._STATIC) {
+			var d:IVec3;
+			M.vec3_fromVec3(d, linearVelocityChange);
+			M.vec3_add(_vel, _vel, d);
+		}
 		wakeUp();
 	}
 
@@ -674,9 +684,11 @@ class RigidBody {
 	 * Adds `angularVelocityChange` to the angular velcity of the rigid body.
 	 */
 	public inline function addAngularVelocity(angularVelocityChange:Vec3):Void {
-		var d:IVec3;
-		M.vec3_fromVec3(d, angularVelocityChange);
-		M.vec3_add(_angVel, _angVel, d);
+		if (_type != RigidBodyType._STATIC) {
+			var d:IVec3;
+			M.vec3_fromVec3(d, angularVelocityChange);
+			M.vec3_add(_angVel, _angVel, d);
+		}
 		wakeUp();
 	}
 

@@ -14,7 +14,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.math.*;
 
 /**
- * ...
+ * Bridge demo
  */
 class BridgeDemo extends DemoBase {
 

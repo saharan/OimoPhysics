@@ -11,7 +11,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * ...
+ * Vertical stacking demo
  */
 class VerticalStackingDemo extends DemoBase {
 	public function new() {

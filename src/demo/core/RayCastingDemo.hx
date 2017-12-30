@@ -9,7 +9,7 @@ import oimo.dynamics.constraint.joint.*;
 import oimo.dynamics.rigidbody.*;
 
 /**
- * ...
+ * Ray casting demo
  */
 class RayCastingDemo extends DemoBase {
 	var lps:Array<LaserPointer>;

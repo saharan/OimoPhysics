@@ -7,7 +7,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * ...
+ * Frictions and restitutions demo
  */
 class FrictionsAndRestitutions extends DemoBase {
 	public function new() {

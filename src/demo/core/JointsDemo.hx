@@ -11,7 +11,7 @@ import oimo.dynamics.constraint.joint.*;
 import oimo.dynamics.rigidbody.*;
 
 /**
- * ...
+ * Joints demo
  */
 class JointsDemo extends DemoBase {
 

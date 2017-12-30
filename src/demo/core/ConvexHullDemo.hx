@@ -7,7 +7,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * ...
+ * Convex hull demo
  */
 class ConvexHullDemo extends DemoBase {
 	public function new() {

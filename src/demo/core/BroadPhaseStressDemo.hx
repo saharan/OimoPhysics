@@ -8,7 +8,7 @@ import oimo.dynamics.*;
 import oimo.dynamics.rigidbody.*;
 
 /**
- * ...
+ * Broad-phase stress demo
  */
 class BroadPhaseStressDemo extends DemoBase {
 	static inline var RIGID_BODIES_STEP:Int = 100;

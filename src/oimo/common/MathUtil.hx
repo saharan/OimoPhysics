@@ -150,4 +150,11 @@ class MathUtil {
 	public static inline function randVec3In(min:Float, max:Float):Vec3 {
 		return new Vec3(min + rand() * (max - min), min + rand() * (max - min), min + rand() * (max - min));
 	}
+
+	/**
+	 * Returns a random `Vec3` from `(-1.0, -1.0, -1.0)` inclusive to `(1.0, 1.0, 1.0)` exclusive.
+	 */
+	public static inline function randVec3():Vec3 {
+		return randVec3In(-1, 1);
+	}
 }

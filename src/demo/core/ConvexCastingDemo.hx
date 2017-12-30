@@ -10,7 +10,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * ...
+ * Convex casting demo
  */
 class ConvexCastingDemo extends DemoBase {
 	var lps:Array<LaserPointer>;

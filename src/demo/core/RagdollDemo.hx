@@ -15,7 +15,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.math.*;
 
 /**
- * ...
+ * Ragdoll demo
  */
 class RagdollDemo extends DemoBase {
 

@@ -7,7 +7,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * ...
+ * Compound shapes demo
  */
 class CompoundShapesDemo extends DemoBase {
 	public function new() {

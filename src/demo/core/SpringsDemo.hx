@@ -10,7 +10,7 @@ import oimo.dynamics.constraint.joint.SpringDamper;
 import oimo.dynamics.constraint.joint.TranslationalLimitMotor;
 
 /**
- * ...
+ * Springs demo
  */
 class SpringsDemo extends DemoBase {
 	public function new() {
@@ -20,9 +20,6 @@ class SpringsDemo extends DemoBase {
 	override public function init(world:World, renderer:DemoRenderer, input:UserInput, viewInfo:ViewInfo):Void {
 		super.init(world, renderer, input, viewInfo);
 		renderer.camera(new Vec3(0, 7, 9), new Vec3(0, 2, 0), new Vec3(0, 1, 0));
-
-		//var thickness:Float = 0.5;
-		//OimoUtil.addBox(world, new Vec3(0, -thickness, 0), new Vec3(7, thickness, 7), true);
 
 		for (i in 0...5) {
 			OimoUtil.addSphere(world, MathUtil.randVec3In(-1, 1).scale3Eq(2, 2, 0.1).addEq(new Vec3(0, 8, 0)), 0.6, false);

@@ -7,7 +7,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * ...
+ * Basic demo
  */
 class BasicDemo extends DemoBase {
 	public function new() {
@@ -31,8 +31,9 @@ class BasicDemo extends DemoBase {
 		for (i in 0...n) {
 			for (j in -w...w + 1) {
 				for (k in -h...h + 1) {
-					var pos:Vec3 = new Vec3(centerX + j * sp + MathUtil.randIn(-0.05, 0.05), size + i * size * 3.0, centerZ + k * sp + MathUtil.randIn(-0.05, 0.05));
-					OimoUtil.addBox(world, pos, new Vec3(size, size, size), false).setAngularVelocity(MathUtil.randVec3In(-0.05, 0.05));
+					var pos:Vec3 = new Vec3(j * sp, size + i * size * 3, centerZ + k * sp);
+					var box:RigidBody = OimoUtil.addBox(world, pos, new Vec3(size, size, size), false);
+					box.setAngularVelocity(MathUtil.randVec3In(-0.05, 0.05));
 				}
 			}
 		}

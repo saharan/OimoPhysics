@@ -8,7 +8,7 @@ import oimo.physics.*;
 import oimo.dynamics.constraint.joint.RotationalLimitMotor;
 
 /**
- * ...
+ * Gears demo
  */
 class GearsDemo extends DemoBase {
 	public function new() {

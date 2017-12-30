@@ -12,7 +12,7 @@ import demo.common.UserInput;
 import demo.common.ViewInfo;
 
 /**
- * ...
+ * Variable time step demo
  */
 class VariableTimeStepDemo extends DemoBase {
 	var bullet:RigidBody;

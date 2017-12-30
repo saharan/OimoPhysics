@@ -7,7 +7,7 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * ...
+ * Falling ragdoll demo
  */
 class FallingRagdollDemo extends DemoBase {
 	var ragdoll:RigidBody;
