@@ -28,6 +28,14 @@ class U {
 		return appendSuffixes(base, ["X", "Y", "Z", "W"]);
 	}
 
+	public static function quatVecNames(base:String) {
+		return appendSuffixes(base, ["X", "Y", "Z"]);
+	}
+
+	public static function quatRealName(base:String) {
+		return base + "W";
+	}
+
 	public static function mat3NamesDiag(base:String) {
 		var m:Array<String> = mat3Names(base);
 		return [m[0], m[4], m[8]];
@@ -50,9 +58,13 @@ class U {
 		if (t == null) return null;
 		var base:String = s;
 		var type:String = t.s1();
+		//trace("1");
 		if (type == (macro:oimo.m.IVec3).toType().toString()) return vec3Names(base);
+		//trace("2");
 		if (type == (macro:oimo.m.IMat3).toType().toString()) return mat3Names(base);
+		//trace("3");
 		if (type == (macro:oimo.m.IQuat).toType().toString()) return quatNames(base);
+		//trace("4");
 		return null;
 	}
 
@@ -72,12 +84,15 @@ class U {
 		return t.toString();
 	}
 
-	public static function pushVariables(fields:Array<Field>, names:Array<String>, kind:ComplexType, access:Array<Access>) {
+	public static function pushVariables(fields:Array<Field>, names:Array<String>, kind:ComplexType, ?meta:Metadata, access:Array<Access>) {
+		if (meta == null) meta = [];
+
 		for (name in names) {
 			fields.push({
 				name: name,
 				kind: FVar(kind),
 				access: access,
+				meta: meta,
 				pos: pos()
 			});
 		}
