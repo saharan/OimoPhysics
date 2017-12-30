@@ -59,7 +59,7 @@ The MIT License
 
 ---
 
-## Old Version
+### Old Version
 * Written in ActionScript 3.0
 * Supports spheres and boxes as collision shapes
 * Supports various joints (ball and socket, distance, hinge, prismatic, etc...)
