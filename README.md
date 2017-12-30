@@ -6,7 +6,7 @@ A lightweight 3D physics engine.
 ## [API Documentation](https://saharan.github.io/OimoPhysics/)
 
 ## Demos
-<a href="http://el-ement.com/etc/oimo/demos/"><img src="http://el-ement.com/etc/oimo/demos/thumbs.png"></a>
+<a href="http://el-ement.com/etc/oimo/demos/"><img src="http://el-ement.com/etc/oimo/demos/thumbnail.png"></a>
 * Press `E` or `Q` to change demos
 * Click or tap text to control
 
