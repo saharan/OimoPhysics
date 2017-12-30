@@ -5,8 +5,10 @@ A lightweight 3D physics engine.
 
 ## [API Documentation](https://saharan.github.io/OimoPhysics/)
 
-## [Demos](http://el-ement.com/etc/oimo/demos/)
+## Demos
 <a href="http://el-ement.com/etc/oimo/demos/"><img src="http://el-ement.com/etc/oimo/demos/thumbs.png"></a>
+* Press `E` or `Q` to change demos
+* Click or tap text to control
 
 ## Features
 * Written in Haxe
