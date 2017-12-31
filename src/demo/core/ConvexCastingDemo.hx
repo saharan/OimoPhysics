@@ -32,8 +32,6 @@ class ConvexCastingDemo extends DemoBase {
 		var wid:Float = 0.3;
 		var hei:Float = 0.3;
 		var spH:Float = hei * 2;
-		var centerX:Float = 0;
-		var centerZ:Float = 0;
 		for (i in 0...n) {
 			for (j in -w...w + 1) {
 				for (k in -h...h + 1) {
@@ -44,15 +42,15 @@ class ConvexCastingDemo extends DemoBase {
 
 					switch (Std.int(5 * Math.random())) {
 					case 0:
-						OimoUtil.addCylinder(world, new Vec3(centerX + j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 1.002, centerZ + k * sp + MathUtil.randIn(-0.01, 0.01)), wid, hei, false);
+						OimoUtil.addCylinder(world, new Vec3(j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 1.002, k * sp + MathUtil.randIn(-0.01, 0.01)), wid, hei, false);
 					case 1:
-						OimoUtil.addCone(world, new Vec3(centerX + j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 1.002, centerZ + k * sp + MathUtil.randIn(-0.01, 0.01)), wid, hei, false);
+						OimoUtil.addCone(world, new Vec3(j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 1.002, k * sp + MathUtil.randIn(-0.01, 0.01)), wid, hei, false);
 					case 2:
-						OimoUtil.addCapsule(world, new Vec3(centerX + j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 1.002, centerZ + k * sp + MathUtil.randIn(-0.01, 0.01)), wid, hei, false);
+						OimoUtil.addCapsule(world, new Vec3(j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 1.002, k * sp + MathUtil.randIn(-0.01, 0.01)), wid, hei, false);
 					case 3:
-						OimoUtil.addBox(world, new Vec3(centerX + j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 0.9998, centerZ + k * sp + MathUtil.randIn(-0.01, 0.01)), new Vec3(wid, hei, wid), false);
+						OimoUtil.addBox(world, new Vec3(j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 0.9998, k * sp + MathUtil.randIn(-0.01, 0.01)), new Vec3(wid, hei, wid), false);
 					case 4:
-						OimoUtil.addSphere(world, new Vec3(centerX + j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 0.9998, centerZ + k * sp + MathUtil.randIn(-0.01, 0.01)), wid, false);
+						OimoUtil.addSphere(world, new Vec3(j * sp + MathUtil.randIn(-0.01, 0.01), spH + i * spH * 2 * 0.9998, k * sp + MathUtil.randIn(-0.01, 0.01)), wid, false);
 					}
 				}
 			}

@@ -28,12 +28,10 @@ class ConvexHullDemo extends DemoBase {
 		var wid:Float = 0.6;
 		var hei:Float = 0.6;
 		var dep:Float = 0.6;
-		var centerX:Float = 0;
-		var centerZ:Float = 0;
 		for (i in 0...n) {
 			for (j in -w...w + 1) {
 				for (k in -h...h + 1) {
-					var center:Vec3 = new Vec3(centerX + j * wid * 2, hei + i * hei * 3.0, centerZ + k * dep * 2);
+					var center:Vec3 = new Vec3(j * wid * 2, hei + i * hei * 3.0, k * dep * 2);
 					var bc:RigidBodyConfig = new RigidBodyConfig();
 					var sc:ShapeConfig = new ShapeConfig();
 					bc.position = center;

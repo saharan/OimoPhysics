@@ -7,11 +7,13 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * Basic demo
+ * Limit rotation demo
  */
-class BasicDemo extends DemoBase {
+class LimitRotationDemo extends DemoBase {
+	var body:RigidBody;
+
 	public function new() {
-		super("Basic Demo");
+		super("Limit Rotation");
 	}
 
 	override public function init(world:World, renderer:DemoRenderer, input:UserInput, viewInfo:ViewInfo):Void {
@@ -31,10 +33,23 @@ class BasicDemo extends DemoBase {
 				for (k in -h...h + 1) {
 					var pos:Vec3 = new Vec3(j * sp, size + i * size * 3, k * sp);
 					var box:RigidBody = OimoUtil.addBox(world, pos, new Vec3(size, size, size), false);
-					box.setAngularVelocity(MathUtil.randVec3In(-0.05, 0.05));
+					box.setRotationFactor(new Vec3(0, 0, 0));
 				}
 			}
 		}
+
+		var cylinder:RigidBody = OimoUtil.addCylinder(world, new Vec3(0, 8, 0), 1.0, 0.3, false);
+		var cylinderShape:Shape = cylinder.getShapeList();
+
+		// modify local transform
+		var localTransform:Transform = cylinderShape.getLocalTransform();
+		localTransform.rotateXyz(new Vec3(MathUtil.HALF_PI, 0, 0));
+		cylinderShape.setLocalTransform(localTransform);
+
+		// limit rotation
+		cylinder.setRotationFactor(new Vec3(0, 0, 1));
+
+		body = cylinder;
 	}
 
 	override public function update():Void {

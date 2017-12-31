@@ -47,7 +47,7 @@ class BridgeDemo extends DemoBase {
 		}
 
 		for (i in 0...num - 1) {
-			OimoUtil.addHingeJoint(world, bodies[i], bodies[i + 1], bodies[i].getPosition().add(bodies[i + 1].getPosition()).scale(0.5), new Vec3(0, 0, 1));
+			OimoUtil.addRevoluteJoint(world, bodies[i], bodies[i + 1], bodies[i].getPosition().add(bodies[i + 1].getPosition()).scale(0.5), new Vec3(0, 0, 1));
 		}
 
 		for (i in 0...num) {

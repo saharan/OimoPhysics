@@ -250,7 +250,7 @@ class RigidBody {
 		M.mat3_fromQuat(_transform._rotation, q);
 
 		// update inertia tensor
-		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		updateInvInertia();
 	}
 
 	// call when added/removed/modified shapes
@@ -334,20 +334,24 @@ class RigidBody {
 			M.mat3_inv(_invLocalInertia, _localInertia);
 			M.mat3_assign(_invLocalInertiaWithoutRotFactor, _invLocalInertia);
 			M.mat3_scaleRows(_invLocalInertia, _invLocalInertiaWithoutRotFactor, _rotFactor.x, _rotFactor.y, _rotFactor.z);
-
-			M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
 		} else {
 			// set mass and inertia zero
 			_invMass = 0;
 			M.mat3_zero(_invLocalInertia);
 			M.mat3_zero(_invLocalInertiaWithoutRotFactor);
-			M.mat3_zero(_invInertia);
 
 			// force static
 			if (_type == RigidBodyType._DYNAMIC) {
 				_type = RigidBodyType._STATIC;
 			}
 		}
+		updateInvInertia();
+	}
+
+	@:extern
+	inline function updateInvInertia():Void {
+		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		M.mat3_scaleRows(_invInertia, _invInertia, _rotFactor.x, _rotFactor.y, _rotFactor.z);
 	}
 
 	// call when the transform is externally updated
@@ -420,7 +424,7 @@ class RigidBody {
 	public inline function setRotation(rotation:Mat3):Void {
 		M.mat3_fromMat3(_transform._rotation, rotation);
 
-		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		updateInvInertia();
 		updateTransformExt();
 	}
 
@@ -432,7 +436,7 @@ class RigidBody {
 		M.vec3_fromVec3(xyz, eulerAngles);
 		M.mat3_fromEulerXyz(_transform._rotation, xyz);
 
-		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		updateInvInertia();
 		updateTransformExt();
 	}
 
@@ -444,7 +448,7 @@ class RigidBody {
 		M.mat3_fromMat3(rot, rotation);
 		M.mat3_mul(_transform._rotation, rot, _transform._rotation);
 
-		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		updateInvInertia();
 		updateTransformExt();
 	}
 
@@ -458,7 +462,7 @@ class RigidBody {
 		M.mat3_fromEulerXyz(rot, xyz);
 		M.mat3_mul(_transform._rotation, rot, _transform._rotation);
 
-		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		updateInvInertia();
 		updateTransformExt();
 	}
 
@@ -492,7 +496,7 @@ class RigidBody {
 		M.quat_fromQuat(q, quaternion);
 		M.mat3_fromQuat(_transform._rotation, q);
 
-		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		updateInvInertia();
 		updateTransformExt();
 	}
 
@@ -521,7 +525,7 @@ class RigidBody {
 		M.vec3_assign(_transform._position, transform._position);
 		M.mat3_assign(_transform._rotation, transform._rotation);
 
-		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		updateInvInertia();
 		updateTransformExt();
 	}
 
@@ -597,14 +601,13 @@ class RigidBody {
 	 * Sets the rotation factor of the rigid body to `rotationFactor`.
 	 *
 	 * This changes moment of inertia internally, so that the change of
-	 * angular velocity in local space along X, Y and Z axis will scale by `rotationFactor.x`,
+	 * angular velocity in **global space** along X, Y and Z axis will scale by `rotationFactor.x`,
 	 * `rotationFactor.y` and `rotationFactor.z` times respectively.
 	 */
 	public inline function setRotationFactor(rotationFactor:Vec3):Void {
 		_rotFactor.copyFrom(rotationFactor);
-		M.mat3_scaleRows(_invLocalInertia, _invLocalInertiaWithoutRotFactor, _rotFactor.x, _rotFactor.y, _rotFactor.z);
 
-		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
+		updateInvInertia();
 		wakeUp();
 	}
 

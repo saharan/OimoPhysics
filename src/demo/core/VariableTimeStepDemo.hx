@@ -34,13 +34,11 @@ class VariableTimeStepDemo extends DemoBase {
 		var wid:Float = 0.3;
 		var hei:Float = 0.3;
 		var dep:Float = 0.3;
-		var centerX:Float = 0;
-		var centerZ:Float = 0;
 		for (i in 0...n) {
 			for (k in -h...h + 1) {
 				for (j in 0...w) {
-					if (j + k & 1 == 0) OimoUtil.addBox(world, new Vec3(centerX + j * wid * 2 + MathUtil.randIn(-0.01, 0.01), hei + i * hei * 2.2, centerZ + k * dep * 2 + MathUtil.randIn(-0.01, 0.01)), new Vec3(wid, hei, dep), false);
-					else OimoUtil.addCylinder(world, new Vec3(centerX + j * wid * 2 + MathUtil.randIn(-0.01, 0.01), hei + i * hei * 2.2, centerZ + k * dep * 2 + MathUtil.randIn(-0.01, 0.01)), wid, hei, false);
+					if (j + k & 1 == 0) OimoUtil.addBox(world, new Vec3(j * wid * 2 + MathUtil.randIn(-0.01, 0.01), hei + i * hei * 2.2, k * dep * 2 + MathUtil.randIn(-0.01, 0.01)), new Vec3(wid, hei, dep), false);
+					else OimoUtil.addCylinder(world, new Vec3(j * wid * 2 + MathUtil.randIn(-0.01, 0.01), hei + i * hei * 2.2, k * dep * 2 + MathUtil.randIn(-0.01, 0.01)), wid, hei, false);
 				}
 			}
 		}

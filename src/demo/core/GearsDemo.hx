@@ -5,6 +5,7 @@ import oimo.common.*;
 import oimo.dynamics.*;
 import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
+import oimo.dynamics.constraint.joint.RevoluteJoint;
 import oimo.dynamics.constraint.joint.RotationalLimitMotor;
 
 /**
@@ -67,7 +68,7 @@ class GearsDemo extends DemoBase {
 
 		var fixture:RigidBody = OimoUtil.addCylinder(world, center, toothInterval / 4, thickness * 0.52, true);
 		fixture.rotate(new Mat3().appendRotationEq(90 * MathUtil.TO_RADIANS, 1, 0, 0));
-		OimoUtil.addHingeJoint(world, wheel, fixture, center, new Vec3(0, 0, 1), null, lm);
+		OimoUtil.addRevoluteJoint(world, wheel, fixture, center, new Vec3(0, 0, 1), null, lm);
 	}
 
 	override public function update():Void {

@@ -85,7 +85,7 @@ class JointsDemo extends DemoBase {
 	function createBoard(x:Float, y:Float, z:Float, lm:RotationalLimitMotor, sd:SpringDamper) {
 		var b1:RigidBody = OimoUtil.addBox(world, new Vec3(x, y, z), new Vec3(0.1, 0.1, 0.1), true);
 		var b2:RigidBody = OimoUtil.addBox(world, new Vec3(x + 0.5, y, z), new Vec3(0.5, 0.2, 0.4), false);
-		OimoUtil.addHingeJoint(world, b1, b2, new Vec3(x, y, z), new Vec3(0, 0, 1), sd, lm);
+		OimoUtil.addRevoluteJoint(world, b1, b2, new Vec3(x, y, z), new Vec3(0, 0, 1), sd, lm);
 	}
 
 	function createBallChain(from:Vec3, radius:Float, num:Int):Void {

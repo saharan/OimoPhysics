@@ -96,11 +96,31 @@ class Transform {
 	}
 
 	/**
+	 * Sets the rotation by Euler angles `eulerAngles` in radians.
+	 */
+	public inline function setRotationXyz(eulerAngles:Vec3):Void {
+		var xyz:IVec3;
+		M.vec3_fromVec3(xyz, eulerAngles);
+		M.mat3_fromEulerXyz(_rotation, xyz);
+	}
+
+	/**
 	 * Applies rotation by the rotation matrix `rotation`.
 	 */
 	public inline function rotate(rotation:Mat3):Void {
 		var rot:IMat3;
 		M.mat3_fromMat3(rot, rotation);
+		M.mat3_mul(_rotation, rot, _rotation);
+	}
+
+	/**
+	 * Applies the rotation by Euler angles `eulerAngles` in radians.
+	 */
+	public inline function rotateXyz(eulerAngles:Vec3):Void {
+		var xyz:IVec3;
+		var rot:IMat3;
+		M.vec3_fromVec3(xyz, eulerAngles);
+		M.mat3_fromEulerXyz(rot, xyz);
 		M.mat3_mul(_rotation, rot, _rotation);
 	}
 

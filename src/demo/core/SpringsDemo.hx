@@ -47,7 +47,7 @@ class SpringsDemo extends DemoBase {
 			var axis:Vec3 = new Vec3(0, 0, 1);
 			var springDamper:SpringDamper = new SpringDamper().setSpring(15, 0.4);
 			var limitMotor:RotationalLimitMotor = new RotationalLimitMotor().setLimits(0, 0);
-			OimoUtil.addHingeJoint(world, b1, b2, anchor, axis, springDamper, limitMotor);
+			OimoUtil.addRevoluteJoint(world, b1, b2, anchor, axis, springDamper, limitMotor);
 		}
 	}
 

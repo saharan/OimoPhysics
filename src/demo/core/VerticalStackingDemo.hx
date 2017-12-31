@@ -30,15 +30,13 @@ class VerticalStackingDemo extends DemoBase {
 		var n:Int = 6;
 		var dn:Int = 2;
 		var size:Float = 0.4;
-		var centerX:Float = 0;
-		var centerZ:Float = 0;
 
 		var tmp = Setting.defaultRestitution;
 		Setting.defaultRestitution = 0;
 
 		for (i in -w...w + 1) {
 			for (j in 0...n + dn * (i + w)) {
-				OimoUtil.addBox(world, new Vec3(centerX + i * sp + MathUtil.randIn(-0.01, 0.01), size + j * size * 2.05, centerZ + MathUtil.randIn(-0.01, 0.01)), new Vec3(size, size, size), false);
+				OimoUtil.addBox(world, new Vec3(i * sp + MathUtil.randIn(-0.01, 0.01), size + j * size * 2.05, MathUtil.randIn(-0.01, 0.01)), new Vec3(size, size, size), false);
 			}
 		}
 

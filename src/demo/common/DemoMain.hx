@@ -82,6 +82,7 @@ class DemoMain {
 			new CollisionFilteringDemo(),
 			new ConvexHullDemo(),
 			new VerticalStackingDemo(),
+			new LimitRotationDemo(),
 			new BroadPhaseStressDemo(),
 			new BridgeDemo(),
 			new SpringsDemo(),

@@ -48,7 +48,7 @@ class OimoUtil {
 		return j;
 	}
 
-	public static function addHingeJoint(w:World, rb1:RigidBody, rb2:RigidBody, anchor:Vec3, axis:Vec3, sd:SpringDamper = null, lm:RotationalLimitMotor = null):RevoluteJoint {
+	public static function addRevoluteJoint(w:World, rb1:RigidBody, rb2:RigidBody, anchor:Vec3, axis:Vec3, sd:SpringDamper = null, lm:RotationalLimitMotor = null):RevoluteJoint {
 		var jc:RevoluteJointConfig = new RevoluteJointConfig();
 		jc.init(rb1, rb2, anchor, axis);
 		if (sd != null) jc.springDamper = sd;
@@ -176,8 +176,8 @@ class OimoUtil {
 		addRagdollJoint(w, body1, armL1, pos.add(new Vec3(-bodyRadius, lowerBody + upperBody, 0)), x, z, sd, 90, 90, sd, lm180);
 		addRagdollJoint(w, body1, armR1, pos.add(new Vec3(bodyRadius, lowerBody + upperBody, 0)), x.negate(), z, sd, 90, 90, sd, lm180);
 
-		addHingeJoint(w, armL1, armL2, pos.add(new Vec3(-bodyRadius - upperArm, lowerBody + upperBody, 0)), y, sd, lmElbow);
-		addHingeJoint(w, armR1, armR2, pos.add(new Vec3(bodyRadius + upperArm, lowerBody + upperBody, 0)), y.negate(), sd, lmElbow);
+		addRevoluteJoint(w, armL1, armL2, pos.add(new Vec3(-bodyRadius - upperArm, lowerBody + upperBody, 0)), y, sd, lmElbow);
+		addRevoluteJoint(w, armR1, armR2, pos.add(new Vec3(bodyRadius + upperArm, lowerBody + upperBody, 0)), y.negate(), sd, lmElbow);
 
 		var jc = new RagdollJointConfig();
 		jc.swingSpringDamper = sd;
@@ -194,8 +194,8 @@ class OimoUtil {
 		jc.localTwistAxis1 = z.negate();
 		w.addJoint(new RagdollJoint(jc));
 
-		addHingeJoint(w, legL1, legL2, pos.add(new Vec3(-legInterval, -legInterval - upperLeg, 0)), x, sd, lmKnee);
-		addHingeJoint(w, legR1, legR2, pos.add(new Vec3(legInterval, -legInterval - upperLeg, 0)), x, sd, lmKnee);
+		addRevoluteJoint(w, legL1, legL2, pos.add(new Vec3(-legInterval, -legInterval - upperLeg, 0)), x, sd, lmKnee);
+		addRevoluteJoint(w, legR1, legR2, pos.add(new Vec3(legInterval, -legInterval - upperLeg, 0)), x, sd, lmKnee);
 
 		return body1;
 	}
