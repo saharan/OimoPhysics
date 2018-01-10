@@ -40888,7 +40888,6 @@ oimo_dynamics_rigidbody_RigidBodyType._KINEMATIC = 2;
 oimo_dynamics_rigidbody_RigidBodyType.DYNAMIC = 0;
 oimo_dynamics_rigidbody_RigidBodyType.STATIC = 1;
 oimo_dynamics_rigidbody_RigidBodyType.KINEMATIC = 2;
-oimo_m_M.EPS = 1e-6;
 window["OIMO"] = {};
 window["OIMO"]["BroadPhase"] = oimo_collision_broadphase_BroadPhase;
 oimo_collision_broadphase_BroadPhase.prototype["createProxy"] = oimo_collision_broadphase_BroadPhase.prototype.createProxy;
