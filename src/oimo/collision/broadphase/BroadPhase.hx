@@ -14,6 +14,7 @@ import oimo.m.M;
  */
 @:build(oimo.m.B.bu())
 class BroadPhase {
+	public var _type:Int;
 	public var _numProxies:Int;
 	public var _proxyList:Proxy;
 	public var _proxyListLast:Proxy;
@@ -34,7 +35,9 @@ class BroadPhase {
 	var rayCastHit:RayCastHit;
 
 	@:dox(hide)
-	public function new() {
+	public function new(type:Int) {
+		_type = type;
+
 		_numProxies = 0;
 		_proxyList = null;
 		_proxyListLast = null;

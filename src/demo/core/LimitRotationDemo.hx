@@ -7,13 +7,13 @@ import oimo.dynamics.rigidbody.*;
 import oimo.physics.*;
 
 /**
- * Limit rotation demo
+ * Rotation limit demo
  */
 class LimitRotationDemo extends DemoBase {
 	var body:RigidBody;
 
 	public function new() {
-		super("Limit Rotation");
+		super("Rotation Limit");
 	}
 
 	override public function init(world:World, renderer:DemoRenderer, input:UserInput, viewInfo:ViewInfo):Void {

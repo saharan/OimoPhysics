@@ -12,6 +12,7 @@ using Lambda;
 /**
  * Build Macro
  */
+@:extern
 class B {
 
 #if macro

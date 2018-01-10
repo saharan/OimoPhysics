@@ -22,7 +22,7 @@ class BvhBroadPhase extends BroadPhase {
 
 	@:dox(hide)
 	public function new() {
-		super();
+		super(BroadPhaseType._BVH);
 		_incremental = true;
 		_tree = new BvhTree();
 		movedProxies = new Vector<BvhProxy>(1024);

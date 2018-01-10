@@ -1,5 +1,6 @@
 package oimo.collision.geometry;
 import oimo.collision.raycast.*;
+import oimo.common.MathUtil;
 import oimo.common.Transform;
 import oimo.common.Vec3;
 import oimo.m.IVec3;
@@ -21,10 +22,28 @@ class BoxGeometry extends ConvexGeometry {
 	public function new(halfExtents:Vec3) {
 		super(GeometryType._BOX);
 		M.vec3_fromVec3(_halfExtents, halfExtents);
-		M.vec3_set(_halfAxisX, M.vec3_get(_halfExtents, 0), 0, 0);
-		M.vec3_set(_halfAxisY, 0, M.vec3_get(_halfExtents, 1), 0);
-		M.vec3_set(_halfAxisZ, 0, 0, M.vec3_get(_halfExtents, 2));
+		M.vec3_set(_halfAxisX, halfExtents.x, 0, 0);
+		M.vec3_set(_halfAxisY, 0, halfExtents.y, 0);
+		M.vec3_set(_halfAxisZ, 0, 0, halfExtents.z);
 		_updateMass();
+
+		var minHalfExtents:Float =
+			if (halfExtents.x < halfExtents.y) {
+				if (halfExtents.z < halfExtents.x) {
+					halfExtents.z;
+				} else {
+					halfExtents.x;
+				}
+			} else {
+				if (halfExtents.z < halfExtents.y) {
+					halfExtents.z;
+				} else {
+					halfExtents.y;
+				}
+			}
+		;
+
+		if (_gjkMargin > minHalfExtents * 0.2) _gjkMargin = minHalfExtents * 0.2;
 	}
 
 	/**

@@ -38,10 +38,11 @@ class GearsDemo extends DemoBase {
 		}
 	}
 
+	// note the gear is locally y-up
 	function createGear(center:Vec3, radius:Float, thickness:Float, lm:RotationalLimitMotor = null):Void {
 		var toothInterval:Float = 0.4;
 		var toothLength:Float = toothInterval / 1.5;
-		var numTeeth:Int = Math.floor(MathUtil.TWO_PI * radius / toothInterval);
+		var numTeeth:Int = Math.round(MathUtil.TWO_PI * radius / toothInterval) + 1;
 		if (numTeeth % 2 == 0) numTeeth--;
 		if (numTeeth < 2) numTeeth = 2;
 
@@ -49,7 +50,7 @@ class GearsDemo extends DemoBase {
 		var toothRot:Mat3 = new Mat3();
 		var dtoothRot:Mat3 = new Mat3().appendRotationEq(MathUtil.TWO_PI / numTeeth, 0, 1, 0);
 
-		var toothGeom:Geometry = new BoxGeometry(new Vec3(toothLength / 2, thickness * 0.5, toothInterval / 4 * 0.95));
+		var toothGeom:Geometry = createGearTooth(toothLength / 2, thickness * 0.5, toothInterval / 3);
 		var toothSc:ShapeConfig = new ShapeConfig();
 		toothSc.restitution = 0;
 		toothSc.geometry = toothGeom;
@@ -69,6 +70,23 @@ class GearsDemo extends DemoBase {
 		var fixture:RigidBody = OimoUtil.addCylinder(world, center, toothInterval / 4, thickness * 0.52, true);
 		fixture.rotate(new Mat3().appendRotationEq(90 * MathUtil.TO_RADIANS, 1, 0, 0));
 		OimoUtil.addRevoluteJoint(world, wheel, fixture, center, new Vec3(0, 0, 1), null, lm);
+	}
+
+	function createGearTooth(hw:Float, hh:Float, hd:Float):Geometry {
+		var scale:Float = 0.3;
+		var vertices:Array<Vec3> = [
+			new Vec3(-hw, -hh, -hd),
+			new Vec3(-hw, -hh, hd),
+			new Vec3(-hw, hh, -hd),
+			new Vec3(-hw, hh, hd),
+			new Vec3(hw, -hh, -hd * scale),
+			new Vec3(hw, -hh, hd * scale),
+			new Vec3(hw, hh, -hd * scale),
+			new Vec3(hw, hh, hd * scale),
+		];
+		var geom:ConvexHullGeometry = new ConvexHullGeometry(vertices);
+		geom.setGjkMergin(0); // set external margin to 0 (not needed for other geoms)
+		return geom;
 	}
 
 	override public function update():Void {

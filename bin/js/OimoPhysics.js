@@ -1,5 +1,5 @@
 /*
- * OimoPhysics 1.0.0 (c) 2018 saharan, The MIT License
+ * OimoPhysics 1.1.0 (c) 2018 saharan, The MIT License
  */
 (function () { "use strict";
 function $extend(from, fields) {
@@ -8,139 +8,8 @@ function $extend(from, fields) {
 	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
 }
-Math.__name__ = true;
-var js__$Boot_HaxeError = function(val) {
-	Error.call(this);
-	this.val = val;
-	this.message = String(val);
-	if(Error.captureStackTrace) {
-		Error.captureStackTrace(this,js__$Boot_HaxeError);
-	}
-};
-js__$Boot_HaxeError.__name__ = true;
-js__$Boot_HaxeError.wrap = function(val) {
-	if((val instanceof Error)) {
-		return val;
-	} else {
-		return new js__$Boot_HaxeError(val);
-	}
-};
-js__$Boot_HaxeError.__super__ = Error;
-js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
-	__class__: js__$Boot_HaxeError
-});
-var js_Boot = function() { };
-js_Boot.__name__ = true;
-js_Boot.getClass = function(o) {
-	if((o instanceof Array) && o.__enum__ == null) {
-		return Array;
-	} else {
-		var cl = o.__class__;
-		if(cl != null) {
-			return cl;
-		}
-		var name = js_Boot.__nativeClassName(o);
-		if(name != null) {
-			return js_Boot.__resolveNativeClass(name);
-		}
-		return null;
-	}
-};
-js_Boot.__interfLoop = function(cc,cl) {
-	if(cc == null) {
-		return false;
-	}
-	if(cc == cl) {
-		return true;
-	}
-	var intf = cc.__interfaces__;
-	if(intf != null) {
-		var _g1 = 0;
-		var _g = intf.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var i1 = intf[i];
-			if(i1 == cl || js_Boot.__interfLoop(i1,cl)) {
-				return true;
-			}
-		}
-	}
-	return js_Boot.__interfLoop(cc.__super__,cl);
-};
-js_Boot.__instanceof = function(o,cl) {
-	if(cl == null) {
-		return false;
-	}
-	switch(cl) {
-	case Array:
-		if((o instanceof Array)) {
-			return o.__enum__ == null;
-		} else {
-			return false;
-		}
-		break;
-	case Bool:
-		return typeof(o) == "boolean";
-	case Dynamic:
-		return true;
-	case Float:
-		return typeof(o) == "number";
-	case Int:
-		if(typeof(o) == "number") {
-			return (o|0) === o;
-		} else {
-			return false;
-		}
-		break;
-	case String:
-		return typeof(o) == "string";
-	default:
-		if(o != null) {
-			if(typeof(cl) == "function") {
-				if(o instanceof cl) {
-					return true;
-				}
-				if(js_Boot.__interfLoop(js_Boot.getClass(o),cl)) {
-					return true;
-				}
-			} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
-				if(o instanceof cl) {
-					return true;
-				}
-			}
-		} else {
-			return false;
-		}
-		if(cl == Class ? o.__name__ != null : false) {
-			return true;
-		}
-		if(cl == Enum ? o.__ename__ != null : false) {
-			return true;
-		}
-		return o.__enum__ == cl;
-	}
-};
-js_Boot.__cast = function(o,t) {
-	if(js_Boot.__instanceof(o,t)) {
-		return o;
-	} else {
-		throw new js__$Boot_HaxeError("Cannot cast " + o + " to " + t);
-	}
-};
-js_Boot.__nativeClassName = function(o) {
-	var name = js_Boot.__toStr.call(o).slice(8,-1);
-	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
-		return null;
-	}
-	return name;
-};
-js_Boot.__isNativeObj = function(o) {
-	return js_Boot.__nativeClassName(o) != null;
-};
-js_Boot.__resolveNativeClass = function(name) {
-	return window[name];
-};
-var oimo_collision_broadphase_BroadPhase = function() {
+var oimo_collision_broadphase_BroadPhase = function(type) {
+	this._type = type;
 	this._numProxies = 0;
 	this._proxyList = null;
 	this._proxyListLast = null;
@@ -155,7 +24,6 @@ var oimo_collision_broadphase_BroadPhase = function() {
 	this.zero = new oimo_common_Vec3();
 	this.rayCastHit = new oimo_collision_geometry_RayCastHit();
 };
-oimo_collision_broadphase_BroadPhase.__name__ = true;
 oimo_collision_broadphase_BroadPhase.prototype = {
 	createProxy: function(userData,aabb) {
 		return null;
@@ -188,13 +56,11 @@ oimo_collision_broadphase_BroadPhase.prototype = {
 	}
 	,aabbTest: function(aabb,callback) {
 	}
-	,__class__: oimo_collision_broadphase_BroadPhase
 };
 var oimo_collision_geometry_Geometry = function(type) {
 	this._type = type;
 	this._volume = 0;
 };
-oimo_collision_geometry_Geometry.__name__ = true;
 oimo_collision_geometry_Geometry.prototype = {
 	_updateMass: function() {
 	}
@@ -300,14 +166,12 @@ oimo_collision_geometry_Geometry.prototype = {
 		}
 		return false;
 	}
-	,__class__: oimo_collision_geometry_Geometry
 };
 var oimo_collision_geometry_ConvexGeometry = function(type) {
 	oimo_collision_geometry_Geometry.call(this,type);
 	this._gjkMargin = oimo_common_Setting.defaultGJKMargin;
 	this._useGjkRayCast = false;
 };
-oimo_collision_geometry_ConvexGeometry.__name__ = true;
 oimo_collision_geometry_ConvexGeometry.__super__ = oimo_collision_geometry_Geometry;
 oimo_collision_geometry_ConvexGeometry.prototype = $extend(oimo_collision_geometry_Geometry.prototype,{
 	getGjkMergin: function() {
@@ -328,12 +192,10 @@ oimo_collision_geometry_ConvexGeometry.prototype = $extend(oimo_collision_geomet
 			return oimo_collision_geometry_Geometry.prototype.rayCast.call(this,begin,end,transform,hit);
 		}
 	}
-	,__class__: oimo_collision_geometry_ConvexGeometry
 });
 var oimo_collision_broadphase__$BroadPhase_ConvexSweepGeometry = function() {
 	oimo_collision_geometry_ConvexGeometry.call(this,-1);
 };
-oimo_collision_broadphase__$BroadPhase_ConvexSweepGeometry.__name__ = true;
 oimo_collision_broadphase__$BroadPhase_ConvexSweepGeometry.__super__ = oimo_collision_geometry_ConvexGeometry;
 oimo_collision_broadphase__$BroadPhase_ConvexSweepGeometry.prototype = $extend(oimo_collision_geometry_ConvexGeometry.prototype,{
 	init: function(c,transform,translation) {
@@ -379,14 +241,12 @@ oimo_collision_broadphase__$BroadPhase_ConvexSweepGeometry.prototype = $extend(o
 			out.z = tz;
 		}
 	}
-	,__class__: oimo_collision_broadphase__$BroadPhase_ConvexSweepGeometry
 });
 var oimo_collision_broadphase__$BroadPhase_AabbGeometry = function() {
 	oimo_collision_geometry_ConvexGeometry.call(this,-1);
 	this.min = new oimo_common_Vec3();
 	this.max = new oimo_common_Vec3();
 };
-oimo_collision_broadphase__$BroadPhase_AabbGeometry.__name__ = true;
 oimo_collision_broadphase__$BroadPhase_AabbGeometry.__super__ = oimo_collision_geometry_ConvexGeometry;
 oimo_collision_broadphase__$BroadPhase_AabbGeometry.prototype = $extend(oimo_collision_geometry_ConvexGeometry.prototype,{
 	computeLocalSupportingVertex: function(dir,out) {
@@ -394,18 +254,14 @@ oimo_collision_broadphase__$BroadPhase_AabbGeometry.prototype = $extend(oimo_col
 		out.y = dir.y > 0 ? this.max.y : this.min.y;
 		out.z = dir.z > 0 ? this.max.z : this.min.z;
 	}
-	,__class__: oimo_collision_broadphase__$BroadPhase_AabbGeometry
 });
 var oimo_collision_broadphase_BroadPhaseProxyCallback = function() {
 };
-oimo_collision_broadphase_BroadPhaseProxyCallback.__name__ = true;
 oimo_collision_broadphase_BroadPhaseProxyCallback.prototype = {
 	process: function(proxy) {
 	}
-	,__class__: oimo_collision_broadphase_BroadPhaseProxyCallback
 };
 var oimo_collision_broadphase_BroadPhaseType = function() { };
-oimo_collision_broadphase_BroadPhaseType.__name__ = true;
 var oimo_collision_broadphase_Proxy = function(userData,id) {
 	this.userData = userData;
 	this._id = id;
@@ -418,7 +274,6 @@ var oimo_collision_broadphase_Proxy = function(userData,id) {
 	this._aabbMaxY = 0;
 	this._aabbMaxZ = 0;
 };
-oimo_collision_broadphase_Proxy.__name__ = true;
 oimo_collision_broadphase_Proxy.prototype = {
 	getId: function() {
 		return this._id;
@@ -441,13 +296,11 @@ oimo_collision_broadphase_Proxy.prototype = {
 		aabb._maxY = this._aabbMaxY;
 		aabb._maxZ = this._aabbMaxZ;
 	}
-	,__class__: oimo_collision_broadphase_Proxy
 };
 var oimo_collision_broadphase_ProxyPair = function() {
 	this._p1 = null;
 	this._p2 = null;
 };
-oimo_collision_broadphase_ProxyPair.__name__ = true;
 oimo_collision_broadphase_ProxyPair.prototype = {
 	getProxy1: function() {
 		return this._p1;
@@ -458,13 +311,11 @@ oimo_collision_broadphase_ProxyPair.prototype = {
 	,getNext: function() {
 		return this._next;
 	}
-	,__class__: oimo_collision_broadphase_ProxyPair
 };
 var oimo_collision_broadphase_bruteforce_BruteForceBroadPhase = function() {
-	oimo_collision_broadphase_BroadPhase.call(this);
+	oimo_collision_broadphase_BroadPhase.call(this,1);
 	this._incremental = false;
 };
-oimo_collision_broadphase_bruteforce_BruteForceBroadPhase.__name__ = true;
 oimo_collision_broadphase_bruteforce_BruteForceBroadPhase.__super__ = oimo_collision_broadphase_BroadPhase;
 oimo_collision_broadphase_bruteforce_BruteForceBroadPhase.prototype = $extend(oimo_collision_broadphase_BroadPhase.prototype,{
 	createProxy: function(userData,aabb) {
@@ -691,17 +542,15 @@ oimo_collision_broadphase_bruteforce_BruteForceBroadPhase.prototype = $extend(oi
 			p = n;
 		}
 	}
-	,__class__: oimo_collision_broadphase_bruteforce_BruteForceBroadPhase
 });
 var oimo_collision_broadphase_bvh_BvhBroadPhase = function() {
-	oimo_collision_broadphase_BroadPhase.call(this);
+	oimo_collision_broadphase_BroadPhase.call(this,2);
 	this._incremental = true;
 	this._tree = new oimo_collision_broadphase_bvh_BvhTree();
 	var this1 = new Array(1024);
 	this.movedProxies = this1;
 	this.numMovedProxies = 0;
 };
-oimo_collision_broadphase_bvh_BvhBroadPhase.__name__ = true;
 oimo_collision_broadphase_bvh_BvhBroadPhase.__super__ = oimo_collision_broadphase_BroadPhase;
 oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_broadphase_BroadPhase.prototype,{
 	collide: function(n1,n2) {
@@ -915,9 +764,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 			_this.leafListLast._nextLeaf = leaf;
 			leaf._prevLeaf = _this.leafListLast;
 			_this.leafListLast = leaf;
-		}
-		if(!(leaf._proxy != null && leaf._proxy._leaf == leaf && leaf._children[0] == null && leaf._children[1] == null && leaf._height == 0)) {
-			throw new Error("assertion error: " + "leaf._proxy != null && leaf._proxy._leaf == leaf && leaf._children[0] == null && leaf._children[1] == null && leaf._height == 0" + " is false");
 		}
 		if(_this._root == null) {
 			_this._root = leaf;
@@ -1191,9 +1037,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 		}
 		leaf._nextLeaf = null;
 		leaf._prevLeaf = null;
-		if(!(leaf._proxy != null && leaf._proxy._leaf == leaf && leaf._children[0] == null && leaf._children[1] == null && leaf._height == 0)) {
-			throw new Error("assertion error: " + "leaf._proxy != null && leaf._proxy._leaf == leaf && leaf._children[0] == null && leaf._children[1] == null && leaf._height == 0" + " is false");
-		}
 		if(_this._root == leaf) {
 			_this._root = null;
 		} else {
@@ -1204,9 +1047,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 				sibling._parent = null;
 				sibling._childIndex = 0;
 				_this._root = sibling;
-				if(!(parent._proxy == null || parent._proxy._leaf == null)) {
-					throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-				}
 				parent._next = null;
 				parent._childIndex = 0;
 				parent._children[0] = null;
@@ -1223,9 +1063,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 				grandParent._children[index] = sibling;
 				sibling._parent = grandParent;
 				sibling._childIndex = index;
-				if(!(parent._proxy == null || parent._proxy._leaf == null)) {
-					throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-				}
 				parent._next = null;
 				parent._childIndex = 0;
 				parent._children[0] = null;
@@ -1417,9 +1254,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 			}
 		}
 		bvhProxy._leaf = null;
-		if(!(leaf._proxy == null || leaf._proxy._leaf == null)) {
-			throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-		}
 		leaf._next = null;
 		leaf._childIndex = 0;
 		leaf._children[0] = null;
@@ -1597,9 +1431,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 				}
 				leaf1._nextLeaf = null;
 				leaf1._prevLeaf = null;
-				if(!(leaf1._proxy != null && leaf1._proxy._leaf == leaf1 && leaf1._children[0] == null && leaf1._children[1] == null && leaf1._height == 0)) {
-					throw new Error("assertion error: " + "leaf._proxy != null && leaf._proxy._leaf == leaf && leaf._children[0] == null && leaf._children[1] == null && leaf._height == 0" + " is false");
-				}
 				if(_this1._root == leaf1) {
 					_this1._root = null;
 				} else {
@@ -1610,9 +1441,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 						sibling._parent = null;
 						sibling._childIndex = 0;
 						_this1._root = sibling;
-						if(!(parent._proxy == null || parent._proxy._leaf == null)) {
-							throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-						}
 						parent._next = null;
 						parent._childIndex = 0;
 						parent._children[0] = null;
@@ -1629,9 +1457,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 						grandParent._children[index] = sibling;
 						sibling._parent = grandParent;
 						sibling._childIndex = index;
-						if(!(parent._proxy == null || parent._proxy._leaf == null)) {
-							throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-						}
 						parent._next = null;
 						parent._childIndex = 0;
 						parent._children[0] = null;
@@ -1823,9 +1648,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 					}
 				}
 				p1._leaf = null;
-				if(!(leaf1._proxy == null || leaf1._proxy._leaf == null)) {
-					throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-				}
 				leaf1._next = null;
 				leaf1._childIndex = 0;
 				leaf1._children[0] = null;
@@ -1861,9 +1683,6 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 					_this2.leafListLast._nextLeaf = leaf2;
 					leaf2._prevLeaf = _this2.leafListLast;
 					_this2.leafListLast = leaf2;
-				}
-				if(!(leaf2._proxy != null && leaf2._proxy._leaf == leaf2 && leaf2._children[0] == null && leaf2._children[1] == null && leaf2._height == 0)) {
-					throw new Error("assertion error: " + "leaf._proxy != null && leaf._proxy._leaf == leaf && leaf._children[0] == null && leaf._children[1] == null && leaf._height == 0" + " is false");
 				}
 				if(_this2._root == null) {
 					_this2._root = leaf2;
@@ -2129,10 +1948,8 @@ oimo_collision_broadphase_bvh_BvhBroadPhase.prototype = $extend(oimo_collision_b
 	,getTreeBalance: function() {
 		return this._tree._getBalance();
 	}
-	,__class__: oimo_collision_broadphase_bvh_BvhBroadPhase
 });
 var oimo_collision_broadphase_bvh_BvhInsertionStrategy = function() { };
-oimo_collision_broadphase_bvh_BvhInsertionStrategy.__name__ = true;
 var oimo_collision_broadphase_bvh_BvhNode = function() {
 	this._next = null;
 	this._prevLeaf = null;
@@ -2150,25 +1967,18 @@ var oimo_collision_broadphase_bvh_BvhNode = function() {
 	this._aabbMaxY = 0;
 	this._aabbMaxZ = 0;
 };
-oimo_collision_broadphase_bvh_BvhNode.__name__ = true;
-oimo_collision_broadphase_bvh_BvhNode.prototype = {
-	__class__: oimo_collision_broadphase_bvh_BvhNode
-};
 var oimo_collision_broadphase_bvh_BvhProxy = function(userData,id) {
 	oimo_collision_broadphase_Proxy.call(this,userData,id);
 	this._leaf = null;
 	this._moved = false;
 };
-oimo_collision_broadphase_bvh_BvhProxy.__name__ = true;
 oimo_collision_broadphase_bvh_BvhProxy.__super__ = oimo_collision_broadphase_Proxy;
 oimo_collision_broadphase_bvh_BvhProxy.prototype = $extend(oimo_collision_broadphase_Proxy.prototype,{
-	__class__: oimo_collision_broadphase_bvh_BvhProxy
 });
 var oimo_collision_broadphase_bvh_BvhStrategy = function() {
 	this._insertionStrategy = 0;
 	this._balancingEnabled = false;
 };
-oimo_collision_broadphase_bvh_BvhStrategy.__name__ = true;
 oimo_collision_broadphase_bvh_BvhStrategy.prototype = {
 	_decideInsertion: function(currentNode,leaf) {
 		var _g = this._insertionStrategy;
@@ -2461,7 +2271,6 @@ oimo_collision_broadphase_bvh_BvhStrategy.prototype = {
 		}
 		return l;
 	}
-	,__class__: oimo_collision_broadphase_bvh_BvhStrategy
 };
 var oimo_collision_broadphase_bvh_BvhTree = function() {
 	this._root = null;
@@ -2473,7 +2282,6 @@ var oimo_collision_broadphase_bvh_BvhTree = function() {
 	var this1 = new Array(1024);
 	this.tmp = this1;
 };
-oimo_collision_broadphase_bvh_BvhTree.__name__ = true;
 oimo_collision_broadphase_bvh_BvhTree.prototype = {
 	_print: function(root,indent) {
 		if(indent == null) {
@@ -2548,9 +2356,6 @@ oimo_collision_broadphase_bvh_BvhTree.prototype = {
 			root._nextLeaf = null;
 			root._prevLeaf = null;
 			root._proxy._leaf = null;
-			if(!(root._proxy == null || root._proxy._leaf == null)) {
-				throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-			}
 			root._next = null;
 			root._childIndex = 0;
 			root._children[0] = null;
@@ -2565,9 +2370,6 @@ oimo_collision_broadphase_bvh_BvhTree.prototype = {
 		}
 		this.deleteRecursive(root._children[0]);
 		this.deleteRecursive(root._children[1]);
-		if(!(root._proxy == null || root._proxy._leaf == null)) {
-			throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-		}
 		root._next = null;
 		root._childIndex = 0;
 		root._children[0] = null;
@@ -2587,9 +2389,6 @@ oimo_collision_broadphase_bvh_BvhTree.prototype = {
 		}
 		this.decomposeRecursive(root._children[0]);
 		this.decomposeRecursive(root._children[1]);
-		if(!(root._proxy == null || root._proxy._leaf == null)) {
-			throw new Error("assertion error: " + "node._proxy == null || node._proxy._leaf == null" + " is false");
-		}
 		root._next = null;
 		root._childIndex = 0;
 		root._children[0] = null;
@@ -2603,9 +2402,6 @@ oimo_collision_broadphase_bvh_BvhTree.prototype = {
 	}
 	,buildTopDownRecursive: function(leaves,from,until) {
 		var num = until - from;
-		if(num <= 0) {
-			throw new Error("assertion error: " + "num > 0" + " is false");
-		}
 		if(num == 1) {
 			var leaf = leaves[from];
 			var proxy = leaf._proxy;
@@ -2657,7 +2453,6 @@ oimo_collision_broadphase_bvh_BvhTree.prototype = {
 		}
 		return balance + this.getBalanceRecursive(root._children[0]) + this.getBalanceRecursive(root._children[1]);
 	}
-	,__class__: oimo_collision_broadphase_bvh_BvhTree
 };
 var oimo_collision_geometry_Aabb = function() {
 	this._minX = 0;
@@ -2667,7 +2462,6 @@ var oimo_collision_geometry_Aabb = function() {
 	this._maxY = 0;
 	this._maxZ = 0;
 };
-oimo_collision_geometry_Aabb.__name__ = true;
 oimo_collision_geometry_Aabb.prototype = {
 	init: function(min,max) {
 		var v = min;
@@ -2853,7 +2647,6 @@ oimo_collision_geometry_Aabb.prototype = {
 		aabb._maxZ = this._maxZ;
 		return aabb;
 	}
-	,__class__: oimo_collision_geometry_Aabb
 };
 var oimo_collision_geometry_BoxGeometry = function(halfExtents) {
 	oimo_collision_geometry_ConvexGeometry.call(this,1);
@@ -2861,18 +2654,21 @@ var oimo_collision_geometry_BoxGeometry = function(halfExtents) {
 	this._halfExtentsX = v.x;
 	this._halfExtentsY = v.y;
 	this._halfExtentsZ = v.z;
-	this._halfAxisXX = this._halfExtentsX;
+	this._halfAxisXX = halfExtents.x;
 	this._halfAxisXY = 0;
 	this._halfAxisXZ = 0;
 	this._halfAxisYX = 0;
-	this._halfAxisYY = this._halfExtentsY;
+	this._halfAxisYY = halfExtents.y;
 	this._halfAxisYZ = 0;
 	this._halfAxisZX = 0;
 	this._halfAxisZY = 0;
-	this._halfAxisZZ = this._halfExtentsZ;
+	this._halfAxisZZ = halfExtents.z;
 	this._updateMass();
+	var minHalfExtents = halfExtents.x < halfExtents.y ? halfExtents.z < halfExtents.x ? halfExtents.z : halfExtents.x : halfExtents.z < halfExtents.y ? halfExtents.z : halfExtents.y;
+	if(this._gjkMargin > minHalfExtents * 0.2) {
+		this._gjkMargin = minHalfExtents * 0.2;
+	}
 };
-oimo_collision_geometry_BoxGeometry.__name__ = true;
 oimo_collision_geometry_BoxGeometry.__super__ = oimo_collision_geometry_ConvexGeometry;
 oimo_collision_geometry_BoxGeometry.prototype = $extend(oimo_collision_geometry_ConvexGeometry.prototype,{
 	getHalfExtents: function() {
@@ -3116,7 +2912,6 @@ oimo_collision_geometry_BoxGeometry.prototype = $extend(oimo_collision_geometry_
 		hit.fraction = min;
 		return true;
 	}
-	,__class__: oimo_collision_geometry_BoxGeometry
 });
 var oimo_collision_geometry_CapsuleGeometry = function(radius,halfHeight) {
 	oimo_collision_geometry_ConvexGeometry.call(this,4);
@@ -3125,7 +2920,6 @@ var oimo_collision_geometry_CapsuleGeometry = function(radius,halfHeight) {
 	this._gjkMargin = this._radius;
 	this._updateMass();
 };
-oimo_collision_geometry_CapsuleGeometry.__name__ = true;
 oimo_collision_geometry_CapsuleGeometry.__super__ = oimo_collision_geometry_ConvexGeometry;
 oimo_collision_geometry_CapsuleGeometry.prototype = $extend(oimo_collision_geometry_ConvexGeometry.prototype,{
 	getRadius: function() {
@@ -3313,7 +3107,6 @@ oimo_collision_geometry_CapsuleGeometry.prototype = $extend(oimo_collision_geome
 		hit.fraction = t1;
 		return true;
 	}
-	,__class__: oimo_collision_geometry_CapsuleGeometry
 });
 var oimo_collision_geometry_ConeGeometry = function(radius,halfHeight) {
 	oimo_collision_geometry_ConvexGeometry.call(this,3);
@@ -3323,7 +3116,6 @@ var oimo_collision_geometry_ConeGeometry = function(radius,halfHeight) {
 	this.cosTheta = 2 * halfHeight / Math.sqrt(radius * radius + 4 * halfHeight * halfHeight);
 	this._updateMass();
 };
-oimo_collision_geometry_ConeGeometry.__name__ = true;
 oimo_collision_geometry_ConeGeometry.__super__ = oimo_collision_geometry_ConvexGeometry;
 oimo_collision_geometry_ConeGeometry.prototype = $extend(oimo_collision_geometry_ConvexGeometry.prototype,{
 	getRadius: function() {
@@ -3583,7 +3375,6 @@ oimo_collision_geometry_ConeGeometry.prototype = $extend(oimo_collision_geometry
 		hit.fraction = min;
 		return true;
 	}
-	,__class__: oimo_collision_geometry_ConeGeometry
 });
 var oimo_collision_geometry_ConvexHullGeometry = function(vertices) {
 	oimo_collision_geometry_ConvexGeometry.call(this,5);
@@ -3604,7 +3395,6 @@ var oimo_collision_geometry_ConvexHullGeometry = function(vertices) {
 	this._useGjkRayCast = true;
 	this._updateMass();
 };
-oimo_collision_geometry_ConvexHullGeometry.__name__ = true;
 oimo_collision_geometry_ConvexHullGeometry.__super__ = oimo_collision_geometry_ConvexGeometry;
 oimo_collision_geometry_ConvexHullGeometry.prototype = $extend(oimo_collision_geometry_ConvexGeometry.prototype,{
 	getVertices: function() {
@@ -3768,7 +3558,6 @@ oimo_collision_geometry_ConvexHullGeometry.prototype = $extend(oimo_collision_ge
 		out.y = v.y;
 		out.z = v.z;
 	}
-	,__class__: oimo_collision_geometry_ConvexHullGeometry
 });
 var oimo_collision_geometry_CylinderGeometry = function(radius,halfHeight) {
 	oimo_collision_geometry_ConvexGeometry.call(this,2);
@@ -3776,7 +3565,6 @@ var oimo_collision_geometry_CylinderGeometry = function(radius,halfHeight) {
 	this._halfHeight = halfHeight;
 	this._updateMass();
 };
-oimo_collision_geometry_CylinderGeometry.__name__ = true;
 oimo_collision_geometry_CylinderGeometry.__super__ = oimo_collision_geometry_ConvexGeometry;
 oimo_collision_geometry_CylinderGeometry.prototype = $extend(oimo_collision_geometry_ConvexGeometry.prototype,{
 	getRadius: function() {
@@ -3959,18 +3747,12 @@ oimo_collision_geometry_CylinderGeometry.prototype = $extend(oimo_collision_geom
 		hit.fraction = min;
 		return true;
 	}
-	,__class__: oimo_collision_geometry_CylinderGeometry
 });
 var oimo_collision_geometry_GeometryType = function() { };
-oimo_collision_geometry_GeometryType.__name__ = true;
 var oimo_collision_geometry_RayCastHit = function() {
 	this.position = new oimo_common_Vec3();
 	this.normal = new oimo_common_Vec3();
 	this.fraction = 0;
-};
-oimo_collision_geometry_RayCastHit.__name__ = true;
-oimo_collision_geometry_RayCastHit.prototype = {
-	__class__: oimo_collision_geometry_RayCastHit
 };
 var oimo_collision_geometry_SphereGeometry = function(radius) {
 	oimo_collision_geometry_ConvexGeometry.call(this,0);
@@ -3978,7 +3760,6 @@ var oimo_collision_geometry_SphereGeometry = function(radius) {
 	this._gjkMargin = this._radius;
 	this._updateMass();
 };
-oimo_collision_geometry_SphereGeometry.__name__ = true;
 oimo_collision_geometry_SphereGeometry.__super__ = oimo_collision_geometry_ConvexGeometry;
 oimo_collision_geometry_SphereGeometry.prototype = $extend(oimo_collision_geometry_ConvexGeometry.prototype,{
 	getRadius: function() {
@@ -4062,7 +3843,6 @@ oimo_collision_geometry_SphereGeometry.prototype = $extend(oimo_collision_geomet
 		hit.fraction = t;
 		return true;
 	}
-	,__class__: oimo_collision_geometry_SphereGeometry
 });
 var oimo_collision_narrowphase_CollisionMatrix = function() {
 	var this1 = new Array(8);
@@ -4088,7 +3868,7 @@ var oimo_collision_narrowphase_CollisionMatrix = function() {
 	this.detectors[sp][ca] = new oimo_collision_narrowphase_detector_SphereCapsuleDetector(false);
 	this.detectors[sp][ch] = gjkEpaDetector;
 	this.detectors[bo][sp] = new oimo_collision_narrowphase_detector_SphereBoxDetector(true);
-	this.detectors[bo][bo] = gjkEpaDetector;
+	this.detectors[bo][bo] = new oimo_collision_narrowphase_detector_BoxBoxDetector();
 	this.detectors[bo][cy] = gjkEpaDetector;
 	this.detectors[bo][co] = gjkEpaDetector;
 	this.detectors[bo][ca] = gjkEpaDetector;
@@ -4118,12 +3898,10 @@ var oimo_collision_narrowphase_CollisionMatrix = function() {
 	this.detectors[ch][ca] = gjkEpaDetector;
 	this.detectors[ch][ch] = gjkEpaDetector;
 };
-oimo_collision_narrowphase_CollisionMatrix.__name__ = true;
 oimo_collision_narrowphase_CollisionMatrix.prototype = {
 	getDetector: function(geomType1,geomType2) {
 		return this.detectors[geomType1][geomType2];
 	}
-	,__class__: oimo_collision_narrowphase_CollisionMatrix
 };
 var oimo_collision_narrowphase_DetectorResult = function() {
 	this.numPoints = 0;
@@ -4139,7 +3917,6 @@ var oimo_collision_narrowphase_DetectorResult = function() {
 		this.points[i] = new oimo_collision_narrowphase_DetectorResultPoint();
 	}
 };
-oimo_collision_narrowphase_DetectorResult.__name__ = true;
 oimo_collision_narrowphase_DetectorResult.prototype = {
 	getMaxDepth: function() {
 		var max = 0;
@@ -4167,7 +3944,6 @@ oimo_collision_narrowphase_DetectorResult.prototype = {
 		}
 		this.normal.zero();
 	}
-	,__class__: oimo_collision_narrowphase_DetectorResult
 };
 var oimo_collision_narrowphase_DetectorResultPoint = function() {
 	this.position1 = new oimo_common_Vec3();
@@ -4175,25 +3951,9 @@ var oimo_collision_narrowphase_DetectorResultPoint = function() {
 	this.depth = 0;
 	this.id = 0;
 };
-oimo_collision_narrowphase_DetectorResultPoint.__name__ = true;
-oimo_collision_narrowphase_DetectorResultPoint.prototype = {
-	__class__: oimo_collision_narrowphase_DetectorResultPoint
-};
-var oimo_collision_narrowphase_detector_CachedDetectorData = function() {
-};
-oimo_collision_narrowphase_detector_CachedDetectorData.__name__ = true;
-oimo_collision_narrowphase_detector_CachedDetectorData.prototype = {
-	_clear: function() {
-		if(this._gjkCache != null) {
-			this._gjkCache.clear();
-		}
-	}
-	,__class__: oimo_collision_narrowphase_detector_CachedDetectorData
-};
 var oimo_collision_narrowphase_detector_Detector = function(swapped) {
 	this.swapped = swapped;
 };
-oimo_collision_narrowphase_detector_Detector.__name__ = true;
 oimo_collision_narrowphase_detector_Detector.prototype = {
 	setNormal: function(result,nX,nY,nZ) {
 		var v = result.normal;
@@ -4255,12 +4015,1792 @@ oimo_collision_narrowphase_detector_Detector.prototype = {
 			this.detectImpl(result,geom1,geom2,transform1,transform2,cachedData);
 		}
 	}
-	,__class__: oimo_collision_narrowphase_detector_Detector
+};
+var oimo_collision_narrowphase_detector_BoxBoxDetector = function() {
+	oimo_collision_narrowphase_detector_Detector.call(this,false);
+	this.clipper = new oimo_collision_narrowphase_detector__$BoxBoxDetector_FaceClipper();
+};
+oimo_collision_narrowphase_detector_BoxBoxDetector.__super__ = oimo_collision_narrowphase_detector_Detector;
+oimo_collision_narrowphase_detector_BoxBoxDetector.prototype = $extend(oimo_collision_narrowphase_detector_Detector.prototype,{
+	detectImpl: function(result,geom1,geom2,tf1,tf2,cachedData) {
+		var b1 = geom1;
+		var b2 = geom2;
+		result.incremental = false;
+		var c1;
+		var c1X;
+		var c1Y;
+		var c1Z;
+		var c2;
+		var c2X;
+		var c2Y;
+		var c2Z;
+		var c12;
+		var c12X;
+		var c12Y;
+		var c12Z;
+		c1X = tf1._positionX;
+		c1Y = tf1._positionY;
+		c1Z = tf1._positionZ;
+		c2X = tf2._positionX;
+		c2Y = tf2._positionY;
+		c2Z = tf2._positionZ;
+		c12X = c2X - c1X;
+		c12Y = c2Y - c1Y;
+		c12Z = c2Z - c1Z;
+		var x1;
+		var x1X;
+		var x1Y;
+		var x1Z;
+		var y1;
+		var y1X;
+		var y1Y;
+		var y1Z;
+		var z1;
+		var z1X;
+		var z1Y;
+		var z1Z;
+		var x2;
+		var x2X;
+		var x2Y;
+		var x2Z;
+		var y2;
+		var y2X;
+		var y2Y;
+		var y2Z;
+		var z2;
+		var z2X;
+		var z2Y;
+		var z2Z;
+		x1X = tf1._rotation00;
+		x1Y = tf1._rotation10;
+		x1Z = tf1._rotation20;
+		y1X = tf1._rotation01;
+		y1Y = tf1._rotation11;
+		y1Z = tf1._rotation21;
+		z1X = tf1._rotation02;
+		z1Y = tf1._rotation12;
+		z1Z = tf1._rotation22;
+		x2X = tf2._rotation00;
+		x2Y = tf2._rotation10;
+		x2Z = tf2._rotation20;
+		y2X = tf2._rotation01;
+		y2Y = tf2._rotation11;
+		y2Z = tf2._rotation21;
+		z2X = tf2._rotation02;
+		z2Y = tf2._rotation12;
+		z2Z = tf2._rotation22;
+		var w1 = b1._halfExtentsX;
+		var h1 = b1._halfExtentsY;
+		var d1 = b1._halfExtentsZ;
+		var w2 = b2._halfExtentsX;
+		var h2 = b2._halfExtentsY;
+		var d2 = b2._halfExtentsZ;
+		var sx1;
+		var sx1X;
+		var sx1Y;
+		var sx1Z;
+		var sy1;
+		var sy1X;
+		var sy1Y;
+		var sy1Z;
+		var sz1;
+		var sz1X;
+		var sz1Y;
+		var sz1Z;
+		var sx2;
+		var sx2X;
+		var sx2Y;
+		var sx2Z;
+		var sy2;
+		var sy2X;
+		var sy2Y;
+		var sy2Z;
+		var sz2;
+		var sz2X;
+		var sz2Y;
+		var sz2Z;
+		sx1X = x1X * w1;
+		sx1Y = x1Y * w1;
+		sx1Z = x1Z * w1;
+		sy1X = y1X * h1;
+		sy1Y = y1Y * h1;
+		sy1Z = y1Z * h1;
+		sz1X = z1X * d1;
+		sz1Y = z1Y * d1;
+		sz1Z = z1Z * d1;
+		sx2X = x2X * w2;
+		sx2Y = x2Y * w2;
+		sx2Z = x2Z * w2;
+		sy2X = y2X * h2;
+		sy2Y = y2Y * h2;
+		sy2Z = y2Z * h2;
+		sz2X = z2X * d2;
+		sz2Y = z2Y * d2;
+		sz2Z = z2Z * d2;
+		var projSum;
+		var projC12Abs;
+		var mDepth = 1.0 / 0.0;
+		var mId = -1;
+		var mSign = 0;
+		var mAxis;
+		var mAxisX;
+		var mAxisY;
+		var mAxisZ;
+		mAxisX = 0;
+		mAxisY = 0;
+		mAxisZ = 0;
+		var proj1 = w1;
+		var dx = x1X * sx2X + x1Y * sx2Y + x1Z * sx2Z;
+		var dy = x1X * sy2X + x1Y * sy2Y + x1Z * sy2Z;
+		var dz = x1X * sz2X + x1Y * sz2Y + x1Z * sz2Z;
+		if(dx < 0) {
+			dx = -dx;
+		}
+		if(dy < 0) {
+			dy = -dy;
+		}
+		if(dz < 0) {
+			dz = -dz;
+		}
+		var proj2 = dx + dy + dz;
+		var projC12 = x1X * c12X + x1Y * c12Y + x1Z * c12Z;
+		var sum = proj1 + proj2;
+		var neg = projC12 < 0;
+		var abs = neg ? -projC12 : projC12;
+		if(abs < sum) {
+			var depth = sum - abs;
+			if(depth < mDepth) {
+				mDepth = depth;
+				mId = 0;
+				mAxisX = x1X;
+				mAxisY = x1Y;
+				mAxisZ = x1Z;
+				mSign = neg ? -1 : 1;
+			}
+		} else {
+			return;
+		}
+		proj1 = h1;
+		var dx1 = y1X * sx2X + y1Y * sx2Y + y1Z * sx2Z;
+		var dy1 = y1X * sy2X + y1Y * sy2Y + y1Z * sy2Z;
+		var dz1 = y1X * sz2X + y1Y * sz2Y + y1Z * sz2Z;
+		if(dx1 < 0) {
+			dx1 = -dx1;
+		}
+		if(dy1 < 0) {
+			dy1 = -dy1;
+		}
+		if(dz1 < 0) {
+			dz1 = -dz1;
+		}
+		proj2 = dx1 + dy1 + dz1;
+		projC12 = y1X * c12X + y1Y * c12Y + y1Z * c12Z;
+		var sum1 = proj1 + proj2;
+		var neg1 = projC12 < 0;
+		var abs1 = neg1 ? -projC12 : projC12;
+		if(abs1 < sum1) {
+			var depth1 = sum1 - abs1;
+			if(depth1 < mDepth) {
+				mDepth = depth1;
+				mId = 1;
+				mAxisX = y1X;
+				mAxisY = y1Y;
+				mAxisZ = y1Z;
+				mSign = neg1 ? -1 : 1;
+			}
+		} else {
+			return;
+		}
+		proj1 = d1;
+		var dx2 = z1X * sx2X + z1Y * sx2Y + z1Z * sx2Z;
+		var dy2 = z1X * sy2X + z1Y * sy2Y + z1Z * sy2Z;
+		var dz2 = z1X * sz2X + z1Y * sz2Y + z1Z * sz2Z;
+		if(dx2 < 0) {
+			dx2 = -dx2;
+		}
+		if(dy2 < 0) {
+			dy2 = -dy2;
+		}
+		if(dz2 < 0) {
+			dz2 = -dz2;
+		}
+		proj2 = dx2 + dy2 + dz2;
+		projC12 = z1X * c12X + z1Y * c12Y + z1Z * c12Z;
+		var sum2 = proj1 + proj2;
+		var neg2 = projC12 < 0;
+		var abs2 = neg2 ? -projC12 : projC12;
+		if(abs2 < sum2) {
+			var depth2 = sum2 - abs2;
+			if(depth2 < mDepth) {
+				mDepth = depth2;
+				mId = 2;
+				mAxisX = z1X;
+				mAxisY = z1Y;
+				mAxisZ = z1Z;
+				mSign = neg2 ? -1 : 1;
+			}
+		} else {
+			return;
+		}
+		if(mDepth > oimo_common_Setting.linearSlop) {
+			mDepth -= oimo_common_Setting.linearSlop;
+		} else {
+			mDepth = 0;
+		}
+		var dx3 = x2X * sx1X + x2Y * sx1Y + x2Z * sx1Z;
+		var dy3 = x2X * sy1X + x2Y * sy1Y + x2Z * sy1Z;
+		var dz3 = x2X * sz1X + x2Y * sz1Y + x2Z * sz1Z;
+		if(dx3 < 0) {
+			dx3 = -dx3;
+		}
+		if(dy3 < 0) {
+			dy3 = -dy3;
+		}
+		if(dz3 < 0) {
+			dz3 = -dz3;
+		}
+		proj1 = dx3 + dy3 + dz3;
+		proj2 = w2;
+		projC12 = x2X * c12X + x2Y * c12Y + x2Z * c12Z;
+		var sum3 = proj1 + proj2;
+		var neg3 = projC12 < 0;
+		var abs3 = neg3 ? -projC12 : projC12;
+		if(abs3 < sum3) {
+			var depth3 = sum3 - abs3;
+			if(depth3 < mDepth) {
+				mDepth = depth3;
+				mId = 3;
+				mAxisX = x2X;
+				mAxisY = x2Y;
+				mAxisZ = x2Z;
+				mSign = neg3 ? -1 : 1;
+			}
+		} else {
+			return;
+		}
+		var dx4 = y2X * sx1X + y2Y * sx1Y + y2Z * sx1Z;
+		var dy4 = y2X * sy1X + y2Y * sy1Y + y2Z * sy1Z;
+		var dz4 = y2X * sz1X + y2Y * sz1Y + y2Z * sz1Z;
+		if(dx4 < 0) {
+			dx4 = -dx4;
+		}
+		if(dy4 < 0) {
+			dy4 = -dy4;
+		}
+		if(dz4 < 0) {
+			dz4 = -dz4;
+		}
+		proj1 = dx4 + dy4 + dz4;
+		proj2 = h2;
+		projC12 = y2X * c12X + y2Y * c12Y + y2Z * c12Z;
+		var sum4 = proj1 + proj2;
+		var neg4 = projC12 < 0;
+		var abs4 = neg4 ? -projC12 : projC12;
+		if(abs4 < sum4) {
+			var depth4 = sum4 - abs4;
+			if(depth4 < mDepth) {
+				mDepth = depth4;
+				mId = 4;
+				mAxisX = y2X;
+				mAxisY = y2Y;
+				mAxisZ = y2Z;
+				mSign = neg4 ? -1 : 1;
+			}
+		} else {
+			return;
+		}
+		var dx5 = z2X * sx1X + z2Y * sx1Y + z2Z * sx1Z;
+		var dy5 = z2X * sy1X + z2Y * sy1Y + z2Z * sy1Z;
+		var dz5 = z2X * sz1X + z2Y * sz1Y + z2Z * sz1Z;
+		if(dx5 < 0) {
+			dx5 = -dx5;
+		}
+		if(dy5 < 0) {
+			dy5 = -dy5;
+		}
+		if(dz5 < 0) {
+			dz5 = -dz5;
+		}
+		proj1 = dx5 + dy5 + dz5;
+		proj2 = d2;
+		projC12 = z2X * c12X + z2Y * c12Y + z2Z * c12Z;
+		var sum5 = proj1 + proj2;
+		var neg5 = projC12 < 0;
+		var abs5 = neg5 ? -projC12 : projC12;
+		if(abs5 < sum5) {
+			var depth5 = sum5 - abs5;
+			if(depth5 < mDepth) {
+				mDepth = depth5;
+				mId = 5;
+				mAxisX = z2X;
+				mAxisY = z2Y;
+				mAxisZ = z2Z;
+				mSign = neg5 ? -1 : 1;
+			}
+		} else {
+			return;
+		}
+		if(mDepth > oimo_common_Setting.linearSlop) {
+			mDepth -= oimo_common_Setting.linearSlop;
+		} else {
+			mDepth = 0;
+		}
+		var edgeAxis;
+		var edgeAxisX;
+		var edgeAxisY;
+		var edgeAxisZ;
+		edgeAxisX = x1Y * x2Z - x1Z * x2Y;
+		edgeAxisY = x1Z * x2X - x1X * x2Z;
+		edgeAxisZ = x1X * x2Y - x1Y * x2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l > 0) {
+				l = 1 / Math.sqrt(l);
+			}
+			edgeAxisX *= l;
+			edgeAxisY *= l;
+			edgeAxisZ *= l;
+			var dx6 = edgeAxisX * sy1X + edgeAxisY * sy1Y + edgeAxisZ * sy1Z;
+			var dy6 = edgeAxisX * sz1X + edgeAxisY * sz1Y + edgeAxisZ * sz1Z;
+			if(dx6 < 0) {
+				dx6 = -dx6;
+			}
+			if(dy6 < 0) {
+				dy6 = -dy6;
+			}
+			proj1 = dx6 + dy6;
+			var dx7 = edgeAxisX * sy2X + edgeAxisY * sy2Y + edgeAxisZ * sy2Z;
+			var dy7 = edgeAxisX * sz2X + edgeAxisY * sz2Y + edgeAxisZ * sz2Z;
+			if(dx7 < 0) {
+				dx7 = -dx7;
+			}
+			if(dy7 < 0) {
+				dy7 = -dy7;
+			}
+			proj2 = dx7 + dy7;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum6 = proj1 + proj2;
+			var neg6 = projC12 < 0;
+			var abs6 = neg6 ? -projC12 : projC12;
+			if(abs6 < sum6) {
+				var depth6 = sum6 - abs6;
+				if(depth6 < mDepth) {
+					mDepth = depth6;
+					mId = 6;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg6 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		edgeAxisX = x1Y * y2Z - x1Z * y2Y;
+		edgeAxisY = x1Z * y2X - x1X * y2Z;
+		edgeAxisZ = x1X * y2Y - x1Y * y2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l1 = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l1 > 0) {
+				l1 = 1 / Math.sqrt(l1);
+			}
+			edgeAxisX *= l1;
+			edgeAxisY *= l1;
+			edgeAxisZ *= l1;
+			var dx8 = edgeAxisX * sy1X + edgeAxisY * sy1Y + edgeAxisZ * sy1Z;
+			var dy8 = edgeAxisX * sz1X + edgeAxisY * sz1Y + edgeAxisZ * sz1Z;
+			if(dx8 < 0) {
+				dx8 = -dx8;
+			}
+			if(dy8 < 0) {
+				dy8 = -dy8;
+			}
+			proj1 = dx8 + dy8;
+			var dx9 = edgeAxisX * sx2X + edgeAxisY * sx2Y + edgeAxisZ * sx2Z;
+			var dy9 = edgeAxisX * sz2X + edgeAxisY * sz2Y + edgeAxisZ * sz2Z;
+			if(dx9 < 0) {
+				dx9 = -dx9;
+			}
+			if(dy9 < 0) {
+				dy9 = -dy9;
+			}
+			proj2 = dx9 + dy9;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum7 = proj1 + proj2;
+			var neg7 = projC12 < 0;
+			var abs7 = neg7 ? -projC12 : projC12;
+			if(abs7 < sum7) {
+				var depth7 = sum7 - abs7;
+				if(depth7 < mDepth) {
+					mDepth = depth7;
+					mId = 7;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg7 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		edgeAxisX = x1Y * z2Z - x1Z * z2Y;
+		edgeAxisY = x1Z * z2X - x1X * z2Z;
+		edgeAxisZ = x1X * z2Y - x1Y * z2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l2 = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l2 > 0) {
+				l2 = 1 / Math.sqrt(l2);
+			}
+			edgeAxisX *= l2;
+			edgeAxisY *= l2;
+			edgeAxisZ *= l2;
+			var dx10 = edgeAxisX * sy1X + edgeAxisY * sy1Y + edgeAxisZ * sy1Z;
+			var dy10 = edgeAxisX * sz1X + edgeAxisY * sz1Y + edgeAxisZ * sz1Z;
+			if(dx10 < 0) {
+				dx10 = -dx10;
+			}
+			if(dy10 < 0) {
+				dy10 = -dy10;
+			}
+			proj1 = dx10 + dy10;
+			var dx11 = edgeAxisX * sx2X + edgeAxisY * sx2Y + edgeAxisZ * sx2Z;
+			var dy11 = edgeAxisX * sy2X + edgeAxisY * sy2Y + edgeAxisZ * sy2Z;
+			if(dx11 < 0) {
+				dx11 = -dx11;
+			}
+			if(dy11 < 0) {
+				dy11 = -dy11;
+			}
+			proj2 = dx11 + dy11;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum8 = proj1 + proj2;
+			var neg8 = projC12 < 0;
+			var abs8 = neg8 ? -projC12 : projC12;
+			if(abs8 < sum8) {
+				var depth8 = sum8 - abs8;
+				if(depth8 < mDepth) {
+					mDepth = depth8;
+					mId = 8;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg8 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		edgeAxisX = y1Y * x2Z - y1Z * x2Y;
+		edgeAxisY = y1Z * x2X - y1X * x2Z;
+		edgeAxisZ = y1X * x2Y - y1Y * x2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l3 = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l3 > 0) {
+				l3 = 1 / Math.sqrt(l3);
+			}
+			edgeAxisX *= l3;
+			edgeAxisY *= l3;
+			edgeAxisZ *= l3;
+			var dx12 = edgeAxisX * sx1X + edgeAxisY * sx1Y + edgeAxisZ * sx1Z;
+			var dy12 = edgeAxisX * sz1X + edgeAxisY * sz1Y + edgeAxisZ * sz1Z;
+			if(dx12 < 0) {
+				dx12 = -dx12;
+			}
+			if(dy12 < 0) {
+				dy12 = -dy12;
+			}
+			proj1 = dx12 + dy12;
+			var dx13 = edgeAxisX * sy2X + edgeAxisY * sy2Y + edgeAxisZ * sy2Z;
+			var dy13 = edgeAxisX * sz2X + edgeAxisY * sz2Y + edgeAxisZ * sz2Z;
+			if(dx13 < 0) {
+				dx13 = -dx13;
+			}
+			if(dy13 < 0) {
+				dy13 = -dy13;
+			}
+			proj2 = dx13 + dy13;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum9 = proj1 + proj2;
+			var neg9 = projC12 < 0;
+			var abs9 = neg9 ? -projC12 : projC12;
+			if(abs9 < sum9) {
+				var depth9 = sum9 - abs9;
+				if(depth9 < mDepth) {
+					mDepth = depth9;
+					mId = 9;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg9 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		edgeAxisX = y1Y * y2Z - y1Z * y2Y;
+		edgeAxisY = y1Z * y2X - y1X * y2Z;
+		edgeAxisZ = y1X * y2Y - y1Y * y2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l4 = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l4 > 0) {
+				l4 = 1 / Math.sqrt(l4);
+			}
+			edgeAxisX *= l4;
+			edgeAxisY *= l4;
+			edgeAxisZ *= l4;
+			var dx14 = edgeAxisX * sx1X + edgeAxisY * sx1Y + edgeAxisZ * sx1Z;
+			var dy14 = edgeAxisX * sz1X + edgeAxisY * sz1Y + edgeAxisZ * sz1Z;
+			if(dx14 < 0) {
+				dx14 = -dx14;
+			}
+			if(dy14 < 0) {
+				dy14 = -dy14;
+			}
+			proj1 = dx14 + dy14;
+			var dx15 = edgeAxisX * sx2X + edgeAxisY * sx2Y + edgeAxisZ * sx2Z;
+			var dy15 = edgeAxisX * sz2X + edgeAxisY * sz2Y + edgeAxisZ * sz2Z;
+			if(dx15 < 0) {
+				dx15 = -dx15;
+			}
+			if(dy15 < 0) {
+				dy15 = -dy15;
+			}
+			proj2 = dx15 + dy15;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum10 = proj1 + proj2;
+			var neg10 = projC12 < 0;
+			var abs10 = neg10 ? -projC12 : projC12;
+			if(abs10 < sum10) {
+				var depth10 = sum10 - abs10;
+				if(depth10 < mDepth) {
+					mDepth = depth10;
+					mId = 10;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg10 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		edgeAxisX = y1Y * z2Z - y1Z * z2Y;
+		edgeAxisY = y1Z * z2X - y1X * z2Z;
+		edgeAxisZ = y1X * z2Y - y1Y * z2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l5 = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l5 > 0) {
+				l5 = 1 / Math.sqrt(l5);
+			}
+			edgeAxisX *= l5;
+			edgeAxisY *= l5;
+			edgeAxisZ *= l5;
+			var dx16 = edgeAxisX * sx1X + edgeAxisY * sx1Y + edgeAxisZ * sx1Z;
+			var dy16 = edgeAxisX * sz1X + edgeAxisY * sz1Y + edgeAxisZ * sz1Z;
+			if(dx16 < 0) {
+				dx16 = -dx16;
+			}
+			if(dy16 < 0) {
+				dy16 = -dy16;
+			}
+			proj1 = dx16 + dy16;
+			var dx17 = edgeAxisX * sx2X + edgeAxisY * sx2Y + edgeAxisZ * sx2Z;
+			var dy17 = edgeAxisX * sy2X + edgeAxisY * sy2Y + edgeAxisZ * sy2Z;
+			if(dx17 < 0) {
+				dx17 = -dx17;
+			}
+			if(dy17 < 0) {
+				dy17 = -dy17;
+			}
+			proj2 = dx17 + dy17;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum11 = proj1 + proj2;
+			var neg11 = projC12 < 0;
+			var abs11 = neg11 ? -projC12 : projC12;
+			if(abs11 < sum11) {
+				var depth11 = sum11 - abs11;
+				if(depth11 < mDepth) {
+					mDepth = depth11;
+					mId = 11;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg11 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		edgeAxisX = z1Y * x2Z - z1Z * x2Y;
+		edgeAxisY = z1Z * x2X - z1X * x2Z;
+		edgeAxisZ = z1X * x2Y - z1Y * x2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l6 = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l6 > 0) {
+				l6 = 1 / Math.sqrt(l6);
+			}
+			edgeAxisX *= l6;
+			edgeAxisY *= l6;
+			edgeAxisZ *= l6;
+			var dx18 = edgeAxisX * sx1X + edgeAxisY * sx1Y + edgeAxisZ * sx1Z;
+			var dy18 = edgeAxisX * sy1X + edgeAxisY * sy1Y + edgeAxisZ * sy1Z;
+			if(dx18 < 0) {
+				dx18 = -dx18;
+			}
+			if(dy18 < 0) {
+				dy18 = -dy18;
+			}
+			proj1 = dx18 + dy18;
+			var dx19 = edgeAxisX * sy2X + edgeAxisY * sy2Y + edgeAxisZ * sy2Z;
+			var dy19 = edgeAxisX * sz2X + edgeAxisY * sz2Y + edgeAxisZ * sz2Z;
+			if(dx19 < 0) {
+				dx19 = -dx19;
+			}
+			if(dy19 < 0) {
+				dy19 = -dy19;
+			}
+			proj2 = dx19 + dy19;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum12 = proj1 + proj2;
+			var neg12 = projC12 < 0;
+			var abs12 = neg12 ? -projC12 : projC12;
+			if(abs12 < sum12) {
+				var depth12 = sum12 - abs12;
+				if(depth12 < mDepth) {
+					mDepth = depth12;
+					mId = 12;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg12 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		edgeAxisX = z1Y * y2Z - z1Z * y2Y;
+		edgeAxisY = z1Z * y2X - z1X * y2Z;
+		edgeAxisZ = z1X * y2Y - z1Y * y2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l7 = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l7 > 0) {
+				l7 = 1 / Math.sqrt(l7);
+			}
+			edgeAxisX *= l7;
+			edgeAxisY *= l7;
+			edgeAxisZ *= l7;
+			var dx20 = edgeAxisX * sx1X + edgeAxisY * sx1Y + edgeAxisZ * sx1Z;
+			var dy20 = edgeAxisX * sy1X + edgeAxisY * sy1Y + edgeAxisZ * sy1Z;
+			if(dx20 < 0) {
+				dx20 = -dx20;
+			}
+			if(dy20 < 0) {
+				dy20 = -dy20;
+			}
+			proj1 = dx20 + dy20;
+			var dx21 = edgeAxisX * sx2X + edgeAxisY * sx2Y + edgeAxisZ * sx2Z;
+			var dy21 = edgeAxisX * sz2X + edgeAxisY * sz2Y + edgeAxisZ * sz2Z;
+			if(dx21 < 0) {
+				dx21 = -dx21;
+			}
+			if(dy21 < 0) {
+				dy21 = -dy21;
+			}
+			proj2 = dx21 + dy21;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum13 = proj1 + proj2;
+			var neg13 = projC12 < 0;
+			var abs13 = neg13 ? -projC12 : projC12;
+			if(abs13 < sum13) {
+				var depth13 = sum13 - abs13;
+				if(depth13 < mDepth) {
+					mDepth = depth13;
+					mId = 13;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg13 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		edgeAxisX = z1Y * z2Z - z1Z * z2Y;
+		edgeAxisY = z1Z * z2X - z1X * z2Z;
+		edgeAxisZ = z1X * z2Y - z1Y * z2X;
+		if(!(edgeAxisX == 0 && edgeAxisY == 0 && edgeAxisZ == 0)) {
+			var l8 = edgeAxisX * edgeAxisX + edgeAxisY * edgeAxisY + edgeAxisZ * edgeAxisZ;
+			if(l8 > 0) {
+				l8 = 1 / Math.sqrt(l8);
+			}
+			edgeAxisX *= l8;
+			edgeAxisY *= l8;
+			edgeAxisZ *= l8;
+			var dx22 = edgeAxisX * sx1X + edgeAxisY * sx1Y + edgeAxisZ * sx1Z;
+			var dy22 = edgeAxisX * sy1X + edgeAxisY * sy1Y + edgeAxisZ * sy1Z;
+			if(dx22 < 0) {
+				dx22 = -dx22;
+			}
+			if(dy22 < 0) {
+				dy22 = -dy22;
+			}
+			proj1 = dx22 + dy22;
+			var dx23 = edgeAxisX * sx2X + edgeAxisY * sx2Y + edgeAxisZ * sx2Z;
+			var dy23 = edgeAxisX * sy2X + edgeAxisY * sy2Y + edgeAxisZ * sy2Z;
+			if(dx23 < 0) {
+				dx23 = -dx23;
+			}
+			if(dy23 < 0) {
+				dy23 = -dy23;
+			}
+			proj2 = dx23 + dy23;
+			projC12 = edgeAxisX * c12X + edgeAxisY * c12Y + edgeAxisZ * c12Z;
+			var sum14 = proj1 + proj2;
+			var neg14 = projC12 < 0;
+			var abs14 = neg14 ? -projC12 : projC12;
+			if(abs14 < sum14) {
+				var depth14 = sum14 - abs14;
+				if(depth14 < mDepth) {
+					mDepth = depth14;
+					mId = 14;
+					mAxisX = edgeAxisX;
+					mAxisY = edgeAxisY;
+					mAxisZ = edgeAxisZ;
+					mSign = neg14 ? -1 : 1;
+				}
+			} else {
+				return;
+			}
+		}
+		if(mId >= 6) {
+			mAxisX *= mSign;
+			mAxisY *= mSign;
+			mAxisZ *= mSign;
+			var id1 = (mId - 6) / 3 | 0;
+			var id2 = mId - 6 - id1 * 3;
+			var p1;
+			var p1X;
+			var p1Y;
+			var p1Z;
+			var p2;
+			var p2X;
+			var p2Y;
+			var p2Z;
+			var d11;
+			var d1X;
+			var d1Y;
+			var d1Z;
+			var d21;
+			var d2X;
+			var d2Y;
+			var d2Z;
+			switch(id1) {
+			case 0:
+				d1X = x1X;
+				d1Y = x1Y;
+				d1Z = x1Z;
+				var signX = sy1X * mAxisX + sy1Y * mAxisY + sy1Z * mAxisZ > 0;
+				var signY = sz1X * mAxisX + sz1Y * mAxisY + sz1Z * mAxisZ > 0;
+				if(signX) {
+					if(signY) {
+						p1X = sy1X + sz1X;
+						p1Y = sy1Y + sz1Y;
+						p1Z = sy1Z + sz1Z;
+					} else {
+						p1X = sy1X - sz1X;
+						p1Y = sy1Y - sz1Y;
+						p1Z = sy1Z - sz1Z;
+					}
+				} else if(signY) {
+					p1X = sz1X - sy1X;
+					p1Y = sz1Y - sy1Y;
+					p1Z = sz1Z - sy1Z;
+				} else {
+					p1X = sy1X + sz1X;
+					p1Y = sy1Y + sz1Y;
+					p1Z = sy1Z + sz1Z;
+					p1X = -p1X;
+					p1Y = -p1Y;
+					p1Z = -p1Z;
+				}
+				break;
+			case 1:
+				d1X = y1X;
+				d1Y = y1Y;
+				d1Z = y1Z;
+				var signX1 = sx1X * mAxisX + sx1Y * mAxisY + sx1Z * mAxisZ > 0;
+				var signY1 = sz1X * mAxisX + sz1Y * mAxisY + sz1Z * mAxisZ > 0;
+				if(signX1) {
+					if(signY1) {
+						p1X = sx1X + sz1X;
+						p1Y = sx1Y + sz1Y;
+						p1Z = sx1Z + sz1Z;
+					} else {
+						p1X = sx1X - sz1X;
+						p1Y = sx1Y - sz1Y;
+						p1Z = sx1Z - sz1Z;
+					}
+				} else if(signY1) {
+					p1X = sz1X - sx1X;
+					p1Y = sz1Y - sx1Y;
+					p1Z = sz1Z - sx1Z;
+				} else {
+					p1X = sx1X + sz1X;
+					p1Y = sx1Y + sz1Y;
+					p1Z = sx1Z + sz1Z;
+					p1X = -p1X;
+					p1Y = -p1Y;
+					p1Z = -p1Z;
+				}
+				break;
+			default:
+				d1X = z1X;
+				d1Y = z1Y;
+				d1Z = z1Z;
+				var signX2 = sx1X * mAxisX + sx1Y * mAxisY + sx1Z * mAxisZ > 0;
+				var signY2 = sy1X * mAxisX + sy1Y * mAxisY + sy1Z * mAxisZ > 0;
+				if(signX2) {
+					if(signY2) {
+						p1X = sx1X + sy1X;
+						p1Y = sx1Y + sy1Y;
+						p1Z = sx1Z + sy1Z;
+					} else {
+						p1X = sx1X - sy1X;
+						p1Y = sx1Y - sy1Y;
+						p1Z = sx1Z - sy1Z;
+					}
+				} else if(signY2) {
+					p1X = sy1X - sx1X;
+					p1Y = sy1Y - sx1Y;
+					p1Z = sy1Z - sx1Z;
+				} else {
+					p1X = sx1X + sy1X;
+					p1Y = sx1Y + sy1Y;
+					p1Z = sx1Z + sy1Z;
+					p1X = -p1X;
+					p1Y = -p1Y;
+					p1Z = -p1Z;
+				}
+			}
+			p1X = c1X + p1X;
+			p1Y = c1Y + p1Y;
+			p1Z = c1Z + p1Z;
+			switch(id2) {
+			case 0:
+				d2X = x2X;
+				d2Y = x2Y;
+				d2Z = x2Z;
+				var signX3 = sy2X * mAxisX + sy2Y * mAxisY + sy2Z * mAxisZ > 0;
+				var signY3 = sz2X * mAxisX + sz2Y * mAxisY + sz2Z * mAxisZ > 0;
+				if(signX3) {
+					if(signY3) {
+						p2X = sy2X + sz2X;
+						p2Y = sy2Y + sz2Y;
+						p2Z = sy2Z + sz2Z;
+					} else {
+						p2X = sy2X - sz2X;
+						p2Y = sy2Y - sz2Y;
+						p2Z = sy2Z - sz2Z;
+					}
+				} else if(signY3) {
+					p2X = sz2X - sy2X;
+					p2Y = sz2Y - sy2Y;
+					p2Z = sz2Z - sy2Z;
+				} else {
+					p2X = sy2X + sz2X;
+					p2Y = sy2Y + sz2Y;
+					p2Z = sy2Z + sz2Z;
+					p2X = -p2X;
+					p2Y = -p2Y;
+					p2Z = -p2Z;
+				}
+				break;
+			case 1:
+				d2X = y2X;
+				d2Y = y2Y;
+				d2Z = y2Z;
+				var signX4 = sx2X * mAxisX + sx2Y * mAxisY + sx2Z * mAxisZ > 0;
+				var signY4 = sz2X * mAxisX + sz2Y * mAxisY + sz2Z * mAxisZ > 0;
+				if(signX4) {
+					if(signY4) {
+						p2X = sx2X + sz2X;
+						p2Y = sx2Y + sz2Y;
+						p2Z = sx2Z + sz2Z;
+					} else {
+						p2X = sx2X - sz2X;
+						p2Y = sx2Y - sz2Y;
+						p2Z = sx2Z - sz2Z;
+					}
+				} else if(signY4) {
+					p2X = sz2X - sx2X;
+					p2Y = sz2Y - sx2Y;
+					p2Z = sz2Z - sx2Z;
+				} else {
+					p2X = sx2X + sz2X;
+					p2Y = sx2Y + sz2Y;
+					p2Z = sx2Z + sz2Z;
+					p2X = -p2X;
+					p2Y = -p2Y;
+					p2Z = -p2Z;
+				}
+				break;
+			default:
+				d2X = z2X;
+				d2Y = z2Y;
+				d2Z = z2Z;
+				var signX5 = sx2X * mAxisX + sx2Y * mAxisY + sx2Z * mAxisZ > 0;
+				var signY5 = sy2X * mAxisX + sy2Y * mAxisY + sy2Z * mAxisZ > 0;
+				if(signX5) {
+					if(signY5) {
+						p2X = sx2X + sy2X;
+						p2Y = sx2Y + sy2Y;
+						p2Z = sx2Z + sy2Z;
+					} else {
+						p2X = sx2X - sy2X;
+						p2Y = sx2Y - sy2Y;
+						p2Z = sx2Z - sy2Z;
+					}
+				} else if(signY5) {
+					p2X = sy2X - sx2X;
+					p2Y = sy2Y - sx2Y;
+					p2Z = sy2Z - sx2Z;
+				} else {
+					p2X = sx2X + sy2X;
+					p2Y = sx2Y + sy2Y;
+					p2Z = sx2Z + sy2Z;
+					p2X = -p2X;
+					p2Y = -p2Y;
+					p2Z = -p2Z;
+				}
+			}
+			p2X = c2X - p2X;
+			p2Y = c2Y - p2Y;
+			p2Z = c2Z - p2Z;
+			var r;
+			var rX;
+			var rY;
+			var rZ;
+			rX = p1X - p2X;
+			rY = p1Y - p2Y;
+			rZ = p1Z - p2Z;
+			var dot12 = d1X * d2X + d1Y * d2Y + d1Z * d2Z;
+			var dot1r = d1X * rX + d1Y * rY + d1Z * rZ;
+			var dot2r = d2X * rX + d2Y * rY + d2Z * rZ;
+			var invDet = 1 / (1 - dot12 * dot12);
+			var t1 = (dot12 * dot2r - dot1r) * invDet;
+			var t2 = (dot2r - dot12 * dot1r) * invDet;
+			var cp1;
+			var cp1X;
+			var cp1Y;
+			var cp1Z;
+			var cp2;
+			var cp2X;
+			var cp2Y;
+			var cp2Z;
+			cp1X = p1X + d1X * t1;
+			cp1Y = p1Y + d1Y * t1;
+			cp1Z = p1Z + d1Z * t1;
+			cp2X = p2X + d2X * t2;
+			cp2Y = p2Y + d2Y * t2;
+			cp2Z = p2Z + d2Z * t2;
+			var normal;
+			var normalX;
+			var normalY;
+			var normalZ;
+			normalX = -mAxisX;
+			normalY = -mAxisY;
+			normalZ = -mAxisZ;
+			this.setNormal(result,normalX,normalY,normalZ);
+			this.addPoint(result,cp1X,cp1Y,cp1Z,cp2X,cp2Y,cp2Z,mDepth,4);
+			return;
+		}
+		var tmp;
+		var tmpX;
+		var tmpY;
+		var tmpZ;
+		var swapped;
+		if(mId >= 3) {
+			mSign = -mSign;
+			c12X = -c12X;
+			c12Y = -c12Y;
+			c12Z = -c12Z;
+			var tmp1 = b1;
+			b1 = b2;
+			b2 = tmp1;
+			var tmp2 = w1;
+			w1 = w2;
+			w2 = tmp2;
+			var tmp3 = h1;
+			h1 = h2;
+			h2 = tmp3;
+			var tmp4 = d1;
+			d1 = d2;
+			d2 = tmp4;
+			tmpX = c1X;
+			tmpY = c1Y;
+			tmpZ = c1Z;
+			c1X = c2X;
+			c1Y = c2Y;
+			c1Z = c2Z;
+			c2X = tmpX;
+			c2Y = tmpY;
+			c2Z = tmpZ;
+			tmpX = x1X;
+			tmpY = x1Y;
+			tmpZ = x1Z;
+			x1X = x2X;
+			x1Y = x2Y;
+			x1Z = x2Z;
+			x2X = tmpX;
+			x2Y = tmpY;
+			x2Z = tmpZ;
+			tmpX = y1X;
+			tmpY = y1Y;
+			tmpZ = y1Z;
+			y1X = y2X;
+			y1Y = y2Y;
+			y1Z = y2Z;
+			y2X = tmpX;
+			y2Y = tmpY;
+			y2Z = tmpZ;
+			tmpX = z1X;
+			tmpY = z1Y;
+			tmpZ = z1Z;
+			z1X = z2X;
+			z1Y = z2Y;
+			z1Z = z2Z;
+			z2X = tmpX;
+			z2Y = tmpY;
+			z2Z = tmpZ;
+			tmpX = sx1X;
+			tmpY = sx1Y;
+			tmpZ = sx1Z;
+			sx1X = sx2X;
+			sx1Y = sx2Y;
+			sx1Z = sx2Z;
+			sx2X = tmpX;
+			sx2Y = tmpY;
+			sx2Z = tmpZ;
+			tmpX = sy1X;
+			tmpY = sy1Y;
+			tmpZ = sy1Z;
+			sy1X = sy2X;
+			sy1Y = sy2Y;
+			sy1Z = sy2Z;
+			sy2X = tmpX;
+			sy2Y = tmpY;
+			sy2Z = tmpZ;
+			tmpX = sz1X;
+			tmpY = sz1Y;
+			tmpZ = sz1Z;
+			sz1X = sz2X;
+			sz1Y = sz2Y;
+			sz1Z = sz2Z;
+			sz2X = tmpX;
+			sz2Y = tmpY;
+			sz2Z = tmpZ;
+			mId -= 3;
+			swapped = true;
+		} else {
+			swapped = false;
+		}
+		var refCenter;
+		var refCenterX;
+		var refCenterY;
+		var refCenterZ;
+		var refNormal;
+		var refNormalX;
+		var refNormalY;
+		var refNormalZ;
+		var refX;
+		var refXX;
+		var refXY;
+		var refXZ;
+		var refY;
+		var refYX;
+		var refYY;
+		var refYZ;
+		var refW;
+		var refH;
+		switch(mId) {
+		case 0:
+			refCenterX = sx1X;
+			refCenterY = sx1Y;
+			refCenterZ = sx1Z;
+			refNormalX = x1X;
+			refNormalY = x1Y;
+			refNormalZ = x1Z;
+			refXX = y1X;
+			refXY = y1Y;
+			refXZ = y1Z;
+			refYX = z1X;
+			refYY = z1Y;
+			refYZ = z1Z;
+			refW = h1;
+			refH = d1;
+			break;
+		case 1:
+			refCenterX = sy1X;
+			refCenterY = sy1Y;
+			refCenterZ = sy1Z;
+			refNormalX = y1X;
+			refNormalY = y1Y;
+			refNormalZ = y1Z;
+			refXX = z1X;
+			refXY = z1Y;
+			refXZ = z1Z;
+			refYX = x1X;
+			refYY = x1Y;
+			refYZ = x1Z;
+			refW = d1;
+			refH = w1;
+			break;
+		default:
+			refCenterX = sz1X;
+			refCenterY = sz1Y;
+			refCenterZ = sz1Z;
+			refNormalX = z1X;
+			refNormalY = z1Y;
+			refNormalZ = z1Z;
+			refXX = x1X;
+			refXY = x1Y;
+			refXZ = x1Z;
+			refYX = y1X;
+			refYY = y1Y;
+			refYZ = y1Z;
+			refW = w1;
+			refH = h1;
+		}
+		if(mSign < 0) {
+			refCenterX = -refCenterX;
+			refCenterY = -refCenterY;
+			refCenterZ = -refCenterZ;
+			refNormalX = -refNormalX;
+			refNormalY = -refNormalY;
+			refNormalZ = -refNormalZ;
+			tmpX = refXX;
+			tmpY = refXY;
+			tmpZ = refXZ;
+			refXX = refYX;
+			refXY = refYY;
+			refXZ = refYZ;
+			refYX = tmpX;
+			refYY = tmpY;
+			refYZ = tmpZ;
+			var tmp5 = refW;
+			refW = refH;
+			refH = tmp5;
+		}
+		refCenterX += c1X;
+		refCenterY += c1Y;
+		refCenterZ += c1Z;
+		var minIncDot = 1;
+		var incId = 0;
+		var incDot = refNormalX * x2X + refNormalY * x2Y + refNormalZ * x2Z;
+		if(incDot < minIncDot) {
+			minIncDot = incDot;
+			incId = 0;
+		}
+		if(-incDot < minIncDot) {
+			minIncDot = -incDot;
+			incId = 1;
+		}
+		incDot = refNormalX * y2X + refNormalY * y2Y + refNormalZ * y2Z;
+		if(incDot < minIncDot) {
+			minIncDot = incDot;
+			incId = 2;
+		}
+		if(-incDot < minIncDot) {
+			minIncDot = -incDot;
+			incId = 3;
+		}
+		incDot = refNormalX * z2X + refNormalY * z2Y + refNormalZ * z2Z;
+		if(incDot < minIncDot) {
+			minIncDot = incDot;
+			incId = 4;
+		}
+		if(-incDot < minIncDot) {
+			minIncDot = -incDot;
+			incId = 5;
+		}
+		var incV1;
+		var incV1X;
+		var incV1Y;
+		var incV1Z;
+		var incV2;
+		var incV2X;
+		var incV2Y;
+		var incV2Z;
+		var incV3;
+		var incV3X;
+		var incV3Y;
+		var incV3Z;
+		var incV4;
+		var incV4X;
+		var incV4Y;
+		var incV4Z;
+		switch(incId) {
+		case 0:
+			incV1X = sx2X + sy2X;
+			incV1Y = sx2Y + sy2Y;
+			incV1Z = sx2Z + sy2Z;
+			incV1X += sz2X;
+			incV1Y += sz2Y;
+			incV1Z += sz2Z;
+			incV2X = sx2X - sy2X;
+			incV2Y = sx2Y - sy2Y;
+			incV2Z = sx2Z - sy2Z;
+			incV2X += sz2X;
+			incV2Y += sz2Y;
+			incV2Z += sz2Z;
+			incV3X = sx2X - sy2X;
+			incV3Y = sx2Y - sy2Y;
+			incV3Z = sx2Z - sy2Z;
+			incV3X -= sz2X;
+			incV3Y -= sz2Y;
+			incV3Z -= sz2Z;
+			incV4X = sx2X + sy2X;
+			incV4Y = sx2Y + sy2Y;
+			incV4Z = sx2Z + sy2Z;
+			incV4X -= sz2X;
+			incV4Y -= sz2Y;
+			incV4Z -= sz2Z;
+			break;
+		case 1:
+			incV1X = sy2X - sx2X;
+			incV1Y = sy2Y - sx2Y;
+			incV1Z = sy2Z - sx2Z;
+			incV1X += sz2X;
+			incV1Y += sz2Y;
+			incV1Z += sz2Z;
+			incV2X = sy2X - sx2X;
+			incV2Y = sy2Y - sx2Y;
+			incV2Z = sy2Z - sx2Z;
+			incV2X -= sz2X;
+			incV2Y -= sz2Y;
+			incV2Z -= sz2Z;
+			incV3X = sx2X + sy2X;
+			incV3Y = sx2Y + sy2Y;
+			incV3Z = sx2Z + sy2Z;
+			incV3X = -incV3X;
+			incV3Y = -incV3Y;
+			incV3Z = -incV3Z;
+			incV3X -= sz2X;
+			incV3Y -= sz2Y;
+			incV3Z -= sz2Z;
+			incV4X = sx2X + sy2X;
+			incV4Y = sx2Y + sy2Y;
+			incV4Z = sx2Z + sy2Z;
+			incV4X = -incV4X;
+			incV4Y = -incV4Y;
+			incV4Z = -incV4Z;
+			incV4X += sz2X;
+			incV4Y += sz2Y;
+			incV4Z += sz2Z;
+			break;
+		case 2:
+			incV1X = sx2X + sy2X;
+			incV1Y = sx2Y + sy2Y;
+			incV1Z = sx2Z + sy2Z;
+			incV1X += sz2X;
+			incV1Y += sz2Y;
+			incV1Z += sz2Z;
+			incV2X = sx2X + sy2X;
+			incV2Y = sx2Y + sy2Y;
+			incV2Z = sx2Z + sy2Z;
+			incV2X -= sz2X;
+			incV2Y -= sz2Y;
+			incV2Z -= sz2Z;
+			incV3X = sy2X - sx2X;
+			incV3Y = sy2Y - sx2Y;
+			incV3Z = sy2Z - sx2Z;
+			incV3X -= sz2X;
+			incV3Y -= sz2Y;
+			incV3Z -= sz2Z;
+			incV4X = sy2X - sx2X;
+			incV4Y = sy2Y - sx2Y;
+			incV4Z = sy2Z - sx2Z;
+			incV4X += sz2X;
+			incV4Y += sz2Y;
+			incV4Z += sz2Z;
+			break;
+		case 3:
+			incV1X = sx2X - sy2X;
+			incV1Y = sx2Y - sy2Y;
+			incV1Z = sx2Z - sy2Z;
+			incV1X += sz2X;
+			incV1Y += sz2Y;
+			incV1Z += sz2Z;
+			incV2X = sx2X + sy2X;
+			incV2Y = sx2Y + sy2Y;
+			incV2Z = sx2Z + sy2Z;
+			incV2X = -incV2X;
+			incV2Y = -incV2Y;
+			incV2Z = -incV2Z;
+			incV2X += sz2X;
+			incV2Y += sz2Y;
+			incV2Z += sz2Z;
+			incV3X = sx2X + sy2X;
+			incV3Y = sx2Y + sy2Y;
+			incV3Z = sx2Z + sy2Z;
+			incV3X = -incV3X;
+			incV3Y = -incV3Y;
+			incV3Z = -incV3Z;
+			incV3X -= sz2X;
+			incV3Y -= sz2Y;
+			incV3Z -= sz2Z;
+			incV4X = sx2X - sy2X;
+			incV4Y = sx2Y - sy2Y;
+			incV4Z = sx2Z - sy2Z;
+			incV4X -= sz2X;
+			incV4Y -= sz2Y;
+			incV4Z -= sz2Z;
+			break;
+		case 4:
+			incV1X = sx2X + sy2X;
+			incV1Y = sx2Y + sy2Y;
+			incV1Z = sx2Z + sy2Z;
+			incV1X += sz2X;
+			incV1Y += sz2Y;
+			incV1Z += sz2Z;
+			incV2X = sy2X - sx2X;
+			incV2Y = sy2Y - sx2Y;
+			incV2Z = sy2Z - sx2Z;
+			incV2X += sz2X;
+			incV2Y += sz2Y;
+			incV2Z += sz2Z;
+			incV3X = sx2X + sy2X;
+			incV3Y = sx2Y + sy2Y;
+			incV3Z = sx2Z + sy2Z;
+			incV3X = -incV3X;
+			incV3Y = -incV3Y;
+			incV3Z = -incV3Z;
+			incV3X += sz2X;
+			incV3Y += sz2Y;
+			incV3Z += sz2Z;
+			incV4X = sx2X - sy2X;
+			incV4Y = sx2Y - sy2Y;
+			incV4Z = sx2Z - sy2Z;
+			incV4X += sz2X;
+			incV4Y += sz2Y;
+			incV4Z += sz2Z;
+			break;
+		default:
+			incV1X = sx2X + sy2X;
+			incV1Y = sx2Y + sy2Y;
+			incV1Z = sx2Z + sy2Z;
+			incV1X -= sz2X;
+			incV1Y -= sz2Y;
+			incV1Z -= sz2Z;
+			incV2X = sx2X - sy2X;
+			incV2Y = sx2Y - sy2Y;
+			incV2Z = sx2Z - sy2Z;
+			incV2X -= sz2X;
+			incV2Y -= sz2Y;
+			incV2Z -= sz2Z;
+			incV3X = sx2X + sy2X;
+			incV3Y = sx2Y + sy2Y;
+			incV3Z = sx2Z + sy2Z;
+			incV3X = -incV3X;
+			incV3Y = -incV3Y;
+			incV3Z = -incV3Z;
+			incV3X -= sz2X;
+			incV3Y -= sz2Y;
+			incV3Z -= sz2Z;
+			incV4X = sy2X - sx2X;
+			incV4Y = sy2Y - sx2Y;
+			incV4Z = sy2Z - sx2Z;
+			incV4X -= sz2X;
+			incV4Y -= sz2Y;
+			incV4Z -= sz2Z;
+		}
+		incV1X += c12X;
+		incV1Y += c12Y;
+		incV1Z += c12Z;
+		incV2X += c12X;
+		incV2Y += c12Y;
+		incV2Z += c12Z;
+		incV3X += c12X;
+		incV3Y += c12Y;
+		incV3Z += c12Z;
+		incV4X += c12X;
+		incV4Y += c12Y;
+		incV4Z += c12Z;
+		var _this = this.clipper;
+		_this.w = refW;
+		_this.h = refH;
+		_this.numVertices = 0;
+		_this.numTmpVertices = 0;
+		var _this1 = this.clipper;
+		var _this2 = _this1.vertices[_this1.numVertices++];
+		_this2.x = incV1X * refXX + incV1Y * refXY + incV1Z * refXZ;
+		_this2.y = incV1X * refYX + incV1Y * refYY + incV1Z * refYZ;
+		_this2.wx = incV1X;
+		_this2.wy = incV1Y;
+		_this2.wz = incV1Z;
+		var _this3 = this.clipper;
+		var _this4 = _this3.vertices[_this3.numVertices++];
+		_this4.x = incV2X * refXX + incV2Y * refXY + incV2Z * refXZ;
+		_this4.y = incV2X * refYX + incV2Y * refYY + incV2Z * refYZ;
+		_this4.wx = incV2X;
+		_this4.wy = incV2Y;
+		_this4.wz = incV2Z;
+		var _this5 = this.clipper;
+		var _this6 = _this5.vertices[_this5.numVertices++];
+		_this6.x = incV3X * refXX + incV3Y * refXY + incV3Z * refXZ;
+		_this6.y = incV3X * refYX + incV3Y * refYY + incV3Z * refYZ;
+		_this6.wx = incV3X;
+		_this6.wy = incV3Y;
+		_this6.wz = incV3Z;
+		var _this7 = this.clipper;
+		var _this8 = _this7.vertices[_this7.numVertices++];
+		_this8.x = incV4X * refXX + incV4Y * refXY + incV4Z * refXZ;
+		_this8.y = incV4X * refYX + incV4Y * refYY + incV4Z * refYZ;
+		_this8.wx = incV4X;
+		_this8.wy = incV4Y;
+		_this8.wz = incV4Z;
+		this.clipper.clip();
+		this.clipper.reduce();
+		var normal1;
+		var normalX1;
+		var normalY1;
+		var normalZ1;
+		if(swapped) {
+			normalX1 = refNormalX;
+			normalY1 = refNormalY;
+			normalZ1 = refNormalZ;
+		} else {
+			normalX1 = -refNormalX;
+			normalY1 = -refNormalY;
+			normalZ1 = -refNormalZ;
+		}
+		this.setNormal(result,normalX1,normalY1,normalZ1);
+		var _g1 = 0;
+		var _g = this.clipper.numVertices;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var v = this.clipper.vertices[i];
+			var clippedVertex;
+			var clippedVertexX;
+			var clippedVertexY;
+			var clippedVertexZ;
+			clippedVertexX = v.wx;
+			clippedVertexY = v.wy;
+			clippedVertexZ = v.wz;
+			clippedVertexX += c1X;
+			clippedVertexY += c1Y;
+			clippedVertexZ += c1Z;
+			var clippedVertexToRefCenter;
+			var clippedVertexToRefCenterX;
+			var clippedVertexToRefCenterY;
+			var clippedVertexToRefCenterZ;
+			clippedVertexToRefCenterX = refCenterX - clippedVertexX;
+			clippedVertexToRefCenterY = refCenterY - clippedVertexY;
+			clippedVertexToRefCenterZ = refCenterZ - clippedVertexZ;
+			var depth15 = clippedVertexToRefCenterX * refNormalX + clippedVertexToRefCenterY * refNormalY + clippedVertexToRefCenterZ * refNormalZ;
+			var clippedVertexOnRefFace;
+			var clippedVertexOnRefFaceX;
+			var clippedVertexOnRefFaceY;
+			var clippedVertexOnRefFaceZ;
+			clippedVertexOnRefFaceX = clippedVertexX + refNormalX * depth15;
+			clippedVertexOnRefFaceY = clippedVertexY + refNormalY * depth15;
+			clippedVertexOnRefFaceZ = clippedVertexZ + refNormalZ * depth15;
+			if(depth15 > -oimo_common_Setting.contactPersistenceThreshold) {
+				if(swapped) {
+					this.addPoint(result,clippedVertexX,clippedVertexY,clippedVertexZ,clippedVertexOnRefFaceX,clippedVertexOnRefFaceY,clippedVertexOnRefFaceZ,depth15,i);
+				} else {
+					this.addPoint(result,clippedVertexOnRefFaceX,clippedVertexOnRefFaceY,clippedVertexOnRefFaceZ,clippedVertexX,clippedVertexY,clippedVertexZ,depth15,i);
+				}
+			}
+		}
+	}
+});
+var oimo_collision_narrowphase_detector__$BoxBoxDetector_IncidentVertex = function() {
+	this.x = 0;
+	this.y = 0;
+	this.wx = 0;
+	this.wy = 0;
+	this.wz = 0;
+};
+var oimo_collision_narrowphase_detector__$BoxBoxDetector_FaceClipper = function() {
+	this.w = 0;
+	this.h = 0;
+	this.numVertices = 0;
+	this.numTmpVertices = 0;
+	var this1 = new Array(8);
+	this.vertices = this1;
+	var this2 = new Array(8);
+	this.tmpVertices = this2;
+	var _g = 0;
+	while(_g < 8) {
+		var i = _g++;
+		this.vertices[i] = new oimo_collision_narrowphase_detector__$BoxBoxDetector_IncidentVertex();
+		this.tmpVertices[i] = new oimo_collision_narrowphase_detector__$BoxBoxDetector_IncidentVertex();
+	}
+};
+oimo_collision_narrowphase_detector__$BoxBoxDetector_FaceClipper.prototype = {
+	clip: function() {
+		var _g1 = 0;
+		var _g = this.numVertices;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var v1 = this.vertices[i];
+			var v2 = this.vertices[(i + 1) % this.numVertices];
+			var s1 = this.w + v1.x;
+			var s2 = this.w + v2.x;
+			if(s1 > 0 && s2 > 0) {
+				var _this = this.tmpVertices[this.numTmpVertices++];
+				_this.x = v1.x;
+				_this.y = v1.y;
+				_this.wx = v1.wx;
+				_this.wy = v1.wy;
+				_this.wz = v1.wz;
+			} else if(s1 > 0 && s2 <= 0) {
+				var _this1 = this.tmpVertices[this.numTmpVertices++];
+				_this1.x = v1.x;
+				_this1.y = v1.y;
+				_this1.wx = v1.wx;
+				_this1.wy = v1.wy;
+				_this1.wz = v1.wz;
+				var t = s1 / (s1 - s2);
+				var _this2 = this.tmpVertices[this.numTmpVertices++];
+				_this2.x = v1.x + (v2.x - v1.x) * t;
+				_this2.y = v1.y + (v2.y - v1.y) * t;
+				_this2.wx = v1.wx + (v2.wx - v1.wx) * t;
+				_this2.wy = v1.wy + (v2.wy - v1.wy) * t;
+				_this2.wz = v1.wz + (v2.wz - v1.wz) * t;
+			} else if(s1 <= 0 && s2 > 0) {
+				var t1 = s1 / (s1 - s2);
+				var _this3 = this.tmpVertices[this.numTmpVertices++];
+				_this3.x = v1.x + (v2.x - v1.x) * t1;
+				_this3.y = v1.y + (v2.y - v1.y) * t1;
+				_this3.wx = v1.wx + (v2.wx - v1.wx) * t1;
+				_this3.wy = v1.wy + (v2.wy - v1.wy) * t1;
+				_this3.wz = v1.wz + (v2.wz - v1.wz) * t1;
+			}
+		}
+		var tmp = this.vertices;
+		this.vertices = this.tmpVertices;
+		this.tmpVertices = tmp;
+		this.numVertices = this.numTmpVertices;
+		this.numTmpVertices = 0;
+		var _g11 = 0;
+		var _g2 = this.numVertices;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var v11 = this.vertices[i1];
+			var v21 = this.vertices[(i1 + 1) % this.numVertices];
+			var s11 = this.w - v11.x;
+			var s21 = this.w - v21.x;
+			if(s11 > 0 && s21 > 0) {
+				var _this4 = this.tmpVertices[this.numTmpVertices++];
+				_this4.x = v11.x;
+				_this4.y = v11.y;
+				_this4.wx = v11.wx;
+				_this4.wy = v11.wy;
+				_this4.wz = v11.wz;
+			} else if(s11 > 0 && s21 <= 0) {
+				var _this5 = this.tmpVertices[this.numTmpVertices++];
+				_this5.x = v11.x;
+				_this5.y = v11.y;
+				_this5.wx = v11.wx;
+				_this5.wy = v11.wy;
+				_this5.wz = v11.wz;
+				var t2 = s11 / (s11 - s21);
+				var _this6 = this.tmpVertices[this.numTmpVertices++];
+				_this6.x = v11.x + (v21.x - v11.x) * t2;
+				_this6.y = v11.y + (v21.y - v11.y) * t2;
+				_this6.wx = v11.wx + (v21.wx - v11.wx) * t2;
+				_this6.wy = v11.wy + (v21.wy - v11.wy) * t2;
+				_this6.wz = v11.wz + (v21.wz - v11.wz) * t2;
+			} else if(s11 <= 0 && s21 > 0) {
+				var t3 = s11 / (s11 - s21);
+				var _this7 = this.tmpVertices[this.numTmpVertices++];
+				_this7.x = v11.x + (v21.x - v11.x) * t3;
+				_this7.y = v11.y + (v21.y - v11.y) * t3;
+				_this7.wx = v11.wx + (v21.wx - v11.wx) * t3;
+				_this7.wy = v11.wy + (v21.wy - v11.wy) * t3;
+				_this7.wz = v11.wz + (v21.wz - v11.wz) * t3;
+			}
+		}
+		var tmp1 = this.vertices;
+		this.vertices = this.tmpVertices;
+		this.tmpVertices = tmp1;
+		this.numVertices = this.numTmpVertices;
+		this.numTmpVertices = 0;
+		var _g12 = 0;
+		var _g3 = this.numVertices;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			var v12 = this.vertices[i2];
+			var v22 = this.vertices[(i2 + 1) % this.numVertices];
+			var s12 = this.h + v12.y;
+			var s22 = this.h + v22.y;
+			if(s12 > 0 && s22 > 0) {
+				var _this8 = this.tmpVertices[this.numTmpVertices++];
+				_this8.x = v12.x;
+				_this8.y = v12.y;
+				_this8.wx = v12.wx;
+				_this8.wy = v12.wy;
+				_this8.wz = v12.wz;
+			} else if(s12 > 0 && s22 <= 0) {
+				var _this9 = this.tmpVertices[this.numTmpVertices++];
+				_this9.x = v12.x;
+				_this9.y = v12.y;
+				_this9.wx = v12.wx;
+				_this9.wy = v12.wy;
+				_this9.wz = v12.wz;
+				var t4 = s12 / (s12 - s22);
+				var _this10 = this.tmpVertices[this.numTmpVertices++];
+				_this10.x = v12.x + (v22.x - v12.x) * t4;
+				_this10.y = v12.y + (v22.y - v12.y) * t4;
+				_this10.wx = v12.wx + (v22.wx - v12.wx) * t4;
+				_this10.wy = v12.wy + (v22.wy - v12.wy) * t4;
+				_this10.wz = v12.wz + (v22.wz - v12.wz) * t4;
+			} else if(s12 <= 0 && s22 > 0) {
+				var t5 = s12 / (s12 - s22);
+				var _this11 = this.tmpVertices[this.numTmpVertices++];
+				_this11.x = v12.x + (v22.x - v12.x) * t5;
+				_this11.y = v12.y + (v22.y - v12.y) * t5;
+				_this11.wx = v12.wx + (v22.wx - v12.wx) * t5;
+				_this11.wy = v12.wy + (v22.wy - v12.wy) * t5;
+				_this11.wz = v12.wz + (v22.wz - v12.wz) * t5;
+			}
+		}
+		var tmp2 = this.vertices;
+		this.vertices = this.tmpVertices;
+		this.tmpVertices = tmp2;
+		this.numVertices = this.numTmpVertices;
+		this.numTmpVertices = 0;
+		var _g13 = 0;
+		var _g4 = this.numVertices;
+		while(_g13 < _g4) {
+			var i3 = _g13++;
+			var v13 = this.vertices[i3];
+			var v23 = this.vertices[(i3 + 1) % this.numVertices];
+			var s13 = this.h - v13.y;
+			var s23 = this.h - v23.y;
+			if(s13 > 0 && s23 > 0) {
+				var _this12 = this.tmpVertices[this.numTmpVertices++];
+				_this12.x = v13.x;
+				_this12.y = v13.y;
+				_this12.wx = v13.wx;
+				_this12.wy = v13.wy;
+				_this12.wz = v13.wz;
+			} else if(s13 > 0 && s23 <= 0) {
+				var _this13 = this.tmpVertices[this.numTmpVertices++];
+				_this13.x = v13.x;
+				_this13.y = v13.y;
+				_this13.wx = v13.wx;
+				_this13.wy = v13.wy;
+				_this13.wz = v13.wz;
+				var t6 = s13 / (s13 - s23);
+				var _this14 = this.tmpVertices[this.numTmpVertices++];
+				_this14.x = v13.x + (v23.x - v13.x) * t6;
+				_this14.y = v13.y + (v23.y - v13.y) * t6;
+				_this14.wx = v13.wx + (v23.wx - v13.wx) * t6;
+				_this14.wy = v13.wy + (v23.wy - v13.wy) * t6;
+				_this14.wz = v13.wz + (v23.wz - v13.wz) * t6;
+			} else if(s13 <= 0 && s23 > 0) {
+				var t7 = s13 / (s13 - s23);
+				var _this15 = this.tmpVertices[this.numTmpVertices++];
+				_this15.x = v13.x + (v23.x - v13.x) * t7;
+				_this15.y = v13.y + (v23.y - v13.y) * t7;
+				_this15.wx = v13.wx + (v23.wx - v13.wx) * t7;
+				_this15.wy = v13.wy + (v23.wy - v13.wy) * t7;
+				_this15.wz = v13.wz + (v23.wz - v13.wz) * t7;
+			}
+		}
+		var tmp3 = this.vertices;
+		this.vertices = this.tmpVertices;
+		this.tmpVertices = tmp3;
+		this.numVertices = this.numTmpVertices;
+		this.numTmpVertices = 0;
+	}
+	,reduce: function() {
+		if(this.numVertices < 4) {
+			return;
+		}
+		var max1 = -1.0 / 0.0;
+		var min1 = 1.0 / 0.0;
+		var max2 = -1.0 / 0.0;
+		var min2 = 1.0 / 0.0;
+		var max1V = null;
+		var min1V = null;
+		var max2V = null;
+		var min2V = null;
+		var e1x = 1;
+		var e1y = 1;
+		var e2x = -1;
+		var e2y = 1;
+		var _g1 = 0;
+		var _g = this.numVertices;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var v = this.vertices[i];
+			var dot1 = v.x * e1x + v.y * e1y;
+			var dot2 = v.x * e2x + v.y * e2y;
+			if(dot1 > max1) {
+				max1 = dot1;
+				max1V = v;
+			}
+			if(dot1 < min1) {
+				min1 = dot1;
+				min1V = v;
+			}
+			if(dot2 > max2) {
+				max2 = dot2;
+				max2V = v;
+			}
+			if(dot2 < min2) {
+				min2 = dot2;
+				min2V = v;
+			}
+		}
+		var _this = this.tmpVertices[this.numTmpVertices++];
+		_this.x = max1V.x;
+		_this.y = max1V.y;
+		_this.wx = max1V.wx;
+		_this.wy = max1V.wy;
+		_this.wz = max1V.wz;
+		var _this1 = this.tmpVertices[this.numTmpVertices++];
+		_this1.x = max2V.x;
+		_this1.y = max2V.y;
+		_this1.wx = max2V.wx;
+		_this1.wy = max2V.wy;
+		_this1.wz = max2V.wz;
+		var _this2 = this.tmpVertices[this.numTmpVertices++];
+		_this2.x = min1V.x;
+		_this2.y = min1V.y;
+		_this2.wx = min1V.wx;
+		_this2.wy = min1V.wy;
+		_this2.wz = min1V.wz;
+		var _this3 = this.tmpVertices[this.numTmpVertices++];
+		_this3.x = min2V.x;
+		_this3.y = min2V.y;
+		_this3.wx = min2V.wx;
+		_this3.wy = min2V.wy;
+		_this3.wz = min2V.wz;
+		var tmp = this.vertices;
+		this.vertices = this.tmpVertices;
+		this.tmpVertices = tmp;
+		this.numVertices = this.numTmpVertices;
+		this.numTmpVertices = 0;
+	}
+};
+var oimo_collision_narrowphase_detector_BoxBoxDetectorMacro = function() { };
+var oimo_collision_narrowphase_detector_CachedDetectorData = function() {
+};
+oimo_collision_narrowphase_detector_CachedDetectorData.prototype = {
+	_clear: function() {
+		if(this._gjkCache != null) {
+			this._gjkCache.clear();
+		}
+	}
 };
 var oimo_collision_narrowphase_detector_CapsuleCapsuleDetector = function() {
 	oimo_collision_narrowphase_detector_Detector.call(this,false);
 };
-oimo_collision_narrowphase_detector_CapsuleCapsuleDetector.__name__ = true;
 oimo_collision_narrowphase_detector_CapsuleCapsuleDetector.__super__ = oimo_collision_narrowphase_detector_Detector;
 oimo_collision_narrowphase_detector_CapsuleCapsuleDetector.prototype = $extend(oimo_collision_narrowphase_detector_Detector.prototype,{
 	detectImpl: function(result,geom1,geom2,tf1,tf2,cachedData) {
@@ -4459,12 +5999,10 @@ oimo_collision_narrowphase_detector_CapsuleCapsuleDetector.prototype = $extend(o
 		pos2Z = cp2Z + nZ * r2;
 		this.addPoint(result,pos1X,pos1Y,pos1Z,pos2X,pos2Y,pos2Z,r1 + r2 - len,0);
 	}
-	,__class__: oimo_collision_narrowphase_detector_CapsuleCapsuleDetector
 });
 var oimo_collision_narrowphase_detector_GjkEpaDetector = function() {
 	oimo_collision_narrowphase_detector_Detector.call(this,false);
 };
-oimo_collision_narrowphase_detector_GjkEpaDetector.__name__ = true;
 oimo_collision_narrowphase_detector_GjkEpaDetector.__super__ = oimo_collision_narrowphase_detector_Detector;
 oimo_collision_narrowphase_detector_GjkEpaDetector.prototype = $extend(oimo_collision_narrowphase_detector_Detector.prototype,{
 	detectImpl: function(result,geom1,geom2,tf1,tf2,cachedData) {
@@ -4529,12 +6067,10 @@ oimo_collision_narrowphase_detector_GjkEpaDetector.prototype = $extend(oimo_coll
 		pos2Z += normalZ * g2._gjkMargin;
 		this.addPoint(result,pos1X,pos1Y,pos1Z,pos2X,pos2Y,pos2Z,g1._gjkMargin + g2._gjkMargin - gjkEpa.distance,0);
 	}
-	,__class__: oimo_collision_narrowphase_detector_GjkEpaDetector
 });
 var oimo_collision_narrowphase_detector_SphereBoxDetector = function(swapped) {
 	oimo_collision_narrowphase_detector_Detector.call(this,swapped);
 };
-oimo_collision_narrowphase_detector_SphereBoxDetector.__name__ = true;
 oimo_collision_narrowphase_detector_SphereBoxDetector.__super__ = oimo_collision_narrowphase_detector_Detector;
 oimo_collision_narrowphase_detector_SphereBoxDetector.prototype = $extend(oimo_collision_narrowphase_detector_Detector.prototype,{
 	detectImpl: function(result,geom1,geom2,tf1,tf2,cachedData) {
@@ -4810,12 +6346,10 @@ oimo_collision_narrowphase_detector_SphereBoxDetector.prototype = $extend(oimo_c
 		pos2Z1 = tf2._positionZ + boxToClosestPointZ1;
 		this.addPoint(result,pos1X1,pos1Y1,pos1Z1,pos2X1,pos2Y1,pos2Z1,r - dist,0);
 	}
-	,__class__: oimo_collision_narrowphase_detector_SphereBoxDetector
 });
 var oimo_collision_narrowphase_detector_SphereCapsuleDetector = function(swapped) {
 	oimo_collision_narrowphase_detector_Detector.call(this,swapped);
 };
-oimo_collision_narrowphase_detector_SphereCapsuleDetector.__name__ = true;
 oimo_collision_narrowphase_detector_SphereCapsuleDetector.__super__ = oimo_collision_narrowphase_detector_Detector;
 oimo_collision_narrowphase_detector_SphereCapsuleDetector.prototype = $extend(oimo_collision_narrowphase_detector_Detector.prototype,{
 	detectImpl: function(result,geom1,geom2,tf1,tf2,cachedData) {
@@ -4925,12 +6459,10 @@ oimo_collision_narrowphase_detector_SphereCapsuleDetector.prototype = $extend(oi
 		pos2Z = cp2Z + nZ * r2;
 		this.addPoint(result,pos1X,pos1Y,pos1Z,pos2X,pos2Y,pos2Z,r1 + r2 - len,0);
 	}
-	,__class__: oimo_collision_narrowphase_detector_SphereCapsuleDetector
 });
 var oimo_collision_narrowphase_detector_SphereSphereDetector = function() {
 	oimo_collision_narrowphase_detector_Detector.call(this,false);
 };
-oimo_collision_narrowphase_detector_SphereSphereDetector.__name__ = true;
 oimo_collision_narrowphase_detector_SphereSphereDetector.__super__ = oimo_collision_narrowphase_detector_Detector;
 oimo_collision_narrowphase_detector_SphereSphereDetector.prototype = $extend(oimo_collision_narrowphase_detector_Detector.prototype,{
 	detectImpl: function(result,geom1,geom2,tf1,tf2,cachedData) {
@@ -4981,7 +6513,6 @@ oimo_collision_narrowphase_detector_SphereSphereDetector.prototype = $extend(oim
 		pos2Z = tf2._positionZ + nZ * r2;
 		this.addPoint(result,pos1X,pos1Y,pos1Z,pos2X,pos2Y,pos2Z,r1 + r2 - len,0);
 	}
-	,__class__: oimo_collision_narrowphase_detector_SphereSphereDetector
 });
 var oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedron = function() {
 	var length = oimo_common_Setting.maxEPAVertices;
@@ -4995,7 +6526,6 @@ var oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedron = function() {
 	this._trianglePool = null;
 	this._vertexPool = null;
 };
-oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedron.__name__ = true;
 oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedron.prototype = {
 	dumpHoleEdge: function(first) {
 	}
@@ -5325,10 +6855,8 @@ oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedron.prototype = {
 	}
 	,_dumpAsObjModel: function() {
 	}
-	,__class__: oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedron
 };
 var oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedronState = function() { };
-oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedronState.__name__ = true;
 var oimo_collision_narrowphase_detector_gjkepa_EpaTriangle = function() {
 	this.id = ++oimo_collision_narrowphase_detector_gjkepa_EpaTriangle.count;
 	this._next = null;
@@ -5350,7 +6878,6 @@ var oimo_collision_narrowphase_detector_gjkepa_EpaTriangle = function() {
 	this._nextIndex[1] = 2;
 	this._nextIndex[2] = 0;
 };
-oimo_collision_narrowphase_detector_gjkepa_EpaTriangle.__name__ = true;
 oimo_collision_narrowphase_detector_gjkepa_EpaTriangle.prototype = {
 	init: function(vertex1,vertex2,vertex3,center,autoCheck) {
 		if(autoCheck == null) {
@@ -5806,7 +7333,6 @@ oimo_collision_narrowphase_detector_gjkepa_EpaTriangle.prototype = {
 	}
 	,dump: function() {
 	}
-	,__class__: oimo_collision_narrowphase_detector_gjkepa_EpaTriangle
 };
 var oimo_collision_narrowphase_detector_gjkepa_EpaVertex = function() {
 	this.randId = Math.random() * 100000 | 0;
@@ -5814,7 +7340,6 @@ var oimo_collision_narrowphase_detector_gjkepa_EpaVertex = function() {
 	this.w1 = new oimo_common_Vec3();
 	this.w2 = new oimo_common_Vec3();
 };
-oimo_collision_narrowphase_detector_gjkepa_EpaVertex.__name__ = true;
 oimo_collision_narrowphase_detector_gjkepa_EpaVertex.prototype = {
 	init: function(v,w1,w2) {
 		var _this = this.v;
@@ -5839,17 +7364,14 @@ oimo_collision_narrowphase_detector_gjkepa_EpaVertex.prototype = {
 		this._tmpEdgeLoopNext = null;
 		this._tmpEdgeLoopOuterTriangle = null;
 	}
-	,__class__: oimo_collision_narrowphase_detector_gjkepa_EpaVertex
 };
 var oimo_collision_narrowphase_detector_gjkepa_GjkCache = function() {
 	this.prevClosestDir = new oimo_common_Vec3();
 };
-oimo_collision_narrowphase_detector_gjkepa_GjkCache.__name__ = true;
 oimo_collision_narrowphase_detector_gjkepa_GjkCache.prototype = {
 	clear: function() {
 		this.prevClosestDir.zero();
 	}
-	,__class__: oimo_collision_narrowphase_detector_gjkepa_GjkCache
 };
 var oimo_common_Vec3 = function(x,y,z) {
 	if(z == null) {
@@ -5866,7 +7388,6 @@ var oimo_common_Vec3 = function(x,y,z) {
 	this.z = z;
 	oimo_common_Vec3.numCreations++;
 };
-oimo_common_Vec3.__name__ = true;
 oimo_common_Vec3.prototype = {
 	init: function(x,y,z) {
 		this.x = x;
@@ -6087,7 +7608,6 @@ oimo_common_Vec3.prototype = {
 	,toString: function() {
 		return "Vec3[" + (this.x > 0 ? (this.x * 10000000 + 0.5 | 0) / 10000000 : (this.x * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.y > 0 ? (this.y * 10000000 + 0.5 | 0) / 10000000 : (this.y * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.z > 0 ? (this.z * 10000000 + 0.5 | 0) / 10000000 : (this.z * 10000000 - 0.5 | 0) / 10000000) + "]";
 	}
-	,__class__: oimo_common_Vec3
 };
 var oimo_common_Transform = function() {
 	this._positionX = 0;
@@ -6103,7 +7623,6 @@ var oimo_common_Transform = function() {
 	this._rotation21 = 0;
 	this._rotation22 = 1;
 };
-oimo_common_Transform.__name__ = true;
 oimo_common_Transform.prototype = {
 	identity: function() {
 		this._positionX = 0;
@@ -6510,10 +8029,8 @@ oimo_common_Transform.prototype = {
 		this._rotation22 = transform._rotation22;
 		return this;
 	}
-	,__class__: oimo_common_Transform
 };
 var oimo_common_Setting = function() { };
-oimo_common_Setting.__name__ = true;
 var oimo_collision_narrowphase_detector_gjkepa_GjkEpa = function() {
 	var this1 = new Array(4);
 	this.s = this1;
@@ -6544,7 +8061,6 @@ var oimo_collision_narrowphase_detector_gjkepa_GjkEpa = function() {
 	this.closestPoint2 = new oimo_common_Vec3();
 	this.polyhedron = new oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedron();
 };
-oimo_collision_narrowphase_detector_gjkepa_GjkEpa.__name__ = true;
 oimo_collision_narrowphase_detector_gjkepa_GjkEpa.getInstance = function() {
 	return oimo_collision_narrowphase_detector_gjkepa_GjkEpa.instance;
 };
@@ -11426,12 +12942,6 @@ oimo_collision_narrowphase_detector_gjkepa_GjkEpa.prototype = {
 			t._next = _this._trianglePool;
 			_this._trianglePool = t;
 		}
-		if(_this._triangleList != null) {
-			throw new Error("assertion error: " + "_triangleList == null" + " is false");
-		}
-		if(_this._triangleListLast != null) {
-			throw new Error("assertion error: " + "_triangleListLast == null" + " is false");
-		}
 		while(_this._numVertices > 0) {
 			var v = _this._vertices[--_this._numVertices];
 			v.removeReferences();
@@ -11759,14 +13269,10 @@ oimo_collision_narrowphase_detector_gjkepa_GjkEpa.prototype = {
 		tl2.zero();
 		return this.convexCastImpl(null,c,tf1,tf2,tl1,tl2,hit);
 	}
-	,__class__: oimo_collision_narrowphase_detector_gjkepa_GjkEpa
 };
 var oimo_collision_narrowphase_detector_gjkepa_GjkEpaLog = function() { };
-oimo_collision_narrowphase_detector_gjkepa_GjkEpaLog.__name__ = true;
 var oimo_collision_narrowphase_detector_gjkepa_GjkEpaResultState = function() { };
-oimo_collision_narrowphase_detector_gjkepa_GjkEpaResultState.__name__ = true;
 var oimo_collision_narrowphase_detector_gjkepa_SimplexUtil = function() { };
-oimo_collision_narrowphase_detector_gjkepa_SimplexUtil.__name__ = true;
 oimo_collision_narrowphase_detector_gjkepa_SimplexUtil.projectOrigin2 = function(vec1,vec2,out) {
 	var v1;
 	var v1X;
@@ -13544,7 +15050,6 @@ var oimo_common_Mat3 = function(e00,e01,e02,e10,e11,e12,e20,e21,e22) {
 	this.e22 = e22;
 	oimo_common_Mat3.numCreations++;
 };
-oimo_common_Mat3.__name__ = true;
 oimo_common_Mat3.prototype = {
 	init: function(e00,e01,e02,e10,e11,e12,e20,e21,e22) {
 		this.e00 = e00;
@@ -14130,7 +15635,6 @@ oimo_common_Mat3.prototype = {
 	,toString: function() {
 		return "Mat3[" + (this.e00 > 0 ? (this.e00 * 10000000 + 0.5 | 0) / 10000000 : (this.e00 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e01 > 0 ? (this.e01 * 10000000 + 0.5 | 0) / 10000000 : (this.e01 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e02 > 0 ? (this.e02 * 10000000 + 0.5 | 0) / 10000000 : (this.e02 * 10000000 - 0.5 | 0) / 10000000) + ",\n" + "     " + (this.e10 > 0 ? (this.e10 * 10000000 + 0.5 | 0) / 10000000 : (this.e10 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e11 > 0 ? (this.e11 * 10000000 + 0.5 | 0) / 10000000 : (this.e11 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e12 > 0 ? (this.e12 * 10000000 + 0.5 | 0) / 10000000 : (this.e12 * 10000000 - 0.5 | 0) / 10000000) + ",\n" + "     " + (this.e20 > 0 ? (this.e20 * 10000000 + 0.5 | 0) / 10000000 : (this.e20 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e21 > 0 ? (this.e21 * 10000000 + 0.5 | 0) / 10000000 : (this.e21 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e22 > 0 ? (this.e22 * 10000000 + 0.5 | 0) / 10000000 : (this.e22 * 10000000 - 0.5 | 0) / 10000000) + "]";
 	}
-	,__class__: oimo_common_Mat3
 };
 var oimo_common_Mat4 = function(e00,e01,e02,e03,e10,e11,e12,e13,e20,e21,e22,e23,e30,e31,e32,e33) {
 	if(e33 == null) {
@@ -14199,7 +15703,6 @@ var oimo_common_Mat4 = function(e00,e01,e02,e03,e10,e11,e12,e13,e20,e21,e22,e23,
 	this.e33 = e33;
 	oimo_common_Mat4.numCreations++;
 };
-oimo_common_Mat4.__name__ = true;
 oimo_common_Mat4.prototype = {
 	init: function(e00,e01,e02,e03,e10,e11,e12,e13,e20,e21,e22,e23,e30,e31,e32,e33) {
 		this.e00 = e00;
@@ -15002,10 +16505,8 @@ oimo_common_Mat4.prototype = {
 	,toString: function() {
 		return "Mat4[" + (this.e00 > 0 ? (this.e00 * 10000000 + 0.5 | 0) / 10000000 : (this.e00 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e01 > 0 ? (this.e01 * 10000000 + 0.5 | 0) / 10000000 : (this.e01 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e02 > 0 ? (this.e02 * 10000000 + 0.5 | 0) / 10000000 : (this.e02 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e03 > 0 ? (this.e03 * 10000000 + 0.5 | 0) / 10000000 : (this.e03 * 10000000 - 0.5 | 0) / 10000000) + ",\n" + "    " + (this.e10 > 0 ? (this.e10 * 10000000 + 0.5 | 0) / 10000000 : (this.e10 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e11 > 0 ? (this.e11 * 10000000 + 0.5 | 0) / 10000000 : (this.e11 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e12 > 0 ? (this.e12 * 10000000 + 0.5 | 0) / 10000000 : (this.e12 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e13 > 0 ? (this.e13 * 10000000 + 0.5 | 0) / 10000000 : (this.e13 * 10000000 - 0.5 | 0) / 10000000) + ",\n" + "    " + (this.e20 > 0 ? (this.e20 * 10000000 + 0.5 | 0) / 10000000 : (this.e20 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e21 > 0 ? (this.e21 * 10000000 + 0.5 | 0) / 10000000 : (this.e21 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e22 > 0 ? (this.e22 * 10000000 + 0.5 | 0) / 10000000 : (this.e22 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e23 > 0 ? (this.e23 * 10000000 + 0.5 | 0) / 10000000 : (this.e23 * 10000000 - 0.5 | 0) / 10000000) + ",\n" + "    " + (this.e30 > 0 ? (this.e30 * 10000000 + 0.5 | 0) / 10000000 : (this.e30 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e31 > 0 ? (this.e31 * 10000000 + 0.5 | 0) / 10000000 : (this.e31 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e32 > 0 ? (this.e32 * 10000000 + 0.5 | 0) / 10000000 : (this.e32 * 10000000 - 0.5 | 0) / 10000000) + ", " + (this.e33 > 0 ? (this.e33 * 10000000 + 0.5 | 0) / 10000000 : (this.e33 * 10000000 - 0.5 | 0) / 10000000) + "]";
 	}
-	,__class__: oimo_common_Mat4
 };
 var oimo_common_MathUtil = function() { };
-oimo_common_MathUtil.__name__ = true;
 oimo_common_MathUtil.abs = function(x) {
 	if(x > 0) {
 		return x;
@@ -15090,7 +16591,6 @@ var oimo_common_Pool = function() {
 	this.stackQuat = this4;
 	this.sizeQuat = 0;
 };
-oimo_common_Pool.__name__ = true;
 oimo_common_Pool.prototype = {
 	vec3: function() {
 		if(this.sizeVec3 == 0) {
@@ -15368,7 +16868,6 @@ oimo_common_Pool.prototype = {
 		}
 		this.stackQuat[this.sizeQuat++] = q;
 	}
-	,__class__: oimo_common_Pool
 };
 var oimo_common_Quat = function(x,y,z,w) {
 	if(w == null) {
@@ -15389,7 +16888,6 @@ var oimo_common_Quat = function(x,y,z,w) {
 	this.w = w;
 	oimo_common_Quat.numCreations++;
 };
-oimo_common_Quat.__name__ = true;
 oimo_common_Quat.prototype = {
 	identity: function() {
 		var tx = 0;
@@ -15665,7 +17163,6 @@ oimo_common_Quat.prototype = {
 	,toString: function() {
 		return "Quat[" + (this.x > 0 ? (this.x * 10000000 + 0.5 | 0) / 10000000 : (this.x * 10000000 - 0.5 | 0) / 10000000) + " i,\n" + "    " + (this.y > 0 ? (this.y * 10000000 + 0.5 | 0) / 10000000 : (this.y * 10000000 - 0.5 | 0) / 10000000) + " j,\n" + "    " + (this.z > 0 ? (this.z * 10000000 + 0.5 | 0) / 10000000 : (this.z * 10000000 - 0.5 | 0) / 10000000) + " k,\n" + "    " + (this.w > 0 ? (this.w * 10000000 + 0.5 | 0) / 10000000 : (this.w * 10000000 - 0.5 | 0) / 10000000) + "]";
 	}
-	,__class__: oimo_common_Quat
 };
 var oimo_dynamics_Contact = function() {
 	this._next = null;
@@ -15686,7 +17183,6 @@ var oimo_dynamics_Contact = function() {
 	this._contactConstraint = new oimo_dynamics_constraint_contact_ContactConstraint(this._manifold);
 	this._touching = false;
 };
-oimo_dynamics_Contact.__name__ = true;
 oimo_dynamics_Contact.prototype = {
 	_updateManifold: function() {
 		if(this._detector == null) {
@@ -15786,7 +17282,6 @@ oimo_dynamics_Contact.prototype = {
 	,getNext: function() {
 		return this._next;
 	}
-	,__class__: oimo_dynamics_Contact
 };
 var oimo_dynamics_ContactLink = function() {
 	this._prev = null;
@@ -15794,7 +17289,6 @@ var oimo_dynamics_ContactLink = function() {
 	this._contact = null;
 	this._other = null;
 };
-oimo_dynamics_ContactLink.__name__ = true;
 oimo_dynamics_ContactLink.prototype = {
 	getContact: function() {
 		return this._contact;
@@ -15808,14 +17302,12 @@ oimo_dynamics_ContactLink.prototype = {
 	,getNext: function() {
 		return this._next;
 	}
-	,__class__: oimo_dynamics_ContactLink
 };
 var oimo_dynamics_ContactManager = function(broadPhase) {
 	this._broadPhase = broadPhase;
 	this._collisionMatrix = new oimo_collision_narrowphase_CollisionMatrix();
 	this._numContacts = 0;
 };
-oimo_dynamics_ContactManager.__name__ = true;
 oimo_dynamics_ContactManager.prototype = {
 	createContacts: function() {
 		var pp = this._broadPhase._proxyPairList;
@@ -15824,9 +17316,6 @@ oimo_dynamics_ContactManager.prototype = {
 			while(true) {
 				var s1;
 				var s2;
-				if(pp._p1._id == pp._p2._id) {
-					throw new Error("assertion error: " + "pp._p1._id != pp._p2._id" + " is false");
-				}
 				if(pp._p1._id < pp._p2._id) {
 					s1 = pp._p1.userData;
 					s2 = pp._p2.userData;
@@ -16184,7 +17673,6 @@ oimo_dynamics_ContactManager.prototype = {
 	,getContactList: function() {
 		return this._contactList;
 	}
-	,__class__: oimo_dynamics_ContactManager
 };
 var oimo_dynamics_Island = function() {
 	var length = oimo_common_Setting.islandInitialRigidBodyArraySize;
@@ -16204,7 +17692,6 @@ var oimo_dynamics_Island = function() {
 	this.numSolversSi = 0;
 	this.numSolversNgs = 0;
 };
-oimo_dynamics_Island.__name__ = true;
 oimo_dynamics_Island.prototype = {
 	_clear: function() {
 		while(this.numRigidBodies > 0) this.rigidBodies[--this.numRigidBodies] = null;
@@ -16785,16 +18272,11 @@ oimo_dynamics_Island.prototype = {
 			}
 		}
 	}
-	,__class__: oimo_dynamics_Island
 };
 var oimo_dynamics_TimeStep = function() {
 	this.dt = 0;
 	this.invDt = 0;
 	this.dtRatio = 1;
-};
-oimo_dynamics_TimeStep.__name__ = true;
-oimo_dynamics_TimeStep.prototype = {
-	__class__: oimo_dynamics_TimeStep
 };
 var oimo_dynamics_World = function(broadPhaseType,gravity) {
 	if(broadPhaseType == null) {
@@ -16837,7 +18319,6 @@ var oimo_dynamics_World = function(broadPhaseType,gravity) {
 	this._pool = new oimo_common_Pool();
 	this._shapeIdCount = 0;
 };
-oimo_dynamics_World.__name__ = true;
 oimo_dynamics_World.prototype = {
 	_updateContacts: function() {
 		var st = new Date().getTime() / 1000;
@@ -17062,6 +18543,10 @@ oimo_dynamics_World.prototype = {
 		var r = this._rigidBodyList;
 		while(r != null) {
 			var n = r._next;
+			if(d.drawBases) {
+				var style1 = d.style;
+				d.basis(r._transform,style1.basisLength,style1.basisColorX,style1.basisColorY,style1.basisColorZ);
+			}
 			var shapeColor = null;
 			var isDynamic = r._type == 0;
 			if(!isDynamic) {
@@ -17621,8 +19106,23 @@ oimo_dynamics_World.prototype = {
 							d.point(pos2,style1.disabledContactColor);
 							d.line(pos1,pos2,style1.disabledContactColor);
 						} else if(p._warmStarted) {
-							d.point(pos1,style1.contactColor);
-							d.point(pos2,style1.contactColor);
+							var color1;
+							var _g4 = p._id & 3;
+							switch(_g4) {
+							case 0:
+								color1 = style1.contactColor;
+								break;
+							case 1:
+								color1 = style1.contactColor2;
+								break;
+							case 2:
+								color1 = style1.contactColor3;
+								break;
+							default:
+								color1 = style1.contactColor4;
+							}
+							d.point(pos1,color1);
+							d.point(pos2,color1);
 							d.line(pos1,pos2,style1.contactColor);
 						} else {
 							d.point(pos1,style1.newContactColor);
@@ -17675,8 +19175,8 @@ oimo_dynamics_World.prototype = {
 								var this3 = new Array(newLength2);
 								var newArray2 = this3;
 								var _g13 = 0;
-								var _g4 = _this12.sizeVec3;
-								while(_g13 < _g4) {
+								var _g5 = _this12.sizeVec3;
+								while(_g13 < _g5) {
 									var i3 = _g13++;
 									newArray2[i3] = _this12.stackVec3[i3];
 									_this12.stackVec3[i3] = null;
@@ -17693,8 +19193,8 @@ oimo_dynamics_World.prototype = {
 								var this4 = new Array(newLength3);
 								var newArray3 = this4;
 								var _g14 = 0;
-								var _g5 = _this13.sizeVec3;
-								while(_g14 < _g5) {
+								var _g6 = _this13.sizeVec3;
+								while(_g14 < _g6) {
 									var i4 = _g14++;
 									newArray3[i4] = _this13.stackVec3[i4];
 									_this13.stackVec3[i4] = null;
@@ -17711,8 +19211,8 @@ oimo_dynamics_World.prototype = {
 								var this5 = new Array(newLength4);
 								var newArray4 = this5;
 								var _g15 = 0;
-								var _g6 = _this14.sizeVec3;
-								while(_g15 < _g6) {
+								var _g7 = _this14.sizeVec3;
+								while(_g15 < _g7) {
 									var i5 = _g15++;
 									newArray4[i5] = _this14.stackVec3[i5];
 									_this14.stackVec3[i5] = null;
@@ -17729,8 +19229,8 @@ oimo_dynamics_World.prototype = {
 								var this6 = new Array(newLength5);
 								var newArray5 = this6;
 								var _g16 = 0;
-								var _g7 = _this15.sizeVec3;
-								while(_g16 < _g7) {
+								var _g8 = _this15.sizeVec3;
+								while(_g16 < _g8) {
 									var i6 = _g16++;
 									newArray5[i6] = _this15.stackVec3[i6];
 									_this15.stackVec3[i6] = null;
@@ -17747,8 +19247,8 @@ oimo_dynamics_World.prototype = {
 								var this7 = new Array(newLength6);
 								var newArray6 = this7;
 								var _g17 = 0;
-								var _g8 = _this16.sizeVec3;
-								while(_g17 < _g8) {
+								var _g9 = _this16.sizeVec3;
+								while(_g17 < _g9) {
 									var i7 = _g17++;
 									newArray6[i7] = _this16.stackVec3[i7];
 									_this16.stackVec3[i7] = null;
@@ -17829,47 +19329,47 @@ oimo_dynamics_World.prototype = {
 				d.line(p1,anchor1,d.style.jointLineColor);
 				d.line(p2,anchor2,d.style.jointLineColor);
 				if(d.drawJointLimits) {
-					var _g9 = j._type;
-					switch(_g9) {
+					var _g10 = j._type;
+					switch(_g10) {
 					case 0:
 						break;
 					case 1:
 						var radius = d.style.jointRotationalConstraintRadius;
-						var color1 = d.style.jointLineColor;
+						var color2 = d.style.jointLineColor;
 						var lm = j._lm;
-						this._drawRotationalLimit(d,anchor1,basisY1,basisZ1,basisY2,radius,lm.lowerLimit,lm.upperLimit,color1);
+						this._drawRotationalLimit(d,anchor1,basisY1,basisZ1,basisY2,radius,lm.lowerLimit,lm.upperLimit,color2);
 						break;
 					case 2:
 						var j1 = j;
 						var radius1 = d.style.jointRotationalConstraintRadius;
-						var color2 = d.style.jointLineColor;
+						var color3 = d.style.jointLineColor;
 						var rlm = j1._rotLm;
 						var tlm = j1._translLm;
-						this._drawRotationalLimit(d,anchor2,basisY1,basisZ1,basisY2,radius1,rlm.lowerLimit,rlm.upperLimit,color2);
-						this._drawTranslationalLimit(d,anchor1,basisX1,tlm.lowerLimit,tlm.upperLimit,color2);
+						this._drawRotationalLimit(d,anchor2,basisY1,basisZ1,basisY2,radius1,rlm.lowerLimit,rlm.upperLimit,color3);
+						this._drawTranslationalLimit(d,anchor1,basisX1,tlm.lowerLimit,tlm.upperLimit,color3);
 						break;
 					case 3:
 						var radius2 = d.style.jointRotationalConstraintRadius;
-						var color3 = d.style.jointLineColor;
+						var color4 = d.style.jointLineColor;
 						var lm1 = j._lm;
-						this._drawTranslationalLimit(d,anchor1,basisX1,lm1.lowerLimit,lm1.upperLimit,color3);
+						this._drawTranslationalLimit(d,anchor1,basisX1,lm1.lowerLimit,lm1.upperLimit,color4);
 						break;
 					case 4:
 						var j2 = j;
 						var radius3 = d.style.jointRotationalConstraintRadius;
-						var color4 = d.style.jointLineColor;
+						var color5 = d.style.jointLineColor;
 						var lm11 = j2._lm1;
 						var lm2 = j2._lm2;
-						this._drawRotationalLimit(d,anchor1,basisY1,basisZ1,basisY1,radius3,j2._angleX - lm11.upperLimit,j2._angleX - lm11.lowerLimit,color4);
-						this._drawRotationalLimit(d,anchor2,basisX2,basisY2,basisX2,radius3,lm2.lowerLimit - j2._angleZ,lm2.upperLimit - j2._angleZ,color4);
+						this._drawRotationalLimit(d,anchor1,basisY1,basisZ1,basisY1,radius3,j2._angleX - lm11.upperLimit,j2._angleX - lm11.lowerLimit,color5);
+						this._drawRotationalLimit(d,anchor2,basisX2,basisY2,basisX2,radius3,lm2.lowerLimit - j2._angleZ,lm2.upperLimit - j2._angleZ,color5);
 						break;
 					case 5:
 						var j3 = j;
 						var radius4 = d.style.jointRotationalConstraintRadius;
-						var color5 = d.style.jointLineColor;
+						var color6 = d.style.jointLineColor;
 						var lm3 = j3._twistLm;
-						this._drawRotationalLimit(d,anchor2,basisY2,basisZ2,basisY2,radius4,lm3.lowerLimit - j3._twistAngle,lm3.upperLimit - j3._twistAngle,color5);
-						this._drawEllipseOnSphere(d,anchor1,basisX1,basisY1,basisZ1,j3._maxSwingAngle1,j3._maxSwingAngle2,radius4,color5);
+						this._drawRotationalLimit(d,anchor2,basisY2,basisZ2,basisY2,radius4,lm3.lowerLimit - j3._twistAngle,lm3.upperLimit - j3._twistAngle,color6);
+						this._drawEllipseOnSphere(d,anchor1,basisX1,basisY1,basisZ1,j3._maxSwingAngle1,j3._maxSwingAngle2,radius4,color6);
 						var _this27 = this._pool;
 						var _this28 = _this27.sizeVec3 == 0 ? new oimo_common_Vec3() : _this27.stackVec3[--_this27.sizeVec3];
 						_this28.x = anchor2.x;
@@ -17883,7 +19383,7 @@ oimo_dynamics_World.prototype = {
 						_this29.y = ty3;
 						_this29.z = tz3;
 						var to = _this29;
-						d.line(anchor2,to,color5);
+						d.line(anchor2,to,color6);
 						var _this30 = this._pool;
 						if(to != null) {
 							to.zero();
@@ -17892,8 +19392,8 @@ oimo_dynamics_World.prototype = {
 								var this8 = new Array(newLength7);
 								var newArray7 = this8;
 								var _g18 = 0;
-								var _g10 = _this30.sizeVec3;
-								while(_g18 < _g10) {
+								var _g19 = _this30.sizeVec3;
+								while(_g18 < _g19) {
 									var i8 = _g18++;
 									newArray7[i8] = _this30.stackVec3[i8];
 									_this30.stackVec3[i8] = null;
@@ -17913,10 +19413,10 @@ oimo_dynamics_World.prototype = {
 						var newLength8 = _this31.sizeVec3 << 1;
 						var this9 = new Array(newLength8);
 						var newArray8 = this9;
-						var _g19 = 0;
+						var _g110 = 0;
 						var _g20 = _this31.sizeVec3;
-						while(_g19 < _g20) {
-							var i9 = _g19++;
+						while(_g110 < _g20) {
+							var i9 = _g110++;
 							newArray8[i9] = _this31.stackVec3[i9];
 							_this31.stackVec3[i9] = null;
 						}
@@ -17931,10 +19431,10 @@ oimo_dynamics_World.prototype = {
 						var newLength9 = _this32.sizeVec3 << 1;
 						var this10 = new Array(newLength9);
 						var newArray9 = this10;
-						var _g110 = 0;
+						var _g111 = 0;
 						var _g21 = _this32.sizeVec3;
-						while(_g110 < _g21) {
-							var i10 = _g110++;
+						while(_g111 < _g21) {
+							var i10 = _g111++;
 							newArray9[i10] = _this32.stackVec3[i10];
 							_this32.stackVec3[i10] = null;
 						}
@@ -17949,10 +19449,10 @@ oimo_dynamics_World.prototype = {
 						var newLength10 = _this33.sizeVec3 << 1;
 						var this11 = new Array(newLength10);
 						var newArray10 = this11;
-						var _g111 = 0;
+						var _g112 = 0;
 						var _g22 = _this33.sizeVec3;
-						while(_g111 < _g22) {
-							var i11 = _g111++;
+						while(_g112 < _g22) {
+							var i11 = _g112++;
 							newArray10[i11] = _this33.stackVec3[i11];
 							_this33.stackVec3[i11] = null;
 						}
@@ -17967,10 +19467,10 @@ oimo_dynamics_World.prototype = {
 						var newLength11 = _this34.sizeVec3 << 1;
 						var this12 = new Array(newLength11);
 						var newArray11 = this12;
-						var _g112 = 0;
+						var _g113 = 0;
 						var _g23 = _this34.sizeVec3;
-						while(_g112 < _g23) {
-							var i12 = _g112++;
+						while(_g113 < _g23) {
+							var i12 = _g113++;
 							newArray11[i12] = _this34.stackVec3[i12];
 							_this34.stackVec3[i12] = null;
 						}
@@ -17985,10 +19485,10 @@ oimo_dynamics_World.prototype = {
 						var newLength12 = _this35.sizeVec3 << 1;
 						var this13 = new Array(newLength12);
 						var newArray12 = this13;
-						var _g113 = 0;
+						var _g114 = 0;
 						var _g24 = _this35.sizeVec3;
-						while(_g113 < _g24) {
-							var i13 = _g113++;
+						while(_g114 < _g24) {
+							var i13 = _g114++;
 							newArray12[i13] = _this35.stackVec3[i13];
 							_this35.stackVec3[i13] = null;
 						}
@@ -18003,10 +19503,10 @@ oimo_dynamics_World.prototype = {
 						var newLength13 = _this36.sizeVec3 << 1;
 						var this14 = new Array(newLength13);
 						var newArray13 = this14;
-						var _g114 = 0;
+						var _g115 = 0;
 						var _g25 = _this36.sizeVec3;
-						while(_g114 < _g25) {
-							var i14 = _g114++;
+						while(_g115 < _g25) {
+							var i14 = _g115++;
 							newArray13[i14] = _this36.stackVec3[i14];
 							_this36.stackVec3[i14] = null;
 						}
@@ -18021,10 +19521,10 @@ oimo_dynamics_World.prototype = {
 						var newLength14 = _this37.sizeVec3 << 1;
 						var this15 = new Array(newLength14);
 						var newArray14 = this15;
-						var _g115 = 0;
+						var _g116 = 0;
 						var _g26 = _this37.sizeVec3;
-						while(_g115 < _g26) {
-							var i15 = _g115++;
+						while(_g116 < _g26) {
+							var i15 = _g116++;
 							newArray14[i15] = _this37.stackVec3[i15];
 							_this37.stackVec3[i15] = null;
 						}
@@ -18039,10 +19539,10 @@ oimo_dynamics_World.prototype = {
 						var newLength15 = _this38.sizeVec3 << 1;
 						var this16 = new Array(newLength15);
 						var newArray15 = this16;
-						var _g116 = 0;
+						var _g117 = 0;
 						var _g27 = _this38.sizeVec3;
-						while(_g116 < _g27) {
-							var i16 = _g116++;
+						while(_g117 < _g27) {
+							var i16 = _g117++;
 							newArray15[i16] = _this38.stackVec3[i16];
 							_this38.stackVec3[i16] = null;
 						}
@@ -18057,10 +19557,10 @@ oimo_dynamics_World.prototype = {
 						var newLength16 = _this39.sizeVec3 << 1;
 						var this17 = new Array(newLength16);
 						var newArray16 = this17;
-						var _g117 = 0;
+						var _g118 = 0;
 						var _g28 = _this39.sizeVec3;
-						while(_g117 < _g28) {
-							var i17 = _g117++;
+						while(_g118 < _g28) {
+							var i17 = _g118++;
 							newArray16[i17] = _this39.stackVec3[i17];
 							_this39.stackVec3[i17] = null;
 						}
@@ -18075,10 +19575,10 @@ oimo_dynamics_World.prototype = {
 						var newLength17 = _this40.sizeVec3 << 1;
 						var this18 = new Array(newLength17);
 						var newArray17 = this18;
-						var _g118 = 0;
+						var _g119 = 0;
 						var _g29 = _this40.sizeVec3;
-						while(_g118 < _g29) {
-							var i18 = _g118++;
+						while(_g119 < _g29) {
+							var i18 = _g119++;
 							newArray17[i18] = _this40.stackVec3[i18];
 							_this40.stackVec3[i18] = null;
 						}
@@ -18691,8 +20191,9 @@ oimo_dynamics_World.prototype = {
 	}
 	,debugDraw: function() {
 		if(this._debugDraw != null) {
-			if(js_Boot.__instanceof(this._broadPhase,oimo_collision_broadphase_bvh_BvhBroadPhase)) {
-				this._drawBvh(this._debugDraw,(js_Boot.__cast(this._broadPhase , oimo_collision_broadphase_bvh_BvhBroadPhase))._tree);
+			if(this._broadPhase._type == 2) {
+				var bvhBroadPhase = this._broadPhase;
+				this._drawBvh(this._debugDraw,bvhBroadPhase._tree);
 			}
 			this._drawRigidBodies(this._debugDraw);
 			this._drawConstraints(this._debugDraw);
@@ -18782,7 +20283,6 @@ oimo_dynamics_World.prototype = {
 		_this.y = gravity.y;
 		_this.z = gravity.z;
 	}
-	,__class__: oimo_dynamics_World
 };
 var oimo_dynamics__$World_RayCastWrapper = function() {
 	oimo_collision_broadphase_BroadPhaseProxyCallback.call(this);
@@ -18791,7 +20291,6 @@ var oimo_dynamics__$World_RayCastWrapper = function() {
 	this.end = new oimo_common_Vec3();
 	this.callback = null;
 };
-oimo_dynamics__$World_RayCastWrapper.__name__ = true;
 oimo_dynamics__$World_RayCastWrapper.__super__ = oimo_collision_broadphase_BroadPhaseProxyCallback;
 oimo_dynamics__$World_RayCastWrapper.prototype = $extend(oimo_collision_broadphase_BroadPhaseProxyCallback.prototype,{
 	process: function(proxy) {
@@ -18800,7 +20299,6 @@ oimo_dynamics__$World_RayCastWrapper.prototype = $extend(oimo_collision_broadpha
 			this.callback.process(shape,this.rayCastHit);
 		}
 	}
-	,__class__: oimo_dynamics__$World_RayCastWrapper
 });
 var oimo_dynamics__$World_ConvexCastWrapper = function() {
 	oimo_collision_broadphase_BroadPhaseProxyCallback.call(this);
@@ -18811,12 +20309,12 @@ var oimo_dynamics__$World_ConvexCastWrapper = function() {
 	this.callback = null;
 	this.convex = null;
 };
-oimo_dynamics__$World_ConvexCastWrapper.__name__ = true;
 oimo_dynamics__$World_ConvexCastWrapper.__super__ = oimo_collision_broadphase_BroadPhaseProxyCallback;
 oimo_dynamics__$World_ConvexCastWrapper.prototype = $extend(oimo_collision_broadphase_BroadPhaseProxyCallback.prototype,{
 	process: function(proxy) {
 		var shape = proxy.userData;
-		if(!js_Boot.__instanceof(shape._geom,oimo_collision_geometry_ConvexGeometry)) {
+		var type = shape._geom._type;
+		if(type < 0 || type > 5) {
 			return;
 		}
 		var geom = shape._geom;
@@ -18824,14 +20322,12 @@ oimo_dynamics__$World_ConvexCastWrapper.prototype = $extend(oimo_collision_broad
 			this.callback.process(shape,this.rayCastHit);
 		}
 	}
-	,__class__: oimo_dynamics__$World_ConvexCastWrapper
 });
 var oimo_dynamics__$World_AabbTestWrapper = function() {
 	oimo_collision_broadphase_BroadPhaseProxyCallback.call(this);
 	this._aabb = new oimo_collision_geometry_Aabb();
 	this._callback = null;
 };
-oimo_dynamics__$World_AabbTestWrapper.__name__ = true;
 oimo_dynamics__$World_AabbTestWrapper.__super__ = oimo_collision_broadphase_BroadPhaseProxyCallback;
 oimo_dynamics__$World_AabbTestWrapper.prototype = $extend(oimo_collision_broadphase_BroadPhaseProxyCallback.prototype,{
 	process: function(proxy) {
@@ -18841,19 +20337,15 @@ oimo_dynamics__$World_AabbTestWrapper.prototype = $extend(oimo_collision_broadph
 			this._callback.process(shape);
 		}
 	}
-	,__class__: oimo_dynamics__$World_AabbTestWrapper
 });
 var oimo_dynamics_callback_AabbTestCallback = function() {
 };
-oimo_dynamics_callback_AabbTestCallback.__name__ = true;
 oimo_dynamics_callback_AabbTestCallback.prototype = {
 	process: function(shape) {
 	}
-	,__class__: oimo_dynamics_callback_AabbTestCallback
 };
 var oimo_dynamics_callback_ContactCallback = function() {
 };
-oimo_dynamics_callback_ContactCallback.__name__ = true;
 oimo_dynamics_callback_ContactCallback.prototype = {
 	beginContact: function(c) {
 	}
@@ -18863,15 +20355,12 @@ oimo_dynamics_callback_ContactCallback.prototype = {
 	}
 	,endContact: function(c) {
 	}
-	,__class__: oimo_dynamics_callback_ContactCallback
 };
 var oimo_dynamics_callback_RayCastCallback = function() {
 };
-oimo_dynamics_callback_RayCastCallback.__name__ = true;
 oimo_dynamics_callback_RayCastCallback.prototype = {
 	process: function(shape,hit) {
 	}
-	,__class__: oimo_dynamics_callback_RayCastCallback
 };
 var oimo_dynamics_callback_RayCastClosest = function() {
 	oimo_dynamics_callback_RayCastCallback.call(this);
@@ -18883,7 +20372,6 @@ var oimo_dynamics_callback_RayCastClosest = function() {
 	this.normal.zero();
 	this.hit = false;
 };
-oimo_dynamics_callback_RayCastClosest.__name__ = true;
 oimo_dynamics_callback_RayCastClosest.__super__ = oimo_dynamics_callback_RayCastCallback;
 oimo_dynamics_callback_RayCastClosest.prototype = $extend(oimo_dynamics_callback_RayCastCallback.prototype,{
 	clear: function() {
@@ -18910,7 +20398,6 @@ oimo_dynamics_callback_RayCastClosest.prototype = $extend(oimo_dynamics_callback
 			_this1.z = v1.z;
 		}
 	}
-	,__class__: oimo_dynamics_callback_RayCastClosest
 });
 var oimo_dynamics_common_DebugDraw = function() {
 	this.p = new oimo_common_Pool();
@@ -18920,6 +20407,7 @@ var oimo_dynamics_common_DebugDraw = function() {
 	this.drawBvhMinLevel = 0;
 	this.drawBvhMaxLevel = 65536;
 	this.drawAabbs = false;
+	this.drawBases = false;
 	this.drawPairs = false;
 	this.drawContacts = false;
 	this.drawJoints = true;
@@ -18981,7 +20469,6 @@ var oimo_dynamics_common_DebugDraw = function() {
 	}
 	this.style = new oimo_dynamics_common_DebugDrawStyle();
 };
-oimo_dynamics_common_DebugDraw.__name__ = true;
 oimo_dynamics_common_DebugDraw.prototype = {
 	aabb: function(min,max,color) {
 		var _this = this.p;
@@ -19155,6 +20642,184 @@ oimo_dynamics_common_DebugDraw.prototype = {
 				_this15.stackVec3 = newArray7;
 			}
 			_this15.stackVec3[_this15.sizeVec3++] = v8;
+		}
+	}
+	,basis: function(transform,length,colorX,colorY,colorZ) {
+		var _this = this.p;
+		var pos = _this.sizeVec3 == 0 ? new oimo_common_Vec3() : _this.stackVec3[--_this.sizeVec3];
+		var _this1 = this.p;
+		var rot = _this1.sizeMat3 == 0 ? new oimo_common_Mat3() : _this1.stackMat3[--_this1.sizeMat3];
+		var _this2 = this.p;
+		var ex = _this2.sizeVec3 == 0 ? new oimo_common_Vec3() : _this2.stackVec3[--_this2.sizeVec3];
+		var _this3 = this.p;
+		var ey = _this3.sizeVec3 == 0 ? new oimo_common_Vec3() : _this3.stackVec3[--_this3.sizeVec3];
+		var _this4 = this.p;
+		var ez = _this4.sizeVec3 == 0 ? new oimo_common_Vec3() : _this4.stackVec3[--_this4.sizeVec3];
+		var v = pos;
+		v.x = transform._positionX;
+		v.y = transform._positionY;
+		v.z = transform._positionZ;
+		var m = rot;
+		m.e00 = transform._rotation00;
+		m.e01 = transform._rotation01;
+		m.e02 = transform._rotation02;
+		m.e10 = transform._rotation10;
+		m.e11 = transform._rotation11;
+		m.e12 = transform._rotation12;
+		m.e20 = transform._rotation20;
+		m.e21 = transform._rotation21;
+		m.e22 = transform._rotation22;
+		ex.init(rot.e00,rot.e10,rot.e20);
+		ey.init(rot.e01,rot.e11,rot.e21);
+		ez.init(rot.e02,rot.e12,rot.e22);
+		var tx = ex.x * length;
+		var ty = ex.y * length;
+		var tz = ex.z * length;
+		ex.x = tx;
+		ex.y = ty;
+		ex.z = tz;
+		var _this5 = ex;
+		var tx1 = _this5.x + pos.x;
+		var ty1 = _this5.y + pos.y;
+		var tz1 = _this5.z + pos.z;
+		_this5.x = tx1;
+		_this5.y = ty1;
+		_this5.z = tz1;
+		var tx2 = ey.x * length;
+		var ty2 = ey.y * length;
+		var tz2 = ey.z * length;
+		ey.x = tx2;
+		ey.y = ty2;
+		ey.z = tz2;
+		var _this6 = ey;
+		var tx3 = _this6.x + pos.x;
+		var ty3 = _this6.y + pos.y;
+		var tz3 = _this6.z + pos.z;
+		_this6.x = tx3;
+		_this6.y = ty3;
+		_this6.z = tz3;
+		var tx4 = ez.x * length;
+		var ty4 = ez.y * length;
+		var tz4 = ez.z * length;
+		ez.x = tx4;
+		ez.y = ty4;
+		ez.z = tz4;
+		var _this7 = ez;
+		var tx5 = _this7.x + pos.x;
+		var ty5 = _this7.y + pos.y;
+		var tz5 = _this7.z + pos.z;
+		_this7.x = tx5;
+		_this7.y = ty5;
+		_this7.z = tz5;
+		this.line(pos,ex,colorX);
+		this.line(pos,ey,colorY);
+		this.line(pos,ez,colorZ);
+		var _this8 = this.p;
+		if(pos != null) {
+			pos.zero();
+			if(_this8.sizeVec3 == _this8.stackVec3.length) {
+				var newLength = _this8.sizeVec3 << 1;
+				var this1 = new Array(newLength);
+				var newArray = this1;
+				var _g1 = 0;
+				var _g = _this8.sizeVec3;
+				while(_g1 < _g) {
+					var i = _g1++;
+					newArray[i] = _this8.stackVec3[i];
+					_this8.stackVec3[i] = null;
+				}
+				_this8.stackVec3 = newArray;
+			}
+			_this8.stackVec3[_this8.sizeVec3++] = pos;
+		}
+		var _this9 = this.p;
+		if(rot != null) {
+			var t00 = 1;
+			var t01 = 0;
+			var t02 = 0;
+			var t10 = 0;
+			var t11 = 1;
+			var t12 = 0;
+			var t20 = 0;
+			var t21 = 0;
+			var t22 = 1;
+			rot.e00 = t00;
+			rot.e01 = t01;
+			rot.e02 = t02;
+			rot.e10 = t10;
+			rot.e11 = t11;
+			rot.e12 = t12;
+			rot.e20 = t20;
+			rot.e21 = t21;
+			rot.e22 = t22;
+			if(_this9.sizeMat3 == _this9.stackMat3.length) {
+				var newLength1 = _this9.sizeMat3 << 1;
+				var this2 = new Array(newLength1);
+				var newArray1 = this2;
+				var _g11 = 0;
+				var _g2 = _this9.sizeMat3;
+				while(_g11 < _g2) {
+					var i1 = _g11++;
+					newArray1[i1] = _this9.stackMat3[i1];
+					_this9.stackMat3[i1] = null;
+				}
+				_this9.stackMat3 = newArray1;
+			}
+			_this9.stackMat3[_this9.sizeMat3++] = rot;
+		}
+		var _this10 = this.p;
+		if(ex != null) {
+			ex.zero();
+			if(_this10.sizeVec3 == _this10.stackVec3.length) {
+				var newLength2 = _this10.sizeVec3 << 1;
+				var this3 = new Array(newLength2);
+				var newArray2 = this3;
+				var _g12 = 0;
+				var _g3 = _this10.sizeVec3;
+				while(_g12 < _g3) {
+					var i2 = _g12++;
+					newArray2[i2] = _this10.stackVec3[i2];
+					_this10.stackVec3[i2] = null;
+				}
+				_this10.stackVec3 = newArray2;
+			}
+			_this10.stackVec3[_this10.sizeVec3++] = ex;
+		}
+		var _this11 = this.p;
+		if(ey != null) {
+			ey.zero();
+			if(_this11.sizeVec3 == _this11.stackVec3.length) {
+				var newLength3 = _this11.sizeVec3 << 1;
+				var this4 = new Array(newLength3);
+				var newArray3 = this4;
+				var _g13 = 0;
+				var _g4 = _this11.sizeVec3;
+				while(_g13 < _g4) {
+					var i3 = _g13++;
+					newArray3[i3] = _this11.stackVec3[i3];
+					_this11.stackVec3[i3] = null;
+				}
+				_this11.stackVec3 = newArray3;
+			}
+			_this11.stackVec3[_this11.sizeVec3++] = ey;
+		}
+		var _this12 = this.p;
+		if(ez != null) {
+			ez.zero();
+			if(_this12.sizeVec3 == _this12.stackVec3.length) {
+				var newLength4 = _this12.sizeVec3 << 1;
+				var this5 = new Array(newLength4);
+				var newArray4 = this5;
+				var _g14 = 0;
+				var _g5 = _this12.sizeVec3;
+				while(_g14 < _g5) {
+					var i4 = _g14++;
+					newArray4[i4] = _this12.stackVec3[i4];
+					_this12.stackVec3[i4] = null;
+				}
+				_this12.stackVec3 = newArray4;
+			}
+			_this12.stackVec3[_this12.sizeVec3++] = ez;
 		}
 	}
 	,ellipse: function(center,ex,ey,radiusX,radiusY,color) {
@@ -22018,9 +23683,12 @@ oimo_dynamics_common_DebugDraw.prototype = {
 	}
 	,line: function(v1,v2,color) {
 	}
-	,__class__: oimo_dynamics_common_DebugDraw
 };
 var oimo_dynamics_common_DebugDrawStyle = function() {
+	this.basisColorZ = new oimo_common_Vec3(0.0,0.0,1.0);
+	this.basisColorY = new oimo_common_Vec3(0.0,1.0,0.0);
+	this.basisColorX = new oimo_common_Vec3(1.0,0.0,0.0);
+	this.basisLength = 0.5;
 	this.jointRotationalConstraintRadius = 0.3;
 	this.jointErrorColor = new oimo_common_Vec3(1.0,0.1,0.1);
 	this.jointLineColor = new oimo_common_Vec3(0.8,0.8,0.8);
@@ -22032,6 +23700,9 @@ var oimo_dynamics_common_DebugDrawStyle = function() {
 	this.contactNormalColor = new oimo_common_Vec3(1.0,0.1,0.1);
 	this.disabledContactColor = new oimo_common_Vec3(0.5,0.1,0.1);
 	this.newContactColor = new oimo_common_Vec3(1.0,1.0,0.1);
+	this.contactColor4 = new oimo_common_Vec3(0.8,0.1,1.0);
+	this.contactColor3 = new oimo_common_Vec3(0.1,0.8,0.6);
+	this.contactColor2 = new oimo_common_Vec3(1.0,0.6,0.1);
 	this.contactColor = new oimo_common_Vec3(1.0,0.1,0.1);
 	this.pairColor = new oimo_common_Vec3(1.0,1.0,0.1);
 	this.bvhNodeColor = new oimo_common_Vec3(0.4,0.4,0.4);
@@ -22045,18 +23716,12 @@ var oimo_dynamics_common_DebugDrawStyle = function() {
 	this.shapeColor2 = new oimo_common_Vec3(1.0,0.8,0.1);
 	this.shapeColor1 = new oimo_common_Vec3(0.7,0.2,0.4);
 };
-oimo_dynamics_common_DebugDrawStyle.__name__ = true;
-oimo_dynamics_common_DebugDrawStyle.prototype = {
-	__class__: oimo_dynamics_common_DebugDrawStyle
-};
 var oimo_dynamics_common_Performance = function() { };
-oimo_dynamics_common_Performance.__name__ = true;
 var oimo_dynamics_constraint_ConstraintSolver = function() {
 	this._b1 = null;
 	this._b2 = null;
 	this._addedToIsland = false;
 };
-oimo_dynamics_constraint_ConstraintSolver.__name__ = true;
 oimo_dynamics_constraint_ConstraintSolver.prototype = {
 	preSolveVelocity: function(timeStep) {
 	}
@@ -22074,15 +23739,12 @@ oimo_dynamics_constraint_ConstraintSolver.prototype = {
 	}
 	,postSolve: function() {
 	}
-	,__class__: oimo_dynamics_constraint_ConstraintSolver
 };
 var oimo_dynamics_constraint_PositionCorrectionAlgorithm = function() { };
-oimo_dynamics_constraint_PositionCorrectionAlgorithm.__name__ = true;
 var oimo_dynamics_constraint_contact_ContactConstraint = function(manifold) {
 	this._solver = new oimo_dynamics_constraint_solver_pgs_PgsContactConstraintSolver(this);
 	this._manifold = manifold;
 };
-oimo_dynamics_constraint_contact_ContactConstraint.__name__ = true;
 oimo_dynamics_constraint_contact_ContactConstraint.prototype = {
 	_getVelocitySolverInfo: function(timeStep,info) {
 		info.b1 = this._b1;
@@ -22272,7 +23934,6 @@ oimo_dynamics_constraint_contact_ContactConstraint.prototype = {
 		}
 		return false;
 	}
-	,__class__: oimo_dynamics_constraint_contact_ContactConstraint
 };
 var oimo_dynamics_constraint_contact_ContactImpulse = function() {
 	this.impulseN = 0;
@@ -22283,7 +23944,6 @@ var oimo_dynamics_constraint_contact_ContactImpulse = function() {
 	this.impulseLY = 0;
 	this.impulseLZ = 0;
 };
-oimo_dynamics_constraint_contact_ContactImpulse.__name__ = true;
 oimo_dynamics_constraint_contact_ContactImpulse.prototype = {
 	copyFrom: function(imp) {
 		this.impulseN = imp.impulseN;
@@ -22293,7 +23953,6 @@ oimo_dynamics_constraint_contact_ContactImpulse.prototype = {
 		this.impulseLY = imp.impulseLY;
 		this.impulseLZ = imp.impulseLZ;
 	}
-	,__class__: oimo_dynamics_constraint_contact_ContactImpulse
 };
 var oimo_dynamics_constraint_contact_Manifold = function() {
 	this._normalX = 0;
@@ -22316,7 +23975,6 @@ var oimo_dynamics_constraint_contact_Manifold = function() {
 		this._points[i] = new oimo_dynamics_constraint_contact_ManifoldPoint();
 	}
 };
-oimo_dynamics_constraint_contact_Manifold.__name__ = true;
 oimo_dynamics_constraint_contact_Manifold.prototype = {
 	_clear: function() {
 		var _g1 = 0;
@@ -22505,7 +24163,6 @@ oimo_dynamics_constraint_contact_Manifold.prototype = {
 	,getNumPoints: function() {
 		return this._numPoints;
 	}
-	,__class__: oimo_dynamics_constraint_contact_Manifold
 };
 var oimo_dynamics_constraint_contact_ManifoldPoint = function() {
 	this._localPos1X = 0;
@@ -22532,7 +24189,6 @@ var oimo_dynamics_constraint_contact_ManifoldPoint = function() {
 	this._disabled = false;
 	this._id = -1;
 };
-oimo_dynamics_constraint_contact_ManifoldPoint.__name__ = true;
 oimo_dynamics_constraint_contact_ManifoldPoint.prototype = {
 	getPosition1: function() {
 		var v = new oimo_common_Vec3();
@@ -22580,7 +24236,6 @@ oimo_dynamics_constraint_contact_ManifoldPoint.prototype = {
 	,isEnabled: function() {
 		return !this._disabled;
 	}
-	,__class__: oimo_dynamics_constraint_contact_ManifoldPoint
 };
 var oimo_dynamics_constraint_contact_ManifoldUpdater = function(manifold) {
 	this._manifold = manifold;
@@ -22595,7 +24250,6 @@ var oimo_dynamics_constraint_contact_ManifoldUpdater = function(manifold) {
 		this.oldPoints[i] = new oimo_dynamics_constraint_contact_ManifoldPoint();
 	}
 };
-oimo_dynamics_constraint_contact_ManifoldUpdater.__name__ = true;
 oimo_dynamics_constraint_contact_ManifoldUpdater.prototype = {
 	removeOutdatedPoints: function() {
 		var num = this._manifold._numPoints;
@@ -23297,9 +24951,6 @@ oimo_dynamics_constraint_contact_ManifoldUpdater.prototype = {
 			var i = _g1++;
 			this._manifold._points[i]._warmStarted = true;
 		}
-		if(result.numPoints != 1) {
-			throw new Error("assertion error: " + "result.numPoints == 1" + " is false");
-		}
 		var newPoint = result.points[0];
 		var index = this.findNearestContactPointIndex(newPoint,tf1,tf2);
 		if(index == -1) {
@@ -23342,7 +24993,6 @@ oimo_dynamics_constraint_contact_ManifoldUpdater.prototype = {
 		}
 		this.removeOutdatedPoints();
 	}
-	,__class__: oimo_dynamics_constraint_contact_ManifoldUpdater
 };
 var oimo_dynamics_constraint_info_JacobianRow = function() {
 	this.lin1X = 0;
@@ -23359,7 +25009,6 @@ var oimo_dynamics_constraint_info_JacobianRow = function() {
 	this.ang2Z = 0;
 	this.flag = 0;
 };
-oimo_dynamics_constraint_info_JacobianRow.__name__ = true;
 oimo_dynamics_constraint_info_JacobianRow.prototype = {
 	updateSparsity: function() {
 		this.flag = 0;
@@ -23370,7 +25019,6 @@ oimo_dynamics_constraint_info_JacobianRow.prototype = {
 			this.flag |= 2;
 		}
 	}
-	,__class__: oimo_dynamics_constraint_info_JacobianRow
 };
 var oimo_dynamics_constraint_info_contact_ContactSolverInfo = function() {
 	this.b1 = null;
@@ -23386,10 +25034,6 @@ var oimo_dynamics_constraint_info_contact_ContactSolverInfo = function() {
 		this.rows[i] = new oimo_dynamics_constraint_info_contact_ContactSolverInfoRow();
 	}
 };
-oimo_dynamics_constraint_info_contact_ContactSolverInfo.__name__ = true;
-oimo_dynamics_constraint_info_contact_ContactSolverInfo.prototype = {
-	__class__: oimo_dynamics_constraint_info_contact_ContactSolverInfo
-};
 var oimo_dynamics_constraint_info_contact_ContactSolverInfoRow = function() {
 	this.jacobianN = new oimo_dynamics_constraint_info_JacobianRow();
 	this.jacobianT = new oimo_dynamics_constraint_info_JacobianRow();
@@ -23398,10 +25042,6 @@ var oimo_dynamics_constraint_info_contact_ContactSolverInfoRow = function() {
 	this.cfm = 0;
 	this.friction = 0;
 	this.impulse = null;
-};
-oimo_dynamics_constraint_info_contact_ContactSolverInfoRow.__name__ = true;
-oimo_dynamics_constraint_info_contact_ContactSolverInfoRow.prototype = {
-	__class__: oimo_dynamics_constraint_info_contact_ContactSolverInfoRow
 };
 var oimo_dynamics_constraint_info_joint_JointSolverInfo = function() {
 	this.b1 = null;
@@ -23417,10 +25057,6 @@ var oimo_dynamics_constraint_info_joint_JointSolverInfo = function() {
 		this.rows[i] = new oimo_dynamics_constraint_info_joint_JointSolverInfoRow();
 	}
 };
-oimo_dynamics_constraint_info_joint_JointSolverInfo.__name__ = true;
-oimo_dynamics_constraint_info_joint_JointSolverInfo.prototype = {
-	__class__: oimo_dynamics_constraint_info_joint_JointSolverInfo
-};
 var oimo_dynamics_constraint_info_joint_JointSolverInfoRow = function() {
 	this.jacobian = new oimo_dynamics_constraint_info_JacobianRow();
 	this.rhs = 0;
@@ -23430,10 +25066,6 @@ var oimo_dynamics_constraint_info_joint_JointSolverInfoRow = function() {
 	this.motorSpeed = 0;
 	this.motorMaxImpulse = 0;
 	this.impulse = null;
-};
-oimo_dynamics_constraint_info_joint_JointSolverInfoRow.__name__ = true;
-oimo_dynamics_constraint_info_joint_JointSolverInfoRow.prototype = {
-	__class__: oimo_dynamics_constraint_info_joint_JointSolverInfoRow
 };
 var oimo_dynamics_constraint_joint_Joint = function(config,type) {
 	this._link1 = new oimo_dynamics_constraint_joint_JointLink(this);
@@ -23503,7 +25135,6 @@ var oimo_dynamics_constraint_joint_Joint = function(config,type) {
 		this._impulses[i] = new oimo_dynamics_constraint_joint_JointImpulse();
 	}
 };
-oimo_dynamics_constraint_joint_Joint.__name__ = true;
 oimo_dynamics_constraint_joint_Joint.prototype = {
 	_syncAnchors: function() {
 		var tf1 = this._b1._transform;
@@ -23866,7 +25497,6 @@ oimo_dynamics_constraint_joint_Joint.prototype = {
 	,getNext: function() {
 		return this._next;
 	}
-	,__class__: oimo_dynamics_constraint_joint_Joint
 };
 var oimo_dynamics_constraint_joint_CylindricalJoint = function(config) {
 	oimo_dynamics_constraint_joint_Joint.call(this,config,2);
@@ -24072,7 +25702,6 @@ var oimo_dynamics_constraint_joint_CylindricalJoint = function(config) {
 	this._rotSd = config.rotationalSpringDamper.clone();
 	this._rotLm = config.rotationalLimitMotor.clone();
 };
-oimo_dynamics_constraint_joint_CylindricalJoint.__name__ = true;
 oimo_dynamics_constraint_joint_CylindricalJoint.__super__ = oimo_dynamics_constraint_joint_Joint;
 oimo_dynamics_constraint_joint_CylindricalJoint.prototype = $extend(oimo_dynamics_constraint_joint_Joint.prototype,{
 	getInfo: function(info,timeStep,isPositionPart) {
@@ -25072,7 +26701,6 @@ oimo_dynamics_constraint_joint_CylindricalJoint.prototype = $extend(oimo_dynamic
 	,getTranslation: function() {
 		return this.translation;
 	}
-	,__class__: oimo_dynamics_constraint_joint_CylindricalJoint
 });
 var oimo_dynamics_constraint_joint_JointConfig = function() {
 	this.rigidBody1 = null;
@@ -25085,7 +26713,6 @@ var oimo_dynamics_constraint_joint_JointConfig = function() {
 	this.breakForce = 0;
 	this.breakTorque = 0;
 };
-oimo_dynamics_constraint_joint_JointConfig.__name__ = true;
 oimo_dynamics_constraint_joint_JointConfig.prototype = {
 	_init: function(rb1,rb2,worldAnchor) {
 		this.rigidBody1 = rb1;
@@ -25141,7 +26768,6 @@ oimo_dynamics_constraint_joint_JointConfig.prototype = {
 		v5.y = vY1;
 		v5.z = vZ1;
 	}
-	,__class__: oimo_dynamics_constraint_joint_JointConfig
 };
 var oimo_dynamics_constraint_joint_CylindricalJointConfig = function() {
 	oimo_dynamics_constraint_joint_JointConfig.call(this);
@@ -25152,7 +26778,6 @@ var oimo_dynamics_constraint_joint_CylindricalJointConfig = function() {
 	this.rotationalLimitMotor = new oimo_dynamics_constraint_joint_RotationalLimitMotor();
 	this.rotationalSpringDamper = new oimo_dynamics_constraint_joint_SpringDamper();
 };
-oimo_dynamics_constraint_joint_CylindricalJointConfig.__name__ = true;
 oimo_dynamics_constraint_joint_CylindricalJointConfig.__super__ = oimo_dynamics_constraint_joint_JointConfig;
 oimo_dynamics_constraint_joint_CylindricalJointConfig.prototype = $extend(oimo_dynamics_constraint_joint_JointConfig.prototype,{
 	init: function(rigidBody1,rigidBody2,worldAnchor,worldAxis) {
@@ -25201,7 +26826,6 @@ oimo_dynamics_constraint_joint_CylindricalJointConfig.prototype = $extend(oimo_d
 		v5.z = vZ1;
 		return this;
 	}
-	,__class__: oimo_dynamics_constraint_joint_CylindricalJointConfig
 });
 var oimo_dynamics_constraint_joint_JointBasis = function(joint) {
 	this.joint = joint;
@@ -25215,23 +26839,14 @@ var oimo_dynamics_constraint_joint_JointBasis = function(joint) {
 	this.zY = 0;
 	this.zZ = 0;
 };
-oimo_dynamics_constraint_joint_JointBasis.__name__ = true;
-oimo_dynamics_constraint_joint_JointBasis.prototype = {
-	__class__: oimo_dynamics_constraint_joint_JointBasis
-};
 var oimo_dynamics_constraint_joint_JointImpulse = function() {
 	this.impulse = 0;
 	this.impulseM = 0;
 	this.impulseP = 0;
 };
-oimo_dynamics_constraint_joint_JointImpulse.__name__ = true;
-oimo_dynamics_constraint_joint_JointImpulse.prototype = {
-	__class__: oimo_dynamics_constraint_joint_JointImpulse
-};
 var oimo_dynamics_constraint_joint_JointLink = function(joint) {
 	this._joint = joint;
 };
-oimo_dynamics_constraint_joint_JointLink.__name__ = true;
 oimo_dynamics_constraint_joint_JointLink.prototype = {
 	getContact: function() {
 		return this._joint;
@@ -25245,12 +26860,9 @@ oimo_dynamics_constraint_joint_JointLink.prototype = {
 	,getNext: function() {
 		return this._next;
 	}
-	,__class__: oimo_dynamics_constraint_joint_JointLink
 };
 var oimo_dynamics_constraint_joint_JointMacro = function() { };
-oimo_dynamics_constraint_joint_JointMacro.__name__ = true;
 var oimo_dynamics_constraint_joint_JointType = function() { };
-oimo_dynamics_constraint_joint_JointType.__name__ = true;
 var oimo_dynamics_constraint_joint_PrismaticJoint = function(config) {
 	oimo_dynamics_constraint_joint_Joint.call(this,config,oimo_dynamics_constraint_joint_JointType.PRISMATIC);
 	var v = config.localAxis1;
@@ -25453,7 +27065,6 @@ var oimo_dynamics_constraint_joint_PrismaticJoint = function(config) {
 	this._sd = config.springDamper.clone();
 	this._lm = config.limitMotor.clone();
 };
-oimo_dynamics_constraint_joint_PrismaticJoint.__name__ = true;
 oimo_dynamics_constraint_joint_PrismaticJoint.__super__ = oimo_dynamics_constraint_joint_Joint;
 oimo_dynamics_constraint_joint_PrismaticJoint.prototype = $extend(oimo_dynamics_constraint_joint_Joint.prototype,{
 	getInfo: function(info,timeStep,isPositionPart) {
@@ -26416,7 +28027,6 @@ oimo_dynamics_constraint_joint_PrismaticJoint.prototype = $extend(oimo_dynamics_
 	,getTranslation: function() {
 		return this.translation;
 	}
-	,__class__: oimo_dynamics_constraint_joint_PrismaticJoint
 });
 var oimo_dynamics_constraint_joint_PrismaticJointConfig = function() {
 	oimo_dynamics_constraint_joint_JointConfig.call(this);
@@ -26425,7 +28035,6 @@ var oimo_dynamics_constraint_joint_PrismaticJointConfig = function() {
 	this.limitMotor = new oimo_dynamics_constraint_joint_TranslationalLimitMotor();
 	this.springDamper = new oimo_dynamics_constraint_joint_SpringDamper();
 };
-oimo_dynamics_constraint_joint_PrismaticJointConfig.__name__ = true;
 oimo_dynamics_constraint_joint_PrismaticJointConfig.__super__ = oimo_dynamics_constraint_joint_JointConfig;
 oimo_dynamics_constraint_joint_PrismaticJointConfig.prototype = $extend(oimo_dynamics_constraint_joint_JointConfig.prototype,{
 	init: function(rigidBody1,rigidBody2,worldAnchor,worldAxis) {
@@ -26474,7 +28083,6 @@ oimo_dynamics_constraint_joint_PrismaticJointConfig.prototype = $extend(oimo_dyn
 		v5.z = vZ1;
 		return this;
 	}
-	,__class__: oimo_dynamics_constraint_joint_PrismaticJointConfig
 });
 var oimo_dynamics_constraint_joint_RagdollJoint = function(config) {
 	oimo_dynamics_constraint_joint_Joint.call(this,config,oimo_dynamics_constraint_joint_JointType.RAGDOLL);
@@ -26705,7 +28313,6 @@ var oimo_dynamics_constraint_joint_RagdollJoint = function(config) {
 	this.swingConstraintAxisY = 0;
 	this.swingConstraintAxisZ = 0;
 };
-oimo_dynamics_constraint_joint_RagdollJoint.__name__ = true;
 oimo_dynamics_constraint_joint_RagdollJoint.__super__ = oimo_dynamics_constraint_joint_Joint;
 oimo_dynamics_constraint_joint_RagdollJoint.prototype = $extend(oimo_dynamics_constraint_joint_Joint.prototype,{
 	getInfo: function(info,timeStep,isPositionPart) {
@@ -27589,7 +29196,6 @@ oimo_dynamics_constraint_joint_RagdollJoint.prototype = $extend(oimo_dynamics_co
 	,getTwistAngle: function() {
 		return this._twistAngle;
 	}
-	,__class__: oimo_dynamics_constraint_joint_RagdollJoint
 });
 var oimo_dynamics_constraint_joint_RagdollJointConfig = function() {
 	oimo_dynamics_constraint_joint_JointConfig.call(this);
@@ -27602,7 +29208,6 @@ var oimo_dynamics_constraint_joint_RagdollJointConfig = function() {
 	this.maxSwingAngle1 = 3.14159265358979;
 	this.maxSwingAngle2 = 3.14159265358979;
 };
-oimo_dynamics_constraint_joint_RagdollJointConfig.__name__ = true;
 oimo_dynamics_constraint_joint_RagdollJointConfig.__super__ = oimo_dynamics_constraint_joint_JointConfig;
 oimo_dynamics_constraint_joint_RagdollJointConfig.prototype = $extend(oimo_dynamics_constraint_joint_JointConfig.prototype,{
 	init: function(rigidBody1,rigidBody2,worldAnchor,worldTwistAxis,worldSwingAxis) {
@@ -27672,7 +29277,6 @@ oimo_dynamics_constraint_joint_RagdollJointConfig.prototype = $extend(oimo_dynam
 		v8.z = vZ2;
 		return this;
 	}
-	,__class__: oimo_dynamics_constraint_joint_RagdollJointConfig
 });
 var oimo_dynamics_constraint_joint_RevoluteJoint = function(config) {
 	oimo_dynamics_constraint_joint_Joint.call(this,config,1);
@@ -27873,7 +29477,6 @@ var oimo_dynamics_constraint_joint_RevoluteJoint = function(config) {
 	this._sd = config.springDamper.clone();
 	this._lm = config.limitMotor.clone();
 };
-oimo_dynamics_constraint_joint_RevoluteJoint.__name__ = true;
 oimo_dynamics_constraint_joint_RevoluteJoint.__super__ = oimo_dynamics_constraint_joint_Joint;
 oimo_dynamics_constraint_joint_RevoluteJoint.prototype = $extend(oimo_dynamics_constraint_joint_Joint.prototype,{
 	getInfo: function(info,timeStep,isPositionPart) {
@@ -28788,7 +30391,6 @@ oimo_dynamics_constraint_joint_RevoluteJoint.prototype = $extend(oimo_dynamics_c
 	,getAngle: function() {
 		return this.angle;
 	}
-	,__class__: oimo_dynamics_constraint_joint_RevoluteJoint
 });
 var oimo_dynamics_constraint_joint_RevoluteJointConfig = function() {
 	oimo_dynamics_constraint_joint_JointConfig.call(this);
@@ -28797,7 +30399,6 @@ var oimo_dynamics_constraint_joint_RevoluteJointConfig = function() {
 	this.springDamper = new oimo_dynamics_constraint_joint_SpringDamper();
 	this.limitMotor = new oimo_dynamics_constraint_joint_RotationalLimitMotor();
 };
-oimo_dynamics_constraint_joint_RevoluteJointConfig.__name__ = true;
 oimo_dynamics_constraint_joint_RevoluteJointConfig.__super__ = oimo_dynamics_constraint_joint_JointConfig;
 oimo_dynamics_constraint_joint_RevoluteJointConfig.prototype = $extend(oimo_dynamics_constraint_joint_JointConfig.prototype,{
 	init: function(rigidBody1,rigidBody2,worldAnchor,worldAxis) {
@@ -28846,14 +30447,12 @@ oimo_dynamics_constraint_joint_RevoluteJointConfig.prototype = $extend(oimo_dyna
 		v5.z = vZ1;
 		return this;
 	}
-	,__class__: oimo_dynamics_constraint_joint_RevoluteJointConfig
 });
 var oimo_dynamics_constraint_joint_RotationalLimitMotor = function() {
 	this.lowerLimit = 1;
 	this.upperLimit = 0;
 	this.motorTorque = 0;
 };
-oimo_dynamics_constraint_joint_RotationalLimitMotor.__name__ = true;
 oimo_dynamics_constraint_joint_RotationalLimitMotor.prototype = {
 	setLimits: function(lower,upper) {
 		this.lowerLimit = lower;
@@ -28873,13 +30472,11 @@ oimo_dynamics_constraint_joint_RotationalLimitMotor.prototype = {
 		lm.motorTorque = this.motorTorque;
 		return lm;
 	}
-	,__class__: oimo_dynamics_constraint_joint_RotationalLimitMotor
 };
 var oimo_dynamics_constraint_joint_SphericalJoint = function(config) {
 	oimo_dynamics_constraint_joint_Joint.call(this,config,0);
 	this._sd = config.springDamper.clone();
 };
-oimo_dynamics_constraint_joint_SphericalJoint.__name__ = true;
 oimo_dynamics_constraint_joint_SphericalJoint.__super__ = oimo_dynamics_constraint_joint_Joint;
 oimo_dynamics_constraint_joint_SphericalJoint.prototype = $extend(oimo_dynamics_constraint_joint_Joint.prototype,{
 	getInfo: function(info,timeStep,isPositionPart) {
@@ -29117,27 +30714,23 @@ oimo_dynamics_constraint_joint_SphericalJoint.prototype = $extend(oimo_dynamics_
 	,getSpringDamper: function() {
 		return this._sd;
 	}
-	,__class__: oimo_dynamics_constraint_joint_SphericalJoint
 });
 var oimo_dynamics_constraint_joint_SphericalJointConfig = function() {
 	oimo_dynamics_constraint_joint_JointConfig.call(this);
 	this.springDamper = new oimo_dynamics_constraint_joint_SpringDamper();
 };
-oimo_dynamics_constraint_joint_SphericalJointConfig.__name__ = true;
 oimo_dynamics_constraint_joint_SphericalJointConfig.__super__ = oimo_dynamics_constraint_joint_JointConfig;
 oimo_dynamics_constraint_joint_SphericalJointConfig.prototype = $extend(oimo_dynamics_constraint_joint_JointConfig.prototype,{
 	init: function(rigidBody1,rigidBody2,worldAnchor) {
 		this._init(rigidBody1,rigidBody2,worldAnchor);
 		return this;
 	}
-	,__class__: oimo_dynamics_constraint_joint_SphericalJointConfig
 });
 var oimo_dynamics_constraint_joint_SpringDamper = function() {
 	this.frequency = 0;
 	this.dampingRatio = 0;
 	this.useSymplecticEuler = false;
 };
-oimo_dynamics_constraint_joint_SpringDamper.__name__ = true;
 oimo_dynamics_constraint_joint_SpringDamper.prototype = {
 	setSpring: function(frequency,dampingRatio) {
 		this.frequency = frequency;
@@ -29155,14 +30748,12 @@ oimo_dynamics_constraint_joint_SpringDamper.prototype = {
 		sd.useSymplecticEuler = this.useSymplecticEuler;
 		return sd;
 	}
-	,__class__: oimo_dynamics_constraint_joint_SpringDamper
 };
 var oimo_dynamics_constraint_joint_TranslationalLimitMotor = function() {
 	this.lowerLimit = 1;
 	this.upperLimit = 0;
 	this.motorForce = 0;
 };
-oimo_dynamics_constraint_joint_TranslationalLimitMotor.__name__ = true;
 oimo_dynamics_constraint_joint_TranslationalLimitMotor.prototype = {
 	setLimits: function(lower,upper) {
 		this.lowerLimit = lower;
@@ -29182,7 +30773,6 @@ oimo_dynamics_constraint_joint_TranslationalLimitMotor.prototype = {
 		lm.motorForce = this.motorForce;
 		return lm;
 	}
-	,__class__: oimo_dynamics_constraint_joint_TranslationalLimitMotor
 };
 var oimo_dynamics_constraint_joint_UniversalJoint = function(config) {
 	oimo_dynamics_constraint_joint_Joint.call(this,config,oimo_dynamics_constraint_joint_JointType.UNIVERSAL);
@@ -29366,7 +30956,6 @@ var oimo_dynamics_constraint_joint_UniversalJoint = function(config) {
 	this._lm1 = config.limitMotor1.clone();
 	this._lm2 = config.limitMotor2.clone();
 };
-oimo_dynamics_constraint_joint_UniversalJoint.__name__ = true;
 oimo_dynamics_constraint_joint_UniversalJoint.__super__ = oimo_dynamics_constraint_joint_Joint;
 oimo_dynamics_constraint_joint_UniversalJoint.prototype = $extend(oimo_dynamics_constraint_joint_Joint.prototype,{
 	getInfo: function(info,timeStep,isPositionPart) {
@@ -30255,7 +31844,6 @@ oimo_dynamics_constraint_joint_UniversalJoint.prototype = $extend(oimo_dynamics_
 	,getAngle2: function() {
 		return this._angleZ;
 	}
-	,__class__: oimo_dynamics_constraint_joint_UniversalJoint
 });
 var oimo_dynamics_constraint_joint_UniversalJointConfig = function() {
 	oimo_dynamics_constraint_joint_JointConfig.call(this);
@@ -30266,7 +31854,6 @@ var oimo_dynamics_constraint_joint_UniversalJointConfig = function() {
 	this.limitMotor1 = new oimo_dynamics_constraint_joint_RotationalLimitMotor();
 	this.limitMotor2 = new oimo_dynamics_constraint_joint_RotationalLimitMotor();
 };
-oimo_dynamics_constraint_joint_UniversalJointConfig.__name__ = true;
 oimo_dynamics_constraint_joint_UniversalJointConfig.__super__ = oimo_dynamics_constraint_joint_JointConfig;
 oimo_dynamics_constraint_joint_UniversalJointConfig.prototype = $extend(oimo_dynamics_constraint_joint_JointConfig.prototype,{
 	init: function(rigidBody1,rigidBody2,worldAnchor,worldAxis1,worldAxis2) {
@@ -30315,10 +31902,8 @@ oimo_dynamics_constraint_joint_UniversalJointConfig.prototype = $extend(oimo_dyn
 		v5.z = vZ1;
 		return this;
 	}
-	,__class__: oimo_dynamics_constraint_joint_UniversalJointConfig
 });
 var oimo_dynamics_constraint_solver_ConstraintSolverType = function() { };
-oimo_dynamics_constraint_solver_ConstraintSolverType.__name__ = true;
 var oimo_dynamics_constraint_solver_common_ContactSolverMassDataRow = function() {
 	this.invMLinN1X = 0;
 	this.invMLinN1Y = 0;
@@ -30362,10 +31947,6 @@ var oimo_dynamics_constraint_solver_common_ContactSolverMassDataRow = function()
 	this.massTB10 = 0;
 	this.massTB11 = 0;
 };
-oimo_dynamics_constraint_solver_common_ContactSolverMassDataRow.__name__ = true;
-oimo_dynamics_constraint_solver_common_ContactSolverMassDataRow.prototype = {
-	__class__: oimo_dynamics_constraint_solver_common_ContactSolverMassDataRow
-};
 var oimo_dynamics_constraint_solver_common_JointSolverMassDataRow = function() {
 	this.invMLin1X = 0;
 	this.invMLin1Y = 0;
@@ -30382,10 +31963,6 @@ var oimo_dynamics_constraint_solver_common_JointSolverMassDataRow = function() {
 	this.mass = 0;
 	this.massWithoutCfm = 0;
 };
-oimo_dynamics_constraint_solver_common_JointSolverMassDataRow.__name__ = true;
-oimo_dynamics_constraint_solver_common_JointSolverMassDataRow.prototype = {
-	__class__: oimo_dynamics_constraint_solver_common_JointSolverMassDataRow
-};
 var oimo_dynamics_constraint_solver_direct_Boundary = function(maxRows) {
 	var this1 = new Array(maxRows);
 	this.iBounded = this1;
@@ -30399,7 +31976,6 @@ var oimo_dynamics_constraint_solver_direct_Boundary = function(maxRows) {
 	this.numUnbounded = 0;
 	this.matrixId = 0;
 };
-oimo_dynamics_constraint_solver_direct_Boundary.__name__ = true;
 oimo_dynamics_constraint_solver_direct_Boundary.prototype = {
 	init: function(buildInfo) {
 		this.numBounded = buildInfo.numBounded;
@@ -30525,7 +32101,6 @@ oimo_dynamics_constraint_solver_direct_Boundary.prototype = {
 		}
 		return ok;
 	}
-	,__class__: oimo_dynamics_constraint_solver_direct_Boundary
 };
 var oimo_dynamics_constraint_solver_direct_BoundaryBuildInfo = function(size) {
 	this.size = size;
@@ -30538,10 +32113,6 @@ var oimo_dynamics_constraint_solver_direct_BoundaryBuildInfo = function(size) {
 	var this3 = new Array(size);
 	this.iUnbounded = this3;
 };
-oimo_dynamics_constraint_solver_direct_BoundaryBuildInfo.__name__ = true;
-oimo_dynamics_constraint_solver_direct_BoundaryBuildInfo.prototype = {
-	__class__: oimo_dynamics_constraint_solver_direct_BoundaryBuildInfo
-};
 var oimo_dynamics_constraint_solver_direct_BoundaryBuilder = function(maxRows) {
 	this.maxRows = maxRows;
 	this.numBoundaries = 0;
@@ -30549,7 +32120,6 @@ var oimo_dynamics_constraint_solver_direct_BoundaryBuilder = function(maxRows) {
 	this.boundaries = this1;
 	this.bbInfo = new oimo_dynamics_constraint_solver_direct_BoundaryBuildInfo(maxRows);
 };
-oimo_dynamics_constraint_solver_direct_BoundaryBuilder.__name__ = true;
 oimo_dynamics_constraint_solver_direct_BoundaryBuilder.prototype = {
 	buildBoundariesRecursive: function(info,i) {
 		if(i == info.numRows) {
@@ -30601,7 +32171,6 @@ oimo_dynamics_constraint_solver_direct_BoundaryBuilder.prototype = {
 		_this.numUnbounded = 0;
 		this.buildBoundariesRecursive(info,0);
 	}
-	,__class__: oimo_dynamics_constraint_solver_direct_BoundaryBuilder
 };
 var oimo_dynamics_constraint_solver_direct_BoundarySelector = function(n) {
 	this.n = n;
@@ -30616,7 +32185,6 @@ var oimo_dynamics_constraint_solver_direct_BoundarySelector = function(n) {
 		this.indices[i] = i;
 	}
 };
-oimo_dynamics_constraint_solver_direct_BoundarySelector.__name__ = true;
 oimo_dynamics_constraint_solver_direct_BoundarySelector.prototype = {
 	getIndex: function(i) {
 		return this.indices[i];
@@ -30651,7 +32219,6 @@ oimo_dynamics_constraint_solver_direct_BoundarySelector.prototype = {
 		this.indices = this.tmpIndices;
 		this.tmpIndices = tmp;
 	}
-	,__class__: oimo_dynamics_constraint_solver_direct_BoundarySelector
 };
 var oimo_dynamics_constraint_solver_direct_DirectJointConstraintSolver = function(joint) {
 	oimo_dynamics_constraint_ConstraintSolver.call(this);
@@ -30689,7 +32256,6 @@ var oimo_dynamics_constraint_solver_direct_DirectJointConstraintSolver = functio
 		this.dTotalImpulses[i1] = 0;
 	}
 };
-oimo_dynamics_constraint_solver_direct_DirectJointConstraintSolver.__name__ = true;
 oimo_dynamics_constraint_solver_direct_DirectJointConstraintSolver.__super__ = oimo_dynamics_constraint_ConstraintSolver;
 oimo_dynamics_constraint_solver_direct_DirectJointConstraintSolver.prototype = $extend(oimo_dynamics_constraint_ConstraintSolver.prototype,{
 	preSolveVelocity: function(timeStep) {
@@ -31770,7 +33336,6 @@ oimo_dynamics_constraint_solver_direct_DirectJointConstraintSolver.prototype = $
 		this.joint._syncAnchors();
 		this.joint._checkDestruction();
 	}
-	,__class__: oimo_dynamics_constraint_solver_direct_DirectJointConstraintSolver
 });
 var oimo_dynamics_constraint_solver_direct_MassMatrix = function(size) {
 	this._size = size;
@@ -31843,7 +33408,6 @@ var oimo_dynamics_constraint_solver_direct_MassMatrix = function(size) {
 		this._cachedSubmatrices[i1] = subMatrix;
 	}
 };
-oimo_dynamics_constraint_solver_direct_MassMatrix.__name__ = true;
 oimo_dynamics_constraint_solver_direct_MassMatrix.prototype = {
 	computeSubmatrix: function(id,indices,size) {
 		var _g1 = 0;
@@ -32633,7 +34197,6 @@ oimo_dynamics_constraint_solver_direct_MassMatrix.prototype = {
 			this._cacheComputed[i2] = false;
 		}
 	}
-	,__class__: oimo_dynamics_constraint_solver_direct_MassMatrix
 };
 var oimo_dynamics_constraint_solver_pgs_PgsContactConstraintSolver = function(constraint) {
 	oimo_dynamics_constraint_ConstraintSolver.call(this);
@@ -32649,7 +34212,6 @@ var oimo_dynamics_constraint_solver_pgs_PgsContactConstraintSolver = function(co
 		this.massData[i] = new oimo_dynamics_constraint_solver_common_ContactSolverMassDataRow();
 	}
 };
-oimo_dynamics_constraint_solver_pgs_PgsContactConstraintSolver.__name__ = true;
 oimo_dynamics_constraint_solver_pgs_PgsContactConstraintSolver.__super__ = oimo_dynamics_constraint_ConstraintSolver;
 oimo_dynamics_constraint_solver_pgs_PgsContactConstraintSolver.prototype = $extend(oimo_dynamics_constraint_ConstraintSolver.prototype,{
 	preSolveVelocity: function(timeStep) {
@@ -33722,7 +35284,6 @@ oimo_dynamics_constraint_solver_pgs_PgsContactConstraintSolver.prototype = $exte
 		}
 		this.constraint._syncManifold();
 	}
-	,__class__: oimo_dynamics_constraint_solver_pgs_PgsContactConstraintSolver
 });
 var oimo_dynamics_constraint_solver_pgs_PgsJointConstraintSolver = function(joint) {
 	oimo_dynamics_constraint_ConstraintSolver.call(this);
@@ -33738,7 +35299,6 @@ var oimo_dynamics_constraint_solver_pgs_PgsJointConstraintSolver = function(join
 		this.massData[i] = new oimo_dynamics_constraint_solver_common_JointSolverMassDataRow();
 	}
 };
-oimo_dynamics_constraint_solver_pgs_PgsJointConstraintSolver.__name__ = true;
 oimo_dynamics_constraint_solver_pgs_PgsJointConstraintSolver.__super__ = oimo_dynamics_constraint_ConstraintSolver;
 oimo_dynamics_constraint_solver_pgs_PgsJointConstraintSolver.prototype = $extend(oimo_dynamics_constraint_ConstraintSolver.prototype,{
 	preSolveVelocity: function(timeStep) {
@@ -34768,15 +36328,10 @@ oimo_dynamics_constraint_solver_pgs_PgsJointConstraintSolver.prototype = $extend
 		this.joint._syncAnchors();
 		this.joint._checkDestruction();
 	}
-	,__class__: oimo_dynamics_constraint_solver_pgs_PgsJointConstraintSolver
 });
 var oimo_dynamics_rigidbody_MassData = function() {
 	this.mass = 0;
 	this.localInertia = new oimo_common_Mat3();
-};
-oimo_dynamics_rigidbody_MassData.__name__ = true;
-oimo_dynamics_rigidbody_MassData.prototype = {
-	__class__: oimo_dynamics_rigidbody_MassData
 };
 var oimo_dynamics_rigidbody_RigidBody = function(config) {
 	this._next = null;
@@ -34889,7 +36444,6 @@ var oimo_dynamics_rigidbody_RigidBody = function(config) {
 	this._gravityScale = 1;
 	this._world = null;
 };
-oimo_dynamics_rigidbody_RigidBody.__name__ = true;
 oimo_dynamics_rigidbody_RigidBody.prototype = {
 	_integrate: function(dt) {
 		var _g = this._type;
@@ -38714,13 +40268,24 @@ oimo_dynamics_rigidbody_RigidBody.prototype = {
 		this._sleeping = false;
 		this._sleepTime = 0;
 	}
+	,getLinearDamping: function() {
+		return this._linearDamping;
+	}
+	,setLinearDamping: function(damping) {
+		this._linearDamping = damping;
+	}
+	,getAngularDamping: function() {
+		return this._angularDamping;
+	}
+	,setAngularDamping: function(damping) {
+		this._angularDamping = damping;
+	}
 	,getPrev: function() {
 		return this._prev;
 	}
 	,getNext: function() {
 		return this._next;
 	}
-	,__class__: oimo_dynamics_rigidbody_RigidBody
 };
 var oimo_dynamics_rigidbody_RigidBodyConfig = function() {
 	this.position = new oimo_common_Vec3();
@@ -38732,12 +40297,7 @@ var oimo_dynamics_rigidbody_RigidBodyConfig = function() {
 	this.linearDamping = 0;
 	this.angularDamping = 0;
 };
-oimo_dynamics_rigidbody_RigidBodyConfig.__name__ = true;
-oimo_dynamics_rigidbody_RigidBodyConfig.prototype = {
-	__class__: oimo_dynamics_rigidbody_RigidBodyConfig
-};
 var oimo_dynamics_rigidbody_RigidBodyType = function() { };
-oimo_dynamics_rigidbody_RigidBodyType.__name__ = true;
 var oimo_dynamics_rigidbody_Shape = function(config) {
 	this._id = -1;
 	this._localTransform = new oimo_common_Transform();
@@ -38796,7 +40356,6 @@ var oimo_dynamics_rigidbody_Shape = function(config) {
 	this._proxy = null;
 	this.displacement = new oimo_common_Vec3();
 };
-oimo_dynamics_rigidbody_Shape.__name__ = true;
 oimo_dynamics_rigidbody_Shape.prototype = {
 	getFriction: function() {
 		return this._friction;
@@ -39189,7 +40748,6 @@ oimo_dynamics_rigidbody_Shape.prototype = {
 	,getNext: function() {
 		return this._next;
 	}
-	,__class__: oimo_dynamics_rigidbody_Shape
 };
 var oimo_dynamics_rigidbody_ShapeConfig = function() {
 	this.position = new oimo_common_Vec3();
@@ -39202,60 +40760,6 @@ var oimo_dynamics_rigidbody_ShapeConfig = function() {
 	this.geometry = null;
 	this.contactCallback = null;
 };
-oimo_dynamics_rigidbody_ShapeConfig.__name__ = true;
-oimo_dynamics_rigidbody_ShapeConfig.prototype = {
-	__class__: oimo_dynamics_rigidbody_ShapeConfig
-};
-var oimo_m_M = function() { };
-oimo_m_M.__name__ = true;
-var oimo_m_U = function() { };
-oimo_m_U.__name__ = true;
-oimo_m_U.vec3Names = function(base) {
-	return oimo_m_U.appendSuffixes(base,["X","Y","Z"]);
-};
-oimo_m_U.mat3Names = function(base) {
-	var _g = [];
-	var _g1 = 0;
-	while(_g1 < 3) {
-		var i = _g1++;
-		var _g2 = 0;
-		while(_g2 < 3) {
-			var j = _g2++;
-			_g.push("" + i + j);
-		}
-	}
-	return oimo_m_U.appendSuffixes(base,_g);
-};
-oimo_m_U.quatNames = function(base) {
-	return oimo_m_U.appendSuffixes(base,["X","Y","Z","W"]);
-};
-oimo_m_U.quatVecNames = function(base) {
-	return oimo_m_U.appendSuffixes(base,["X","Y","Z"]);
-};
-oimo_m_U.quatRealName = function(base) {
-	return base + "W";
-};
-oimo_m_U.mat3NamesDiag = function(base) {
-	var m = oimo_m_U.mat3Names(base);
-	return [m[0],m[4],m[8]];
-};
-oimo_m_U.appendSuffixes = function(base,suffixes) {
-	return suffixes.map(function(s) {
-		return base + s;
-	});
-};
-String.prototype.__class__ = String;
-String.__name__ = true;
-Array.__name__ = true;
-Date.prototype.__class__ = Date;
-Date.__name__ = ["Date"];
-var Int = { };
-var Dynamic = { };
-var Float = Number;
-var Bool = Boolean;
-var Class = { };
-var Enum = { };
-js_Boot.__toStr = ({ }).toString;
 oimo_collision_broadphase_BroadPhaseType._BRUTE_FORCE = 1;
 oimo_collision_broadphase_BroadPhaseType._BVH = 2;
 oimo_collision_broadphase_BroadPhaseType.BRUTE_FORCE = 1;
@@ -39268,12 +40772,15 @@ oimo_collision_geometry_GeometryType._CYLINDER = 2;
 oimo_collision_geometry_GeometryType._CONE = 3;
 oimo_collision_geometry_GeometryType._CAPSULE = 4;
 oimo_collision_geometry_GeometryType._CONVEX_HULL = 5;
+oimo_collision_geometry_GeometryType._CONVEX_MIN = 0;
+oimo_collision_geometry_GeometryType._CONVEX_MAX = 5;
 oimo_collision_geometry_GeometryType.SPHERE = 0;
 oimo_collision_geometry_GeometryType.BOX = 1;
 oimo_collision_geometry_GeometryType.CYLINDER = 2;
 oimo_collision_geometry_GeometryType.CONE = 3;
 oimo_collision_geometry_GeometryType.CAPSULE = 4;
 oimo_collision_geometry_GeometryType.CONVEX_HULL = 5;
+oimo_collision_narrowphase_detector_BoxBoxDetector.EDGE_BIAS_MULT = 1.0;
 oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedronState.OK = 0;
 oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedronState.INVALID_TRIANGLE = 1;
 oimo_collision_narrowphase_detector_gjkepa_EpaPolyhedronState.NO_ADJACENT_PAIR_INDEX = 2;

@@ -12,6 +12,9 @@ class GeometryType {
 	public static inline var _CAPSULE:Int     = 4;
 	public static inline var _CONVEX_HULL:Int = 5;
 
+	public static inline var _CONVEX_MIN:Int = 0;
+	public static inline var _CONVEX_MAX:Int = 5;
+
 	/**
 	 * Represents a sphere collision geometry.
 	 *

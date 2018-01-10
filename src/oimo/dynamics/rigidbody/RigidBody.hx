@@ -1038,6 +1038,34 @@ class RigidBody {
 	}
 
 	/**
+	 * Returns the linear damping.
+	 */
+	public inline function getLinearDamping():Float {
+		return _linearDamping;
+	}
+
+	/**
+	 * Sets the linear damping to `damping`.
+	 */
+	public inline function setLinearDamping(damping:Float):Void {
+		_linearDamping = damping;
+	}
+
+	/**
+	 * Returns the angular damping.
+	 */
+	public inline function getAngularDamping():Float {
+		return _angularDamping;
+	}
+
+	/**
+	 * Sets the angular damping to `damping`.
+	 */
+	public inline function setAngularDamping(damping:Float):Void {
+		_angularDamping = damping;
+	}
+
+	/**
 	 * Returns the previous rigid body in the world.
 	 *
 	 * If the previous one does not exist, `null` will be returned.

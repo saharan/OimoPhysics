@@ -304,6 +304,9 @@ class World {
 
 		var r:RigidBody = _rigidBodyList;
 		M.list_foreach(r, _next, {
+			if (d.drawBases) {
+				_drawBasis(d, r._transform);
+			}
 			var shapeColor:Vec3 = null;
 			var isDynamic:Bool = r._type == RigidBodyType._DYNAMIC;
 			if (!isDynamic) {
@@ -334,6 +337,12 @@ class World {
 				}
 			});
 		});
+	}
+
+	@:extern
+	inline function _drawBasis(d:DebugDraw, tf:Transform):Void {
+		var style:DebugDrawStyle = d.style;
+		d.basis(tf, style.basisLength, style.basisColorX, style.basisColorY, style.basisColorZ);
 	}
 
 	@:extern
@@ -503,8 +512,19 @@ class World {
 			d.point(pos2, style.disabledContactColor);
 			d.line(pos1, pos2, style.disabledContactColor);
 		} else if (p._warmStarted) {
-			d.point(pos1, style.contactColor);
-			d.point(pos2, style.contactColor);
+			var color:Vec3;
+			switch (p._id & 3) {
+			case 0:
+				color = style.contactColor;
+			case 1:
+				color = style.contactColor2;
+			case 2:
+				color = style.contactColor3;
+			case _:
+				color = style.contactColor4;
+			}
+			d.point(pos1, color);
+			d.point(pos2, color);
 			d.line(pos1, pos2, style.contactColor);
 		} else {
 			d.point(pos1, style.newContactColor);
@@ -823,8 +843,9 @@ class World {
 	 */
 	public function debugDraw():Void {
 		if (_debugDraw != null) {
-			if (Std.is(_broadPhase, BvhBroadPhase)) {
-				_drawBvh(_debugDraw, cast(_broadPhase, BvhBroadPhase)._tree);
+			if (_broadPhase._type == BroadPhaseType._BVH) {
+				var bvhBroadPhase:BvhBroadPhase = cast _broadPhase;
+				_drawBvh(_debugDraw, bvhBroadPhase._tree);
 			}
 			_drawRigidBodies(_debugDraw);
 			_drawConstraints(_debugDraw);
@@ -1017,7 +1038,8 @@ private class ConvexCastWrapper extends BroadPhaseProxyCallback {
 
 	override public function process(proxy:Proxy):Void {
 		var shape:Shape = cast proxy.userData;
-		if (!Std.is(shape._geom, ConvexGeometry)) return;
+		var type:Int = shape._geom._type;
+		if (type < GeometryType._CONVEX_MIN || type > GeometryType._CONVEX_MAX) return;
 
 		var geom:ConvexGeometry = cast shape._geom;
 		if (GjkEpa.getInstance().convexCast(convex, geom, begin, shape._transform, translation, zero, rayCastHit)) {

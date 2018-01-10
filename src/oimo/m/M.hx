@@ -12,7 +12,6 @@ using haxe.macro.TypeTools;
  * Expression Macro
  */
 class M {
-
 	// ---------------------------------------------------------------------
 	// Util
 	// ---------------------------------------------------------------------
@@ -280,7 +279,11 @@ class M {
 	// ---------------------------------------------------------------------
 
 	public static macro function assert(expectedToBeTrue:ExprOf<Bool>) {
+		#if OIMO_ASSERT
 		return macro if (!$expectedToBeTrue) throw M.error("assertion error: " + $v{expectedToBeTrue.s()} + " is false");
+		#else
+		return macro {};
+		#end
 	}
 
 	// ---------------------------------------------------------------------

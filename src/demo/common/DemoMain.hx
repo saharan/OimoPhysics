@@ -177,10 +177,16 @@ class DemoMain {
 				() -> dd.drawPairs = !dd.drawPairs
 			),
 			new Control(
-				"B",
+				"V",
 				() -> (dd.drawAabbs ? "hide" : "draw") + " AABBs",
-				"B".charCodeAt(0),
+				"V".charCodeAt(0),
 				() -> dd.drawAabbs = !dd.drawAabbs
+			),
+			new Control(
+				"B",
+				() -> (dd.drawBases ? "hide" : "draw") + " bases",
+				"B".charCodeAt(0),
+				() -> dd.drawBases = !dd.drawBases
 			),
 			new Control(
 				"C",

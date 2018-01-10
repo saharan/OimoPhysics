@@ -40,7 +40,7 @@ class CollisionMatrix {
 		detectors[sp][ch] = gjkEpaDetector;
 
 		detectors[bo][sp] = new SphereBoxDetector(true);
-		detectors[bo][bo] = gjkEpaDetector;
+		detectors[bo][bo] = new BoxBoxDetector();
 		detectors[bo][cy] = gjkEpaDetector;
 		detectors[bo][co] = gjkEpaDetector;
 		detectors[bo][ca] = gjkEpaDetector;

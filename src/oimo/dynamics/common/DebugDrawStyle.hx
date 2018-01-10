@@ -20,6 +20,9 @@ class DebugDrawStyle {
 	public var pairColor:Vec3 = new Vec3(1.0, 1.0, 0.1);
 
 	public var contactColor:Vec3 = new Vec3(1.0, 0.1, 0.1);
+	public var contactColor2:Vec3 = new Vec3(1.0, 0.6, 0.1);
+	public var contactColor3:Vec3 = new Vec3(0.1, 0.8, 0.6);
+	public var contactColor4:Vec3 = new Vec3(0.8, 0.1, 1.0);
 	public var newContactColor:Vec3 = new Vec3(1.0, 1.0, 0.1);
 	public var disabledContactColor:Vec3 = new Vec3(0.5, 0.1, 0.1);
 
@@ -33,6 +36,11 @@ class DebugDrawStyle {
 	public var jointLineColor:Vec3 = new Vec3(0.8, 0.8, 0.8);
 	public var jointErrorColor:Vec3 = new Vec3(1.0, 0.1, 0.1);
 	public var jointRotationalConstraintRadius:Float = 0.3;
+
+	public var basisLength:Float = 0.5;
+	public var basisColorX:Vec3 = new Vec3(1.0, 0.0, 0.0);
+	public var basisColorY:Vec3 = new Vec3(0.0, 1.0, 0.0);
+	public var basisColorZ:Vec3 = new Vec3(0.0, 0.0, 1.0);
 
 	/**
 	 * Default constructor.

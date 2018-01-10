@@ -17,7 +17,7 @@ class BruteForceBroadPhase extends BroadPhase {
 
 	@:dox(hide)
 	public function new() {
-		super();
+		super(BroadPhaseType._BRUTE_FORCE);
 		_incremental = false;
 	}
 

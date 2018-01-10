@@ -7,6 +7,7 @@ import oimo.common.MathUtil;
 import oimo.common.Pool;
 import oimo.common.Vec3;
 import oimo.common.Transform;
+import oimo.m.M;
 
 /**
  * The interface of debug drawer. This provides graphical information of a physics world
@@ -47,6 +48,11 @@ class DebugDraw {
 	 * Whether to draw the AABBs.
 	 */
 	public var drawAabbs:Bool;
+
+	/**
+	 * Whether to draw the bases of the rigid bodies.
+	 */
+	public var drawBases:Bool;
 
 	/**
 	 * Whether to draw the overlapping pairs of the AABBs.
@@ -105,6 +111,7 @@ class DebugDraw {
 		drawBvhMinLevel = 0;
 		drawBvhMaxLevel = 65536;
 		drawAabbs = false;
+		drawBases = false;
 		drawPairs = false;
 		drawContacts = false;
 		drawJoints = true;
@@ -268,6 +275,45 @@ class DebugDraw {
 		disp(v6);
 		disp(v7);
 		disp(v8);
+	}
+
+	/**
+	 * Draws the basis of a transform `transform`.
+	 *
+	 * `length` is the length of the lines to be drawn.
+	 *
+	 * `colorX` is the color of the x-axis of the basis.
+	 *
+	 * `colorY` is the color of the y-axis of the basis.
+	 *
+	 * `colorZ` is the color of the z-axis of the basis.
+	 */
+	public function basis(transform:Transform, length:Float, colorX:Vec3, colorY:Vec3, colorZ:Vec3):Void {
+		var pos:Vec3 = vec3();
+		var rot:Mat3 = mat3();
+		var ex:Vec3 = vec3();
+		var ey:Vec3 = vec3();
+		var ez:Vec3 = vec3();
+
+		M.vec3_toVec3(pos, transform._position);
+		M.mat3_toMat3(rot, transform._rotation);
+		rot.getColTo(0, ex);
+		rot.getColTo(1, ey);
+		rot.getColTo(2, ez);
+
+		ex.scaleEq(length).addEq(pos);
+		ey.scaleEq(length).addEq(pos);
+		ez.scaleEq(length).addEq(pos);
+
+		line(pos, ex, colorX);
+		line(pos, ey, colorY);
+		line(pos, ez, colorZ);
+
+		disp(pos);
+		disp(rot);
+		disp(ex);
+		disp(ey);
+		disp(ez);
 	}
 
 	/**

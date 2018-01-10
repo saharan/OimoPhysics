@@ -12,10 +12,13 @@ using haxe.macro.ExprTools;
 using haxe.macro.TypeTools;
 using haxe.macro.ComplexTypeTools;
 
+#if macro
+
 /**
  * Macro Utils
  */
 class U {
+
 	public static function vec3Names(base:String) {
 		return appendSuffixes(base, ["X", "Y", "Z"]);
 	}
@@ -46,8 +49,6 @@ class U {
 			return base + s;
 		});
 	}
-
-#if macro
 
 	public static function namesE(e:Expr):Array<String> {
 		if (e == null) return null;
@@ -107,6 +108,6 @@ class U {
 		return Context.getBuildFields();
 	}
 
-#end
-
 }
+
+#end

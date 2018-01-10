@@ -36,7 +36,7 @@ class VerticalStackingDemo extends DemoBase {
 
 		for (i in -w...w + 1) {
 			for (j in 0...n + dn * (i + w)) {
-				OimoUtil.addBox(world, new Vec3(i * sp + MathUtil.randIn(-0.01, 0.01), size + j * size * 2.05, MathUtil.randIn(-0.01, 0.01)), new Vec3(size, size, size), false);
+				OimoUtil.addBox(world, new Vec3(i * sp + MathUtil.randIn(-0.01, 0.01), size + j * size * 2.2, MathUtil.randIn(-0.01, 0.01)), new Vec3(size, size, size), false);
 			}
 		}
 
