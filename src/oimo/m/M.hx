@@ -113,42 +113,12 @@ class M {
 	// Float
 	// ---------------------------------------------------------------------
 
-	public static inline var EPS:Float = 1e-6;
-
 	public static macro function toFixed4(x:ExprOf<Float>) {
 		return macro $x > 0 ? Std.int($x * 1000 + 0.5) / 1000 : Std.int($x * 1000 - 0.5) / 1000;
 	}
 
 	public static macro function toFixed8(x:ExprOf<Float>) {
 		return macro $x > 0 ? Std.int($x * 10000000 + 0.5) / 10000000 : Std.int($x * 10000000 - 0.5) / 10000000;
-	}
-
-	public static macro function round(x:ExprOf<Float>) {
-		return macro $x > 0 ? Std.int($x + 0.5) : Std.int($x - 0.5);
-	}
-
-	public static macro function eq(x:ExprOf<Float>, y:ExprOf<Float>) {
-		return macro $x > $y - M.EPS && $x < $y + M.EPS;
-	}
-
-	public static macro function eq0(x:ExprOf<Float>) {
-		return macro $x > -M.EPS && $x < M.EPS;
-	}
-
-	public static macro function gt0(x:ExprOf<Float>) {
-		return macro $x > M.EPS;
-	}
-
-	public static macro function lt0(x:ExprOf<Float>) {
-		return macro $x < -M.EPS;
-	}
-
-	public static macro function min(x:ExprOf<Float>, y:ExprOf<Float>) {
-		return macro $x < $y ? $x : $y;
-	}
-
-	public static macro function max(x:ExprOf<Float>, y:ExprOf<Float>) {
-		return macro $x > $y ? $x : $y;
 	}
 
 	// ---------------------------------------------------------------------
@@ -1174,7 +1144,7 @@ class M {
 		var bs = v2.s().vec3Names();
 		return macro {
 			var d:Float = M.vec3_dot($v1, $v2);
-			if (M.eq(d, -1)) { // PI rotation, ignore v2 and set a vector perpendicular to v1
+			if (d < -1 + 1e-9) { // PI rotation, ignore v2 and set a vector perpendicular to v1
 				var vX:Float, vY:Float, vZ:Float;
 				M.vec3_perp(v, $v1);
 				M.quat_fromVec3AndFloat($dst, v, 0);

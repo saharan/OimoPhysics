@@ -33,19 +33,15 @@ class RagdollJoint extends Joint {
 	public var _maxSwingAngle1:Float;
 	public var _maxSwingAngle2:Float;
 
+	var swingAxis:IVec3;
+	var twistAxis:IVec3;
 
-	public var swingAxis:IVec3;
-	public var twistAxis:IVec3;
-
-	public var swingError:Float;
+	var linearError:IVec3;
+	var swingError:Float;
 	var dummySwingLm:RotationalLimitMotor;
-
-	public var swingConstraintAxis1:IVec3;
-	public var swingConstraintAxis:IVec3;
 
 	public var _swingAngle:Float;
 	public var _twistAngle:Float;
-	var linearError:IVec3;
 
 	/**
 	 * Creates a new ragdoll joint by configuration `config`.
@@ -81,9 +77,6 @@ class RagdollJoint extends Joint {
 		swingError = 0;
 		M.vec3_zero(swingAxis);
 		M.vec3_zero(twistAxis);
-
-		M.vec3_zero(swingConstraintAxis1);
-		M.vec3_zero(swingConstraintAxis);
 	}
 
 	// --- private ---
@@ -247,7 +240,6 @@ class RagdollJoint extends Joint {
 				M.vec3_mulMat3(swingAxis, swingAxis, basis1Mat);
 				// then swing it
 				M.vec3_mulMat3(swingAxis, swingAxis, swingM);
-				M.vec3_assign(swingConstraintAxis, swingAxis);
 			} else {
 				swingError = 0;
 			}

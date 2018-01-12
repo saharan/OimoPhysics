@@ -40,7 +40,7 @@ A lightweight 3D physics engine.
 	* Direct block MLCP solver
 	* Projected Gauss-Seidel solver
 * Sleepings with island splittings
-* Limit rotations
+* Rotation limits
 * Collision event callbacks
 * Collision filterings
 * Collision queries

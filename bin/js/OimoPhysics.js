@@ -1,5 +1,5 @@
 /*
- * OimoPhysics 1.1.0 (c) 2018 saharan, The MIT License
+ * OimoPhysics 1.1.2 (c) 2018 saharan, The MIT License
  */
 (function () { "use strict";
 function $extend(from, fields) {
@@ -25550,7 +25550,7 @@ var oimo_dynamics_constraint_joint_CylindricalJoint = function(config) {
 	var slerpM21;
 	var slerpM22;
 	var d = this._localBasisX1X * this._localBasisX2X + this._localBasisX1Y * this._localBasisX2Y + this._localBasisX1Z * this._localBasisX2Z;
-	if(d > -1.000001 && d < -0.999999) {
+	if(d < -0.999999999) {
 		var vX;
 		var vY;
 		var vZ;
@@ -26257,7 +26257,7 @@ oimo_dynamics_constraint_joint_CylindricalJoint.prototype = $extend(oimo_dynamic
 		var prevYY;
 		var prevYZ;
 		var d = _this.joint._basisX1X * _this.joint._basisX2X + _this.joint._basisX1Y * _this.joint._basisX2Y + _this.joint._basisX1Z * _this.joint._basisX2Z;
-		if(d > -1.000001 && d < -0.999999) {
+		if(d < -0.999999999) {
 			var vX;
 			var vY;
 			var vZ;
@@ -26431,7 +26431,7 @@ oimo_dynamics_constraint_joint_CylindricalJoint.prototype = $extend(oimo_dynamic
 		prevYY = _this.yY;
 		prevYZ = _this.yZ;
 		var d3 = prevXX * newXX + prevXY * newXY + prevXZ * newXZ;
-		if(d3 > -1.000001 && d3 < -0.999999) {
+		if(d3 < -0.999999999) {
 			var vX1;
 			var vY1;
 			var vZ1;
@@ -26915,7 +26915,7 @@ var oimo_dynamics_constraint_joint_PrismaticJoint = function(config) {
 	var slerpM21;
 	var slerpM22;
 	var d = this._localBasisX1X * this._localBasisX2X + this._localBasisX1Y * this._localBasisX2Y + this._localBasisX1Z * this._localBasisX2Z;
-	if(d > -1.000001 && d < -0.999999) {
+	if(d < -0.999999999) {
 		var vX;
 		var vY;
 		var vZ;
@@ -27487,7 +27487,7 @@ oimo_dynamics_constraint_joint_PrismaticJoint.prototype = $extend(oimo_dynamics_
 		var prevYY;
 		var prevYZ;
 		var d = _this.joint._basisX1X * _this.joint._basisX2X + _this.joint._basisX1Y * _this.joint._basisX2Y + _this.joint._basisX1Z * _this.joint._basisX2Z;
-		if(d > -1.000001 && d < -0.999999) {
+		if(d < -0.999999999) {
 			var vX;
 			var vY;
 			var vZ;
@@ -27661,7 +27661,7 @@ oimo_dynamics_constraint_joint_PrismaticJoint.prototype = $extend(oimo_dynamics_
 		prevYY = _this.yY;
 		prevYZ = _this.yZ;
 		var d3 = prevXX * newXX + prevXY * newXY + prevXZ * newXZ;
-		if(d3 > -1.000001 && d3 < -0.999999) {
+		if(d3 < -0.999999999) {
 			var vX1;
 			var vY1;
 			var vZ1;
@@ -28176,7 +28176,7 @@ var oimo_dynamics_constraint_joint_RagdollJoint = function(config) {
 	var slerpM21;
 	var slerpM22;
 	var d1 = this._localBasisX1X * this._localBasisX2X + this._localBasisX1Y * this._localBasisX2Y + this._localBasisX1Z * this._localBasisX2Z;
-	if(d1 > -1.000001 && d1 < -0.999999) {
+	if(d1 < -0.999999999) {
 		var vX;
 		var vY;
 		var vZ;
@@ -28306,12 +28306,6 @@ var oimo_dynamics_constraint_joint_RagdollJoint = function(config) {
 	this.twistAxisX = 0;
 	this.twistAxisY = 0;
 	this.twistAxisZ = 0;
-	this.swingConstraintAxis1X = 0;
-	this.swingConstraintAxis1Y = 0;
-	this.swingConstraintAxis1Z = 0;
-	this.swingConstraintAxisX = 0;
-	this.swingConstraintAxisY = 0;
-	this.swingConstraintAxisZ = 0;
 };
 oimo_dynamics_constraint_joint_RagdollJoint.__super__ = oimo_dynamics_constraint_joint_Joint;
 oimo_dynamics_constraint_joint_RagdollJoint.prototype = $extend(oimo_dynamics_constraint_joint_Joint.prototype,{
@@ -28921,7 +28915,7 @@ oimo_dynamics_constraint_joint_RagdollJoint.prototype = $extend(oimo_dynamics_co
 		var swingVY;
 		var swingVZ;
 		var d = axis1X * axis2X + axis1Y * axis2Y + axis1Z * axis2Z;
-		if(d > -1.000001 && d < -0.999999) {
+		if(d < -0.999999999) {
 			var vX;
 			var vY;
 			var vZ;
@@ -29092,9 +29086,6 @@ oimo_dynamics_constraint_joint_RagdollJoint.prototype = $extend(oimo_dynamics_co
 				this.swingAxisX = __tmp__X3;
 				this.swingAxisY = __tmp__Y3;
 				this.swingAxisZ = __tmp__Z3;
-				this.swingConstraintAxisX = this.swingAxisX;
-				this.swingConstraintAxisY = this.swingAxisY;
-				this.swingConstraintAxisZ = this.swingAxisZ;
 			} else {
 				this.swingError = 0;
 			}
@@ -29330,7 +29321,7 @@ var oimo_dynamics_constraint_joint_RevoluteJoint = function(config) {
 	var slerpM21;
 	var slerpM22;
 	var d = this._localBasisX1X * this._localBasisX2X + this._localBasisX1Y * this._localBasisX2Y + this._localBasisX1Z * this._localBasisX2Z;
-	if(d > -1.000001 && d < -0.999999) {
+	if(d < -0.999999999) {
 		var vX;
 		var vY;
 		var vZ;
@@ -29963,7 +29954,7 @@ oimo_dynamics_constraint_joint_RevoluteJoint.prototype = $extend(oimo_dynamics_c
 		var prevYY;
 		var prevYZ;
 		var d = _this.joint._basisX1X * _this.joint._basisX2X + _this.joint._basisX1Y * _this.joint._basisX2Y + _this.joint._basisX1Z * _this.joint._basisX2Z;
-		if(d > -1.000001 && d < -0.999999) {
+		if(d < -0.999999999) {
 			var vX;
 			var vY;
 			var vZ;
@@ -30137,7 +30128,7 @@ oimo_dynamics_constraint_joint_RevoluteJoint.prototype = $extend(oimo_dynamics_c
 		prevYY = _this.yY;
 		prevYZ = _this.yZ;
 		var d3 = prevXX * newXX + prevXY * newXY + prevXZ * newXZ;
-		if(d3 > -1.000001 && d3 < -0.999999) {
+		if(d3 < -0.999999999) {
 			var vX1;
 			var vY1;
 			var vZ1;
@@ -40760,6 +40751,7 @@ var oimo_dynamics_rigidbody_ShapeConfig = function() {
 	this.geometry = null;
 	this.contactCallback = null;
 };
+var oimo_m_M = function() { };
 oimo_collision_broadphase_BroadPhaseType._BRUTE_FORCE = 1;
 oimo_collision_broadphase_BroadPhaseType._BVH = 2;
 oimo_collision_broadphase_BroadPhaseType.BRUTE_FORCE = 1;
@@ -40989,6 +40981,7 @@ oimo_collision_narrowphase_DetectorResult.prototype["clear"] = oimo_collision_na
 window["OIMO"]["DetectorResultPoint"] = oimo_collision_narrowphase_DetectorResultPoint;
 window["OIMO"]["Detector"] = oimo_collision_narrowphase_detector_Detector;
 oimo_collision_narrowphase_detector_Detector.prototype["detect"] = oimo_collision_narrowphase_detector_Detector.prototype.detect;
+window["OIMO"]["BoxBoxDetector"] = oimo_collision_narrowphase_detector_BoxBoxDetector;
 window["OIMO"]["CapsuleCapsuleDetector"] = oimo_collision_narrowphase_detector_CapsuleCapsuleDetector;
 window["OIMO"]["GjkEpaDetector"] = oimo_collision_narrowphase_detector_GjkEpaDetector;
 window["OIMO"]["SphereBoxDetector"] = oimo_collision_narrowphase_detector_SphereBoxDetector;
@@ -41034,7 +41027,9 @@ oimo_common_Transform.prototype["translate"] = oimo_common_Transform.prototype.t
 oimo_common_Transform.prototype["getRotation"] = oimo_common_Transform.prototype.getRotation;
 oimo_common_Transform.prototype["getRotationTo"] = oimo_common_Transform.prototype.getRotationTo;
 oimo_common_Transform.prototype["setRotation"] = oimo_common_Transform.prototype.setRotation;
+oimo_common_Transform.prototype["setRotationXyz"] = oimo_common_Transform.prototype.setRotationXyz;
 oimo_common_Transform.prototype["rotate"] = oimo_common_Transform.prototype.rotate;
+oimo_common_Transform.prototype["rotateXyz"] = oimo_common_Transform.prototype.rotateXyz;
 oimo_common_Transform.prototype["getOrientation"] = oimo_common_Transform.prototype.getOrientation;
 oimo_common_Transform.prototype["getOrientationTo"] = oimo_common_Transform.prototype.getOrientationTo;
 oimo_common_Transform.prototype["setOrientation"] = oimo_common_Transform.prototype.setOrientation;
@@ -41145,6 +41140,7 @@ oimo_common_MathUtil["clamp"] = oimo_common_MathUtil.clamp;
 oimo_common_MathUtil["rand"] = oimo_common_MathUtil.rand;
 oimo_common_MathUtil["randIn"] = oimo_common_MathUtil.randIn;
 oimo_common_MathUtil["randVec3In"] = oimo_common_MathUtil.randVec3In;
+oimo_common_MathUtil["randVec3"] = oimo_common_MathUtil.randVec3;
 window["OIMO"]["Pool"] = oimo_common_Pool;
 oimo_common_Pool.prototype["vec3"] = oimo_common_Pool.prototype.vec3;
 oimo_common_Pool.prototype["mat3"] = oimo_common_Pool.prototype.mat3;
@@ -41220,30 +41216,12 @@ oimo_dynamics_World.prototype["setNumPositionIterations"] = oimo_dynamics_World.
 oimo_dynamics_World.prototype["getGravity"] = oimo_dynamics_World.prototype.getGravity;
 oimo_dynamics_World.prototype["setGravity"] = oimo_dynamics_World.prototype.setGravity;
 window["OIMO"]["AabbTestCallback"] = oimo_dynamics_callback_AabbTestCallback;
-oimo_dynamics_callback_AabbTestCallback.prototype["process"] = oimo_dynamics_callback_AabbTestCallback.prototype.process;
 window["OIMO"]["ContactCallback"] = oimo_dynamics_callback_ContactCallback;
-oimo_dynamics_callback_ContactCallback.prototype["beginContact"] = oimo_dynamics_callback_ContactCallback.prototype.beginContact;
-oimo_dynamics_callback_ContactCallback.prototype["preSolve"] = oimo_dynamics_callback_ContactCallback.prototype.preSolve;
-oimo_dynamics_callback_ContactCallback.prototype["postSolve"] = oimo_dynamics_callback_ContactCallback.prototype.postSolve;
-oimo_dynamics_callback_ContactCallback.prototype["endContact"] = oimo_dynamics_callback_ContactCallback.prototype.endContact;
 window["OIMO"]["RayCastCallback"] = oimo_dynamics_callback_RayCastCallback;
-oimo_dynamics_callback_RayCastCallback.prototype["process"] = oimo_dynamics_callback_RayCastCallback.prototype.process;
 window["OIMO"]["RayCastClosest"] = oimo_dynamics_callback_RayCastClosest;
 oimo_dynamics_callback_RayCastClosest.prototype["clear"] = oimo_dynamics_callback_RayCastClosest.prototype.clear;
 oimo_dynamics_callback_RayCastClosest.prototype["process"] = oimo_dynamics_callback_RayCastClosest.prototype.process;
 window["OIMO"]["DebugDraw"] = oimo_dynamics_common_DebugDraw;
-oimo_dynamics_common_DebugDraw.prototype["aabb"] = oimo_dynamics_common_DebugDraw.prototype.aabb;
-oimo_dynamics_common_DebugDraw.prototype["ellipse"] = oimo_dynamics_common_DebugDraw.prototype.ellipse;
-oimo_dynamics_common_DebugDraw.prototype["arc"] = oimo_dynamics_common_DebugDraw.prototype.arc;
-oimo_dynamics_common_DebugDraw.prototype["cone"] = oimo_dynamics_common_DebugDraw.prototype.cone;
-oimo_dynamics_common_DebugDraw.prototype["cylinder"] = oimo_dynamics_common_DebugDraw.prototype.cylinder;
-oimo_dynamics_common_DebugDraw.prototype["capsule"] = oimo_dynamics_common_DebugDraw.prototype.capsule;
-oimo_dynamics_common_DebugDraw.prototype["sphere"] = oimo_dynamics_common_DebugDraw.prototype.sphere;
-oimo_dynamics_common_DebugDraw.prototype["box"] = oimo_dynamics_common_DebugDraw.prototype.box;
-oimo_dynamics_common_DebugDraw.prototype["rect"] = oimo_dynamics_common_DebugDraw.prototype.rect;
-oimo_dynamics_common_DebugDraw.prototype["point"] = oimo_dynamics_common_DebugDraw.prototype.point;
-oimo_dynamics_common_DebugDraw.prototype["triangle"] = oimo_dynamics_common_DebugDraw.prototype.triangle;
-oimo_dynamics_common_DebugDraw.prototype["line"] = oimo_dynamics_common_DebugDraw.prototype.line;
 window["OIMO"]["DebugDrawStyle"] = oimo_dynamics_common_DebugDrawStyle;
 window["OIMO"]["Performance"] = oimo_dynamics_common_Performance;
 window["OIMO"]["ConstraintSolver"] = oimo_dynamics_constraint_ConstraintSolver;
@@ -41505,6 +41483,10 @@ oimo_dynamics_rigidbody_RigidBody.prototype["wakeUp"] = oimo_dynamics_rigidbody_
 oimo_dynamics_rigidbody_RigidBody.prototype["sleep"] = oimo_dynamics_rigidbody_RigidBody.prototype.sleep;
 oimo_dynamics_rigidbody_RigidBody.prototype["getSleepTime"] = oimo_dynamics_rigidbody_RigidBody.prototype.getSleepTime;
 oimo_dynamics_rigidbody_RigidBody.prototype["setAutoSleep"] = oimo_dynamics_rigidbody_RigidBody.prototype.setAutoSleep;
+oimo_dynamics_rigidbody_RigidBody.prototype["getLinearDamping"] = oimo_dynamics_rigidbody_RigidBody.prototype.getLinearDamping;
+oimo_dynamics_rigidbody_RigidBody.prototype["setLinearDamping"] = oimo_dynamics_rigidbody_RigidBody.prototype.setLinearDamping;
+oimo_dynamics_rigidbody_RigidBody.prototype["getAngularDamping"] = oimo_dynamics_rigidbody_RigidBody.prototype.getAngularDamping;
+oimo_dynamics_rigidbody_RigidBody.prototype["setAngularDamping"] = oimo_dynamics_rigidbody_RigidBody.prototype.setAngularDamping;
 oimo_dynamics_rigidbody_RigidBody.prototype["getPrev"] = oimo_dynamics_rigidbody_RigidBody.prototype.getPrev;
 oimo_dynamics_rigidbody_RigidBody.prototype["getNext"] = oimo_dynamics_rigidbody_RigidBody.prototype.getNext;
 window["OIMO"]["RigidBodyConfig"] = oimo_dynamics_rigidbody_RigidBodyConfig;

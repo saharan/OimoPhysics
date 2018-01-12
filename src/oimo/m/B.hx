@@ -55,6 +55,7 @@ class B {
 
 				var doc = classType.doc;
 				var hidden = classType.meta.extract(":dox").exists((me) -> me.params.exists((e) -> e.expr.equals((macro hide).expr)));
+				var isInterface = classType.meta.has(":interface");
 				if (doc != null && !hidden) {
 					exports.push('window["OIMO"]["$className"] = $jsClassName;');
 
@@ -62,13 +63,17 @@ class B {
 					var pubStats = classType.statics.get().filter((cf) -> cf.isPublic && !cf.name.startsWith("_"));
 					var pubFields = pubMembers.concat(pubStats);
 
-					var pubVars = pubFields.filter((cf) -> cf.kind.match(FVar(_, _)));
-					pubVars.iter((pf) -> externs.push('OIMO.$className.${pf.name};'));
+					if (isInterface) {
+						pubFields.iter((pf) -> externs.push('OIMO.$className.${pf.name};'));
+					} else {
+						var pubVars = pubFields.filter((cf) -> cf.kind.match(FVar(_, _)));
+						pubVars.iter((pf) -> externs.push('OIMO.$className.${pf.name};'));
 
-					var pubMethods = pubMembers.filter((cf) -> cf.kind.match(FMethod(_)));
-					var pubFuncs = pubStats.filter((cf) -> cf.kind.match(FMethod(_)));
-					pubMethods.iter((pf) -> exports.push('$jsClassName.prototype["${pf.name}"] = $jsClassName.prototype.${pf.name};'));
-					pubFuncs.iter((pf) -> exports.push('$jsClassName["${pf.name}"] = $jsClassName.${pf.name};'));
+						var pubMethods = pubMembers.filter((cf) -> cf.kind.match(FMethod(_)));
+						var pubFuncs = pubStats.filter((cf) -> cf.kind.match(FMethod(_)));
+						pubMethods.iter((pf) -> exports.push('$jsClassName.prototype["${pf.name}"] = $jsClassName.prototype.${pf.name};'));
+						pubFuncs.iter((pf) -> exports.push('$jsClassName["${pf.name}"] = $jsClassName.${pf.name};'));
+					}
 				}
 			}
 		case _:
@@ -112,7 +117,7 @@ class B {
 							name: ":dox",
 							params: [macro hide],
 							pos: U.pos()
-						}], [APublic]);
+						}], field.access);
 
 						field.meta.push({
 							name: ":extern",

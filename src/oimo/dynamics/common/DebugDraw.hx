@@ -14,6 +14,7 @@ import oimo.m.M;
  * for debugging softwares. Users should override at least three methods `DebugDraw.point`,
  * `DebugDraw.triangle`, `DebugDraw.line`.
  */
+@:interface
 class DebugDraw {
 	/**
 	 * Whether the shapes are drawn in wireframe mode.

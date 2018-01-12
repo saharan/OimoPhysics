@@ -2,8 +2,9 @@ package oimo.dynamics.callback;
 import oimo.dynamics.rigidbody.Shape;
 
 /**
- * A callback class for aabb tests in a world.
+ * A callback interface for aabb tests in a world.
  */
+@:interface
 class AabbTestCallback {
 
 	/**

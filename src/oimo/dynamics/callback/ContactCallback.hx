@@ -11,6 +11,7 @@ import oimo.dynamics.Contact;
  * 1. (repeats 2. and 3. every frame while the shapes are touching)
  * 1. `endContact`
  */
+@:interface
 class ContactCallback {
 
 	/**

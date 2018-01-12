@@ -5,6 +5,7 @@ import oimo.dynamics.rigidbody.Shape;
 /**
  * A callback class for ray casts in a world.
  */
+@:interface
 class RayCastCallback {
 
 	/**

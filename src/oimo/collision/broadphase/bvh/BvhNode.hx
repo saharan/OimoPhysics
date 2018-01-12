@@ -77,7 +77,7 @@ class BvhNode {
 	public inline function _computeHeight():Void {
 		var h1:Int = _children[0]._height;
 		var h2:Int = _children[1]._height;
-		_height = M.max(h1, h2) + 1;
+		_height = (h1 > h2 ? h1 : h2) + 1;
 	}
 
 	@:extern
