@@ -808,7 +808,7 @@ class Mat4 {
 		e30 = 0;
 		e31 = 0;
 		e32 = 0;
-		e33 = 0;
+		e33 = 1;
 		return this;
 	}
 

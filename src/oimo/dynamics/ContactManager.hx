@@ -120,8 +120,8 @@ class ContactManager {
 				}
 				var aabb1:Aabb = s1._aabb;
 				var aabb2:Aabb = s2._aabb;
-				if (!_broadPhase.isOverlapping(s1._proxy, s2._proxy)) {
-					// the proxy pair is separated
+				if (!_broadPhase.isOverlapping(s1._proxy, s2._proxy) || !shouldCollide(s1, s2)) {
+					// the proxy pair is separated or shouldn't collide
 					_destroyContact(c);
 					break;
 				}

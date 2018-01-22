@@ -1020,6 +1020,13 @@ class RigidBody {
 	}
 
 	/**
+	 * Returns whether the rigid body is sleeping.
+	 */
+	public inline function isSleeping():Bool {
+		return _sleeping;
+	}
+
+	/**
 	 * Returns how long the rigid body is stopping moving. This returns `0` if the body
 	 * has already slept.
 	 */

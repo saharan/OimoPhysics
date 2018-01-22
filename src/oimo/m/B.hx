@@ -109,7 +109,7 @@ class B {
 				case FVar(t, e):
 					log("FVar(" + t + ", " + e + ")");
 
-					var names:Array<String> = field.name.names(t.toType());
+					var names:Array<String> = field.name.names(t);
 					if (names != null) {
 
 						U.pushVariables(fs2, names, macro:Float, [{
@@ -135,7 +135,7 @@ class B {
 					for (arg in f.args) {
 						log("arg " + arg);
 						if (arg.type == null) continue;
-						var names:Array<String> = arg.name.names(arg.type.toType());
+						var names:Array<String> = arg.name.names(arg.type);
 						log("names " + names);
 						if (names != null) {
 							for (name in names) {
@@ -175,7 +175,7 @@ class B {
 			var newVars:Array<Var> = vars.copy();
 			for (v in vars) {
 				log("v " + v);
-				var names:Array<String> = v.name.names(v.type.toType());
+				var names:Array<String> = v.name.names(v.type);
 				log("names " + names);
 				if (names != null) {
 					newVars = newVars.concat(names.map(function(name) {

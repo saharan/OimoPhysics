@@ -1,7 +1,7 @@
 /*
- * OimoPhysics 1.1.2 (c) 2018 saharan, The MIT License
+ * OimoPhysics 1.2.0 (c) 2018 saharan, The MIT License
  */
-(function () { "use strict";
+(function (window) { "use strict";
 function $extend(from, fields) {
 	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
 	for (var name in fields) proto[name] = fields[name];
@@ -16412,7 +16412,7 @@ oimo_common_Mat4.prototype = {
 		this.e30 = 0;
 		this.e31 = 0;
 		this.e32 = 0;
-		this.e33 = 0;
+		this.e33 = 1;
 		return this;
 	}
 	,toArray: function(columnMajor) {
@@ -17525,7 +17525,7 @@ oimo_dynamics_ContactManager.prototype = {
 				var aabb2 = s2._aabb;
 				var proxy1 = s1._proxy;
 				var proxy2 = s2._proxy;
-				if(!(proxy1._aabbMinX < proxy2._aabbMaxX && proxy1._aabbMaxX > proxy2._aabbMinX && proxy1._aabbMinY < proxy2._aabbMaxY && proxy1._aabbMaxY > proxy2._aabbMinY && proxy1._aabbMinZ < proxy2._aabbMaxZ && proxy1._aabbMaxZ > proxy2._aabbMinZ)) {
+				if(!(proxy1._aabbMinX < proxy2._aabbMaxX && proxy1._aabbMaxX > proxy2._aabbMinX && proxy1._aabbMinY < proxy2._aabbMaxY && proxy1._aabbMaxY > proxy2._aabbMinY && proxy1._aabbMinZ < proxy2._aabbMaxZ && proxy1._aabbMaxZ > proxy2._aabbMinZ) || !this.shouldCollide(s1,s2)) {
 					var prev3 = c._prev;
 					var next3 = c._next;
 					if(prev3 != null) {
@@ -40251,6 +40251,9 @@ oimo_dynamics_rigidbody_RigidBody.prototype = {
 		this._sleeping = true;
 		this._sleepTime = 0;
 	}
+	,isSleeping: function() {
+		return this._sleeping;
+	}
 	,getSleepTime: function() {
 		return this._sleepTime;
 	}
@@ -40751,7 +40754,6 @@ var oimo_dynamics_rigidbody_ShapeConfig = function() {
 	this.geometry = null;
 	this.contactCallback = null;
 };
-var oimo_m_M = function() { };
 oimo_collision_broadphase_BroadPhaseType._BRUTE_FORCE = 1;
 oimo_collision_broadphase_BroadPhaseType._BVH = 2;
 oimo_collision_broadphase_BroadPhaseType.BRUTE_FORCE = 1;
@@ -40881,6 +40883,7 @@ oimo_dynamics_rigidbody_RigidBodyType.DYNAMIC = 0;
 oimo_dynamics_rigidbody_RigidBodyType.STATIC = 1;
 oimo_dynamics_rigidbody_RigidBodyType.KINEMATIC = 2;
 window["OIMO"] = {};
+window["OIMO"]["DebugDraw"] = oimo_dynamics_common_DebugDraw;
 window["OIMO"]["BroadPhase"] = oimo_collision_broadphase_BroadPhase;
 oimo_collision_broadphase_BroadPhase.prototype["createProxy"] = oimo_collision_broadphase_BroadPhase.prototype.createProxy;
 oimo_collision_broadphase_BroadPhase.prototype["destroyProxy"] = oimo_collision_broadphase_BroadPhase.prototype.destroyProxy;
@@ -41221,7 +41224,6 @@ window["OIMO"]["RayCastCallback"] = oimo_dynamics_callback_RayCastCallback;
 window["OIMO"]["RayCastClosest"] = oimo_dynamics_callback_RayCastClosest;
 oimo_dynamics_callback_RayCastClosest.prototype["clear"] = oimo_dynamics_callback_RayCastClosest.prototype.clear;
 oimo_dynamics_callback_RayCastClosest.prototype["process"] = oimo_dynamics_callback_RayCastClosest.prototype.process;
-window["OIMO"]["DebugDraw"] = oimo_dynamics_common_DebugDraw;
 window["OIMO"]["DebugDrawStyle"] = oimo_dynamics_common_DebugDrawStyle;
 window["OIMO"]["Performance"] = oimo_dynamics_common_Performance;
 window["OIMO"]["ConstraintSolver"] = oimo_dynamics_constraint_ConstraintSolver;
@@ -41481,6 +41483,7 @@ oimo_dynamics_rigidbody_RigidBody.prototype["getType"] = oimo_dynamics_rigidbody
 oimo_dynamics_rigidbody_RigidBody.prototype["setType"] = oimo_dynamics_rigidbody_RigidBody.prototype.setType;
 oimo_dynamics_rigidbody_RigidBody.prototype["wakeUp"] = oimo_dynamics_rigidbody_RigidBody.prototype.wakeUp;
 oimo_dynamics_rigidbody_RigidBody.prototype["sleep"] = oimo_dynamics_rigidbody_RigidBody.prototype.sleep;
+oimo_dynamics_rigidbody_RigidBody.prototype["isSleeping"] = oimo_dynamics_rigidbody_RigidBody.prototype.isSleeping;
 oimo_dynamics_rigidbody_RigidBody.prototype["getSleepTime"] = oimo_dynamics_rigidbody_RigidBody.prototype.getSleepTime;
 oimo_dynamics_rigidbody_RigidBody.prototype["setAutoSleep"] = oimo_dynamics_rigidbody_RigidBody.prototype.setAutoSleep;
 oimo_dynamics_rigidbody_RigidBody.prototype["getLinearDamping"] = oimo_dynamics_rigidbody_RigidBody.prototype.getLinearDamping;
@@ -41516,4 +41519,4 @@ oimo_dynamics_rigidbody_Shape.prototype["setContactCallback"] = oimo_dynamics_ri
 oimo_dynamics_rigidbody_Shape.prototype["getPrev"] = oimo_dynamics_rigidbody_Shape.prototype.getPrev;
 oimo_dynamics_rigidbody_Shape.prototype["getNext"] = oimo_dynamics_rigidbody_Shape.prototype.getNext;
 window["OIMO"]["ShapeConfig"] = oimo_dynamics_rigidbody_ShapeConfig;
-})();
+})(window);
