@@ -50,7 +50,7 @@ class ConeGeometry extends ConvexGeometry {
 		M.mat3_diagonal(_inertiaCoeff,
 			1 / 20 * (3 * r2 + 2 * h2),
 			3 / 10 * r2,
-			1 / 12 * (3 * r2 + 2 * h2)
+			1 / 20 * (3 * r2 + 2 * h2)
 		);
 	}
 
