@@ -79,7 +79,7 @@ import oimo.dynamics.constraint.joint.Joint;
 import oimo.dynamics.constraint.joint.CylindricalJoint;
 import oimo.dynamics.constraint.joint.JointConfig;
 import oimo.dynamics.constraint.joint.CylindricalJointConfig;
-import oimo.dynamics.constraint.joint.JointBasis;
+import oimo.dynamics.constraint.joint.BasisTracker;
 import oimo.dynamics.constraint.joint.JointImpulse;
 import oimo.dynamics.constraint.joint.JointLink;
 import oimo.dynamics.constraint.joint.JointMacro;

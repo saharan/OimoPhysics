@@ -43,8 +43,8 @@ class GenericJoint extends Joint {
 	public function new(config:GenericJointConfig) {
 		super(config, JointType.GENERIC);
 		
-		var lb1:Mat3;
-		var lb2:Mat3;
+		var lb1:IMat3;
+		var lb2:IMat3;
 		M.mat3_fromMat3(lb1, config.localBasis1);
 		M.mat3_fromMat3(lb2, config.localBasis2);
 		M.mat3_getCol(_localBasisX1, lb1, 0);
@@ -148,7 +148,7 @@ class GenericJoint extends Joint {
 		// linear X
 		if (_translSds[0].frequency <= 0 || !isPositionPart) {
 			row = info.addRow(_impulses[0]);
-			setSolverInfoRowLinear(row, _translX, _translLms[0], translMotorMass, _translSds[0], timeStep, isPositionPart);
+			setSolverInfoRowLinear(row, translationX, _translLms[0], translMotorMass, _translSds[0], timeStep, isPositionPart);
 
 			j = row.jacobian;
 			M.vec3_assign(j.lin1, _basisX1);
@@ -160,7 +160,7 @@ class GenericJoint extends Joint {
 		// linear Y
 		if (_translSds[1].frequency <= 0 || !isPositionPart) {
 			row = info.addRow(_impulses[1]);
-			setSolverInfoRowLinear(row, _translY, _translLms[1], translMotorMass, _translSds[1], timeStep, isPositionPart);
+			setSolverInfoRowLinear(row, translationY, _translLms[1], translMotorMass, _translSds[1], timeStep, isPositionPart);
 
 			j = row.jacobian;
 			M.vec3_assign(j.lin1, _basisY1);
@@ -172,7 +172,7 @@ class GenericJoint extends Joint {
 		// linear Z
 		if (_translSds[2].frequency <= 0 || !isPositionPart) {
 			row = info.addRow(_impulses[2]);
-			setSolverInfoRowLinear(row, _translZ, _translLms[2], translMotorMass, _translSds[2], timeStep, isPositionPart);
+			setSolverInfoRowLinear(row, translationZ, _translLms[2], translMotorMass, _translSds[2], timeStep, isPositionPart);
 
 			j = row.jacobian;
 			M.vec3_assign(j.lin1, _basisZ1);
@@ -268,94 +268,6 @@ class GenericJoint extends Joint {
 	}
 
 	// --- public ---
-
-	/**
-	 * Returns the first rigid body's constraint basis in world coordinates.
-	 */
-	public inline function getBasis1():Mat3 {
-		var m:Mat3 = new Mat3();
-		var b:IMat3;
-		M.mat3_fromCols(b, _basisX1, _basisY1, _basisZ1);
-		M.mat3_toMat3(m, b);
-		return m;
-	}
-
-	/**
-	 * Returns the second rigid body's constraint basis in world coordinates.
-	 */
-	public inline function getBasis2():Mat3 {
-		var m:Mat3 = new Mat3();
-		var b:IMat3;
-		M.mat3_fromCols(b, _basisX2, _basisY2, _basisZ2);
-		M.mat3_toMat3(m, b);
-		return m;
-	}
-
-	/**
-	 * Sets `basis` to the first rigid body's constraint basis in world coordinates.
-	 *
-	 * This does not create a new instance of `Mat3`.
-	 */
-	public inline function getBasis1To(basis:Mat3):Void {
-		var b:IMat3;
-		M.mat3_fromCols(b, _basisX1, _basisY1, _basisZ1);
-		M.mat3_toMat3(basis, b);
-	}
-
-	/**
-	 * Sets `basis` to the second rigid body's constraint basis in world coordinates.
-	 *
-	 * This does not create a new instance of `Mat3`.
-	 */
-	public inline function getBasis2To(basis:Vec3):Void {
-		var b:IMat3;
-		M.mat3_fromCols(b, _basisX2, _basisY2, _basisZ2);
-		M.mat3_toMat3(basis, b);
-	}
-
-	/**
-	 * Returns the first rigid body's constraint basis relative to the rigid body's transform.
-	 */
-	public inline function getLocalBasis1():Mat3 {
-		var m:Mat3 = new Mat3();
-		var b:IMat3;
-		M.mat3_fromCols(b, _localBasisX1, _localBasisY1, _localBasisZ1);
-		M.mat3_toMat3(m, b);
-		return m;
-	}
-
-	/**
-	 * Returns the second rigid body's constraint basis relative to the rigid body's transform.
-	 */
-	public inline function getLocalBasis2():Mat3 {
-		var m:Mat3 = new Mat3();
-		var b:IMat3;
-		M.mat3_fromCols(b, _localBasisX2, _localBasisY2, _localBasisZ2);
-		M.mat3_toMat3(m, b);
-		return m;
-	}
-
-	/**
-	 * Sets `basis` to the first rigid body's constraint basis relative to the rigid body's transform.
-	 *
-	 * This does not create a new instance of `Mat3`.
-	 */
-	public inline function getLocalBasis1To(basis:Mat3):Void {
-		var b:IMat3;
-		M.mat3_fromCols(b, _localBasisX1, _localBasisY1, _localBasisZ1);
-		M.mat3_toMat3(basis, b);
-	}
-
-	/**
-	 * Sets `basis` to the second rigid body's constraint basis relative to the rigid body's transform.
-	 *
-	 * This does not create a new instance of `Mat3`.
-	 */
-	public inline function getLocalBasis2To(basis:Vec3):Void {
-		var b:IMat3;
-		M.mat3_fromCols(b, _localBasisX2, _localBasisY2, _localBasisZ2);
-		M.mat3_toMat3(basis, b);
-	}
 	
 	/**
 	 * Returns the translational spring and damper settings along the first body's constraint basis.
@@ -381,7 +293,7 @@ class GenericJoint extends Joint {
 	/**
 	 * Returns the rotational limits and motor settings along the rotation axes of the relative x-y-z Euler angles.
 	 */
-	public inline function getTranslationalLimitMotors():Array<TranslationalLimitMotor> {
+	public inline function getRotationalLimitMotors():Array<RotationalLimitMotor> {
 		return _rotLms.toArray();
 	}
 

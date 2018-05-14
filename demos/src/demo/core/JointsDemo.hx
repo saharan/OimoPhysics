@@ -80,6 +80,25 @@ class JointsDemo extends DemoBase {
 			var b2:RigidBody = OimoUtil.addBox(world, new Vec3(x, y - length, z), new Vec3(0.2, 0.5, 0.2), false);
 			OimoUtil.addUniversalJoint(world, b1, b2, new Vec3(x, y, z), new Vec3(1, 0, 0), new Vec3(0, 0, 1), new SpringDamper(), hingeLimit1, new SpringDamper(), hingeLimit2);
 		}
+
+		{
+			var x:Float = 0;
+			var y:Float = 3;
+			var z:Float = 3;
+			var length:Float = 1.0;
+			var rotXLimit = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.2, MathUtil.HALF_PI * 0.2);
+			var rotYLimit = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.5, MathUtil.HALF_PI * 0.5);
+			var rotZLimit = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.8, MathUtil.HALF_PI * 0.8);
+			var translXLimit = new TranslationalLimitMotor().setLimits(0, 0);
+			var translYLimit = new TranslationalLimitMotor().setLimits(-0.5, 0);
+			var translZLimit = new TranslationalLimitMotor().setLimits(0, 0.5);
+
+			var b1:RigidBody = OimoUtil.addBox(world, new Vec3(x, y + length, z), new Vec3(0.2, 0.5, 0.2), true);
+			b1.setType(RigidBodyType.KINEMATIC);
+			b1.setAngularVelocity(new Vec3(0, 1.5, 0));
+			var b2:RigidBody = OimoUtil.addBox(world, new Vec3(x, y - length, z), new Vec3(0.2, 0.5, 0.2), false);
+			OimoUtil.addGenericJoint(world, b1, b2, new Vec3(x, y, z), new Mat3(), new Mat3(), null, [translXLimit, translYLimit, translZLimit], null, [rotXLimit, rotYLimit, rotZLimit]);
+		}
 	}
 
 	function createBoard(x:Float, y:Float, z:Float, lm:RotationalLimitMotor, sd:SpringDamper) {

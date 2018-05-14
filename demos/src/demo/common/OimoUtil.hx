@@ -10,8 +10,6 @@ import oimo.dynamics.rigidbody.*;
  */
 class OimoUtil {
 	public static function addRagdollJoint(w:World, rb1:RigidBody, rb2:RigidBody, anchor:Vec3, twistAxis:Vec3, swingAxis:Vec3, swingSd:SpringDamper = null, maxSwing1Deg:Float = 180, maxSwing2Deg:Float = 180, twistSd:SpringDamper = null, twistLm:RotationalLimitMotor = null):RagdollJoint {
-		var invRot1:Mat3 = rb1.getRotation().transpose();
-		var invRot2:Mat3 = rb2.getRotation().transpose();
 		var jc:RagdollJointConfig = new RagdollJointConfig();
 		jc.init(rb1, rb2, anchor, twistAxis, swingAxis);
 		if (twistSd != null) jc.twistSpringDamper = twistSd;
@@ -25,8 +23,6 @@ class OimoUtil {
 	}
 
 	public static function addUniversalJoint(w:World, rb1:RigidBody, rb2:RigidBody, anchor:Vec3, axis1:Vec3, axis2:Vec3, sd1:SpringDamper = null, lm1:RotationalLimitMotor = null, sd2:SpringDamper = null, lm2:RotationalLimitMotor = null):UniversalJoint {
-		var invRot1:Mat3 = rb1.getRotation().transpose();
-		var invRot2:Mat3 = rb2.getRotation().transpose();
 		var jc:UniversalJointConfig = new UniversalJointConfig();
 		jc.init(rb1, rb2, anchor, axis1, axis2);
 		if (sd1 != null) jc.springDamper1 = sd1;
@@ -34,6 +30,20 @@ class OimoUtil {
 		if (sd2 != null) jc.springDamper2 = sd2;
 		if (lm2 != null) jc.limitMotor2 = lm2;
 		var j:UniversalJoint = new UniversalJoint(jc);
+		w.addJoint(j);
+		return j;
+	}
+
+	public static function addGenericJoint(w:World, rb1:RigidBody, rb2:RigidBody, anchor:Vec3, basis1:Mat3, basis2:Mat3, translSds:Array<SpringDamper> = null, translLms:Array<TranslationalLimitMotor> = null, rotSds:Array<SpringDamper> = null, rotLms:Array<RotationalLimitMotor> = null):GenericJoint {
+		var jc:GenericJointConfig = new GenericJointConfig();
+		jc.init(rb1, rb2, anchor, basis1, basis2);
+		for (i in 0...3) {
+			if (translSds != null && translSds[i] != null) jc.translationalSpringDampers[i] = translSds[i];
+			if (translLms != null && translLms[i] != null) jc.translationalLimitMotors[i]   = translLms[i];
+			if (rotSds != null    && rotSds[i] != null)    jc.rotationalSpringDampers[i]           = rotSds[i];
+			if (rotLms != null    && rotLms[i] != null)    jc.rotationalLimitMotors[i]             = rotLms[i];
+		}
+		var j:GenericJoint = new GenericJoint(jc);
 		w.addJoint(j);
 		return j;
 	}
