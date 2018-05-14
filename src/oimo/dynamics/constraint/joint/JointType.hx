@@ -11,6 +11,7 @@ class JointType {
 	public static inline var _PRISMATIC:Int     = 3;
 	public static inline var _UNIVERSAL:Int     = 4;
 	public static inline var _RAGDOLL:Int       = 5;
+	public static inline var _GENERIC:Int       = 6;
 
 	/**
 	 * Represents a spherical joint.
@@ -53,4 +54,11 @@ class JointType {
 	 * See `RagdollJoint` for details.
 	 */
 	public static var RAGDOLL(default, never):Int = _RAGDOLL;
+
+	/**
+	 * Represents a generic joint.
+	 *
+	 * See `GenericJoint` for details.
+	 */
+	public static var GENERIC(default, never):Int = _GENERIC;
 }

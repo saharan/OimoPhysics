@@ -114,8 +114,7 @@ class Joint {
 
 	// --- private ---
 
-	@:extern
-	inline function buildLocalBasesFromX():Void {
+	function buildLocalBasesFromX():Void {
 		// validate X
 		if (M.vec3_dot(_localBasisX1, _localBasisX1) == 0) {
 			M.vec3_set(_localBasisX1, 1, 0, 0);
@@ -141,8 +140,7 @@ class Joint {
 		M.vec3_mulMat3(_localBasisZ2, _localBasisZ1, slerpM);
 	}
 
-	@:extern
-	inline function buildLocalBasesFromXY():Void {
+	function buildLocalBasesFromXY():Void {
 		// validate X
 		if (M.vec3_dot(_localBasisX1, _localBasisX1) == 0) {
 			M.vec3_set(_localBasisX1, 1, 0, 0);
@@ -185,8 +183,7 @@ class Joint {
 		}
 	}
 
-	@:extern
-	inline function buildLocalBasesFromX1Z2():Void {
+	function buildLocalBasesFromX1Z2():Void {
 		// validate X1 and Z2
 		if (M.vec3_dot(_localBasisX1, _localBasisX1) == 0) {
 			M.vec3_set(_localBasisX1, 1, 0, 0);
@@ -229,8 +226,7 @@ class Joint {
 		M.vec3_mulMat3Transposed(_localBasisZ2, worldZ2, tf2._rotation);
 	}
 
-	@:extern
-	inline function buildLocalBasesFromXY1X2():Void {
+	function buildLocalBasesFromXY1X2():Void {
 		// validate X1
 		if (M.vec3_dot(_localBasisX1, _localBasisX1) == 0) {
 			M.vec3_set(_localBasisX1, 1, 0, 0);
@@ -264,8 +260,7 @@ class Joint {
 		M.vec3_mulMat3(_localBasisZ2, _localBasisZ1, slerpM);
 	}
 
-	@:extern
-	inline function setSolverInfoRowLinear(row:JointSolverInfoRow, diff:Float, lm:TranslationalLimitMotor, mass:Float, sd:SpringDamper, timeStep:TimeStep, isPositionPart:Bool):Void {
+	function setSolverInfoRowLinear(row:JointSolverInfoRow, diff:Float, lm:TranslationalLimitMotor, mass:Float, sd:SpringDamper, timeStep:TimeStep, isPositionPart:Bool):Void {
 		var cfmFactor:Float;
 		var erp:Float;
 		var slop:Float = Setting.linearSlop;
@@ -340,8 +335,7 @@ class Joint {
 		row.rhs = error * erp;
 	}
 
-	@:extern
-	inline function setSolverInfoRowAngular(row:JointSolverInfoRow, diff:Float, lm:RotationalLimitMotor, mass:Float, sd:SpringDamper, timeStep:TimeStep, isPositionPart:Bool):Void {
+	function setSolverInfoRowAngular(row:JointSolverInfoRow, diff:Float, lm:RotationalLimitMotor, mass:Float, sd:SpringDamper, timeStep:TimeStep, isPositionPart:Bool):Void {
 		var cfmFactor:Float;
 		var erp:Float;
 		var slop:Float = Setting.angularSlop;
@@ -422,8 +416,7 @@ class Joint {
 		row.rhs = error * erp;
 	}
 
-	@:extern
-	inline function getErp(timeStep:TimeStep, isPositionPart:Bool):Float {
+	function getErp(timeStep:TimeStep, isPositionPart:Bool):Float {
 		if (isPositionPart) {
 			return 1;
 		} else {
@@ -435,8 +428,7 @@ class Joint {
 		}
 	}
 
-	@:extern
-	inline function computeEffectiveInertiaMoment(axis:IVec3):Float {
+	function computeEffectiveInertiaMoment(axis:IVec3):Float {
 		var ia1:IVec3;
 		var ia2:IVec3;
 		M.vec3_mulMat3(ia1, axis, _b1._invInertia);
@@ -470,8 +462,7 @@ class Joint {
 		return invI1 + invI2 == 0 ? 0 : 1 / (invI1 + invI2);
 	}
 
-	@:extern
-	inline function computeEffectiveInertiaMoment2(axis1:IVec3, axis2:IVec3):Float {
+	function computeEffectiveInertiaMoment2(axis1:IVec3, axis2:IVec3):Float {
 		var ia1:IVec3;
 		var ia2:IVec3;
 		M.vec3_mulMat3(ia1, axis1, _b1._invInertia);

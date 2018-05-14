@@ -9,7 +9,7 @@ import oimo.m.M;
  */
 @:build(oimo.m.B.bu())
 @:dox(hide)
-class JointBasis {
+class BasisTracker {
 	var joint:Joint;
 
 	public var x:IVec3;

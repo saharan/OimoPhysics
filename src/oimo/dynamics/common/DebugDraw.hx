@@ -206,7 +206,7 @@ class DebugDraw {
 		return v;
 	}
 
-	@:extern
+	// @:extern // uncommenting this line causes error in version 4.0.0-preview.1
 	inline function polarCoord(origin:Vec3, x:Vec3, y:Vec3, r:Float, theta:Float):Vec3 {
 		var v:Vec3 = cartesianCoord2D(origin, x, y,
 			r * MathUtil.cos(theta),

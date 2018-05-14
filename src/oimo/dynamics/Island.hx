@@ -109,6 +109,10 @@ class Island {
 		// store previous transform
 		M.transform_assign(rb._ptransform, rb._transform);
 
+		// clear linear/angular contact impulse
+		M.vec3_zero(rb._linearContactImpulse);
+		M.vec3_zero(rb._angularContactImpulse);
+
 		// update sleep time
 		if (rb._isSleepy()) {
 			rb._sleepTime += dt;
@@ -156,6 +160,10 @@ class Island {
 
 			// store previous transform
 			M.transform_assign(rb._ptransform, rb._transform);
+
+			// clear linear/angular contact impulse
+			M.vec3_zero(rb._linearContactImpulse);
+			M.vec3_zero(rb._angularContactImpulse);
 
 			// don't let the rigid body sleep
 			rb._sleeping = false;

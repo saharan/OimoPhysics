@@ -54,6 +54,9 @@ class RigidBody {
 	public var _force:IVec3;
 	public var _torque:IVec3;
 
+	public var _linearContactImpulse:IVec3;
+	public var _angularContactImpulse:IVec3;
+
 	public var _world:World;
 
 	public var _contactLinkList:ContactLink;
@@ -121,6 +124,9 @@ class RigidBody {
 
 		M.vec3_zero(_force);
 		M.vec3_zero(_torque);
+
+		M.vec3_zero(_linearContactImpulse);
+		M.vec3_zero(_angularContactImpulse);
 
 		_rotFactor = new Vec3(1, 1, 1);
 
@@ -785,6 +791,42 @@ class RigidBody {
 		M.vec3_add(_torque, _torque, itorque);
 
 		wakeUp();
+	}
+
+	/**
+	 * Returns the total linear impulse applied by contact constraints.
+	 */
+	public inline function getLinearContactImpulse():Vec3 {
+		var res:Vec3 = new Vec3();
+		M.vec3_toVec3(res, _linearContactImpulse);
+		return res;
+	}
+
+	/**
+	 * Sets `linearContactImpulse` to the total linear impulse applied by contact constraints.
+	 *
+	 * This does not create a new instance of `Vec3`.
+	 */
+	public inline function getLinearContactImpulseTo(linearContactImpulse:Vec3):Void {
+		M.vec3_toVec3(linearContactImpulse, _linearContactImpulse);
+	}
+
+	/**
+	 * Returns the total angular impulse applied by contact constraints.
+	 */
+	public inline function getAngularContactImpulse():Vec3 {
+		var res:Vec3 = new Vec3();
+		M.vec3_toVec3(res, _angularContactImpulse);
+		return res;
+	}
+
+	/**
+	 * Sets `angularContactImpulse` to the total angular impulse applied by contact constraints.
+	 *
+	 * This does not create a new instance of `Vec3`.
+	 */
+	public inline function getAngularContactImpulseTo(angularContactImpulse:Vec3):Void {
+		M.vec3_toVec3(angularContactImpulse, _angularContactImpulse);
 	}
 
 	/**

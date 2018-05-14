@@ -1,5 +1,6 @@
 package oimo.collision.narrowphase.detector.gjkepa;
 import haxe.ds.Vector;
+import oimo.common.MathUtil;
 import oimo.common.Setting;
 import oimo.common.Vec3;
 import oimo.m.M;
@@ -212,7 +213,7 @@ class EpaPolyhedron {
 	@:extern
 	public inline function _getBestTriangle():EpaTriangle {
 		var f:EpaTriangle = _triangleList;
-		var mind:Float = 1.0 / 0;
+		var mind:Float = MathUtil.POSITIVE_INFINITY;
 		var minf:EpaTriangle = null;
 		M.list_foreach(f, _next, {
 			if (f._distanceSq < mind) {

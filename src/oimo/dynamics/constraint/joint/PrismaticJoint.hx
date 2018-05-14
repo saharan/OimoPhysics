@@ -23,7 +23,7 @@ class PrismaticJoint extends Joint {
 	public var _sd:SpringDamper;
 	public var _lm:TranslationalLimitMotor;
 
-	public var _basis:JointBasis;
+	public var _basis:BasisTracker;
 
 	var translation:Float;
 	var linearErrorY:Float;
@@ -41,7 +41,7 @@ class PrismaticJoint extends Joint {
 
 		buildLocalBasesFromX();
 
-		_basis = new JointBasis(this);
+		_basis = new BasisTracker(this);
 
 		translation = 0;
 		linearErrorY = 0;
@@ -66,13 +66,6 @@ class PrismaticJoint extends Joint {
 		var angRhsY:Float = M.vec3_get(angularError, 1) * erp;
 		var angRhsZ:Float = M.vec3_get(angularError, 2) * erp;
 
-		var crossR1:IMat3;
-		var crossR2:IMat3;
-		M.vec3_toCrossMatrix(crossR1, _relativeAnchor1);
-		M.vec3_toCrossMatrix(crossR2, _relativeAnchor2);
-		M.mat3_negate(crossR1, crossR1);
-		M.mat3_negate(crossR2, crossR2);
-
 		var row:JointSolverInfoRow;
 		var j:JacobianRow;
 		var motorMass:Float = 1 / (_b1._invMass + _b2._invMass);
@@ -85,8 +78,8 @@ class PrismaticJoint extends Joint {
 			j = row.jacobian;
 			M.vec3_assign(j.lin1, _basis.x);
 			M.vec3_assign(j.lin2, _basis.x);
-			M.mat3_getRow(j.ang1, crossR1, 0);
-			M.mat3_getRow(j.ang2, crossR2, 0);
+			M.vec3_cross(j.ang1, _relativeAnchor1, _basis.x);
+			M.vec3_cross(j.ang2, _relativeAnchor2, _basis.x);
 		}
 
 		// linear Y
@@ -96,8 +89,8 @@ class PrismaticJoint extends Joint {
 		j = row.jacobian;
 		M.vec3_assign(j.lin1, _basis.y);
 		M.vec3_assign(j.lin2, _basis.y);
-		M.mat3_getRow(j.ang1, crossR1, 1);
-		M.mat3_getRow(j.ang2, crossR2, 1);
+		M.vec3_cross(j.ang1, _relativeAnchor1, _basis.y);
+		M.vec3_cross(j.ang2, _relativeAnchor2, _basis.y);
 
 		// linear Z
 		row = info.addRow(_impulses[2]);
@@ -106,8 +99,8 @@ class PrismaticJoint extends Joint {
 		j = row.jacobian;
 		M.vec3_assign(j.lin1, _basis.z);
 		M.vec3_assign(j.lin2, _basis.z);
-		M.mat3_getRow(j.ang1, crossR1, 2);
-		M.mat3_getRow(j.ang2, crossR2, 2);
+		M.vec3_cross(j.ang1, _relativeAnchor1, _basis.z);
+		M.vec3_cross(j.ang2, _relativeAnchor2, _basis.z);
 
 		// angular X
 		row = info.addRow(_impulses[3]);

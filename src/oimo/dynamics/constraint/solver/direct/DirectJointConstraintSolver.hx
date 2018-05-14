@@ -288,7 +288,7 @@ class DirectJointConstraintSolver extends ConstraintSolver {
 				var impulseM:Float = oldImpulseM + md.massWithoutCfm * (-row.motorSpeed - relVels[i]);
 
 				// clamp motor impulse
-				var maxImpulseM:Float = imp.impulseM;
+				var maxImpulseM:Float = row.motorMaxImpulse;
 				if (impulseM < -maxImpulseM) impulseM = -maxImpulseM;
 				else if (impulseM > maxImpulseM) impulseM = maxImpulseM;
 				imp.impulseM = impulseM;

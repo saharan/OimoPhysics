@@ -1,6 +1,6 @@
 package oimo.m;
 
-#if java
+#if (java || cpp)
 class IQuat {
 }
 #else

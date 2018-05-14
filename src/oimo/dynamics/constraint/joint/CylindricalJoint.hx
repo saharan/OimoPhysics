@@ -24,7 +24,7 @@ class CylindricalJoint extends Joint {
 	public var _rotSd:SpringDamper;
 	public var _rotLm:RotationalLimitMotor;
 
-	public var _basis:JointBasis;
+	public var _basis:BasisTracker;
 
 	var angle:Float;
 	var angularErrorY:Float;
@@ -51,7 +51,7 @@ class CylindricalJoint extends Joint {
 		linearErrorY = 0;
 		linearErrorZ = 0;
 
-		_basis = new JointBasis(this);
+		_basis = new BasisTracker(this);
 
 		_translSd = config.translationalSpringDamper.clone();
 		_translLm = config.translationalLimitMotor.clone();
@@ -71,13 +71,6 @@ class CylindricalJoint extends Joint {
 		var angRhsY:Float = angularErrorY * erp;
 		var angRhsZ:Float = angularErrorZ * erp;
 
-		var crossR1:IMat3;
-		var crossR2:IMat3;
-		M.vec3_toCrossMatrix(crossR1, _relativeAnchor1);
-		M.vec3_toCrossMatrix(crossR2, _relativeAnchor2);
-		M.mat3_negate(crossR1, crossR1);
-		M.mat3_negate(crossR2, crossR2);
-
 		var row:JointSolverInfoRow;
 		var j:JacobianRow;
 		var translationalMotorMass:Float = 1 / (_b1._invMass + _b2._invMass);
@@ -91,8 +84,8 @@ class CylindricalJoint extends Joint {
 			j = row.jacobian;
 			M.vec3_assign(j.lin1, _basis.x);
 			M.vec3_assign(j.lin2, _basis.x);
-			M.mat3_getRow(j.ang1, crossR1, 0);
-			M.mat3_getRow(j.ang2, crossR2, 0);
+			M.vec3_cross(j.ang1, _relativeAnchor1, _basis.x);
+			M.vec3_cross(j.ang2, _relativeAnchor2, _basis.x);
 		}
 
 		// linear Y
@@ -102,8 +95,8 @@ class CylindricalJoint extends Joint {
 		j = row.jacobian;
 		M.vec3_assign(j.lin1, _basis.y);
 		M.vec3_assign(j.lin2, _basis.y);
-		M.mat3_getRow(j.ang1, crossR1, 1);
-		M.mat3_getRow(j.ang2, crossR2, 1);
+		M.vec3_cross(j.ang1, _relativeAnchor1, _basis.y);
+		M.vec3_cross(j.ang2, _relativeAnchor2, _basis.y);
 
 		// linear Z
 		row = info.addRow(_impulses[2]);
@@ -112,8 +105,8 @@ class CylindricalJoint extends Joint {
 		j = row.jacobian;
 		M.vec3_assign(j.lin1, _basis.z);
 		M.vec3_assign(j.lin2, _basis.z);
-		M.mat3_getRow(j.ang1, crossR1, 2);
-		M.mat3_getRow(j.ang2, crossR2, 2);
+		M.vec3_cross(j.ang1, _relativeAnchor1, _basis.z);
+		M.vec3_cross(j.ang2, _relativeAnchor2, _basis.z);
 
 		// angular X
 		if (_rotSd.frequency <= 0 || !isPositionPart) {

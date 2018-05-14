@@ -22,7 +22,7 @@ class RevoluteJoint extends Joint {
 	public var _sd:SpringDamper;
 	public var _lm:RotationalLimitMotor;
 
-	public var _basis:JointBasis;
+	public var _basis:BasisTracker;
 
 	var angle:Float;
 	var angularErrorY:Float;
@@ -44,7 +44,7 @@ class RevoluteJoint extends Joint {
 		angularErrorY = 0;
 		angularErrorZ = 0;
 
-		_basis = new JointBasis(this);
+		_basis = new BasisTracker(this);
 
 		_sd = config.springDamper.clone();
 		_lm = config.limitMotor.clone();

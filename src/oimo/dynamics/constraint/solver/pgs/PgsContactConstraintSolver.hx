@@ -381,19 +381,48 @@ class PgsContactConstraintSolver extends ConstraintSolver {
 	}
 
 	override public function postSolve():Void {
+		// contact impulses
+		var lin1:IVec3;
+		// lin2 == lin1
+		var ang1:IVec3;
+		var ang2:IVec3;
+		M.vec3_zero(lin1);
+		M.vec3_zero(ang1);
+		M.vec3_zero(ang2);
+
 		for (i in 0...info.numRows) {
 			var row:ContactSolverInfoRow = info.rows[i];
 			var imp:ContactImpulse = row.impulse;
+			var jn:JacobianRow = row.jacobianN;
 			var jt:JacobianRow = row.jacobianT;
 			var jb:JacobianRow = row.jacobianB;
+			var impN:Float = imp.impulseN;
+			var impT:Float = imp.impulseT;
+			var impB:Float = imp.impulseB;
 			var impulseL:IVec3;
 
+			// store lateral impulse
 			M.vec3_zero(impulseL);
-			M.vec3_addRhsScaled(impulseL, impulseL, jt.lin1, imp.impulseT);
-			M.vec3_addRhsScaled(impulseL, impulseL, jb.lin1, imp.impulseB);
-
+			M.vec3_addRhsScaled(impulseL, impulseL, jt.lin1, impT);
+			M.vec3_addRhsScaled(impulseL, impulseL, jb.lin1, impB);
 			M.vec3_assign(imp.impulseL, impulseL);
+
+			// accumulate contact impulses
+			M.vec3_addRhsScaled(lin1, lin1, jn.lin1, impN);
+			M.vec3_addRhsScaled(ang1, ang1, jn.ang1, impN);
+			M.vec3_addRhsScaled(ang2, ang2, jn.ang2, impN);
+			M.vec3_addRhsScaled(lin1, lin1, jt.lin1, impT);
+			M.vec3_addRhsScaled(ang1, ang1, jt.ang1, impT);
+			M.vec3_addRhsScaled(ang2, ang2, jt.ang2, impT);
+			M.vec3_addRhsScaled(lin1, lin1, jb.lin1, impB);
+			M.vec3_addRhsScaled(ang1, ang1, jb.ang1, impB);
+			M.vec3_addRhsScaled(ang2, ang2, jb.ang2, impB);
 		}
+
+		M.vec3_add(_b1._linearContactImpulse, _b1._linearContactImpulse, lin1);
+		M.vec3_add(_b1._angularContactImpulse, _b1._angularContactImpulse, ang1);
+		M.vec3_sub(_b2._linearContactImpulse, _b2._linearContactImpulse, lin1);
+		M.vec3_sub(_b2._angularContactImpulse, _b2._angularContactImpulse, ang2);
 
 		constraint._syncManifold();
 	}
