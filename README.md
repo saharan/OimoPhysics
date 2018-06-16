@@ -35,6 +35,7 @@ A lightweight 3D physics engine.
 	* Prismatic (a.k.a. slider)
 	* Universal
 	* Ragdoll (a.k.a. cone twist, character)
+	* Generic (a.k.a. generic 6DoF) *WIP, not applied to bin/js yet*
 * Breakable joints
 * Constraint solvers
 	* Direct block MLCP solver

@@ -20,7 +20,7 @@ class GenericJointConfig extends JointConfig {
 	 * The second body's local constraint basis.
 	 */
 	public var localBasis2:Mat3;
-	
+
 	/**
 	 * The translational limits and motors along the first body's the constraint basis.
 	 */
@@ -30,7 +30,7 @@ class GenericJointConfig extends JointConfig {
 	 * The translational springs and dampers along the first body's constraint basis.
 	 */
 	public var translationalSpringDampers:Array<SpringDamper>;
-	
+
 	/**
 	 * The rotational limits and motors along the rotation axes of the relative x-y-z Euler angles.
 	 */
@@ -48,8 +48,8 @@ class GenericJointConfig extends JointConfig {
 		super();
 		localBasis1 = new Mat3();
 		localBasis2 = new Mat3();
-		translationalLimitMotors = [new TranslationalLimitMotor(), new TranslationalLimitMotor(), new TranslationalLimitMotor()];
-		rotationalLimitMotors = [new RotationalLimitMotor(), new RotationalLimitMotor(), new RotationalLimitMotor()];
+		translationalLimitMotors = [for (i in 0...3) new TranslationalLimitMotor().setLimits(0, 0)];
+		rotationalLimitMotors = [for (i in 0...3) new RotationalLimitMotor().setLimits(0, 0)];
 		translationalSpringDampers = [new SpringDamper(), new SpringDamper(), new SpringDamper()];
 		rotationalSpringDampers = [new SpringDamper(), new SpringDamper(), new SpringDamper()];
 	}

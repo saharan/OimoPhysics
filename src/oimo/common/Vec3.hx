@@ -77,6 +77,13 @@ class Vec3 {
 	}
 
 	/**
+	 * Returns (`this.x` + `vx`, `this.y` + `vy`, `this.z` + `vz`).
+	 */
+	public inline function add3(vx:Float, vy:Float, vz:Float):Vec3 {
+		return new Vec3(x + vx, y + vy, z + vz);
+	}
+
+	/**
 	 * Returns `this` + `v` * `s`.
 	 */
 	public inline function addScaled(v:Vec3, s:Float):Vec3 {
@@ -88,6 +95,13 @@ class Vec3 {
 	 */
 	public inline function sub(v:Vec3):Vec3 {
 		return new Vec3(x - v.x, y - v.y, z - v.z);
+	}
+
+	/**
+	 * Returns (`this.x` - `vx`, `this.y` - `vy`, `this.z` - `vz`).
+	 */
+	public inline function sub3(vx:Float, vy:Float, vz:Float):Vec3 {
+		return new Vec3(x - vx, y - vy, z - vz);
 	}
 
 	/**
@@ -130,6 +144,13 @@ class Vec3 {
 	}
 
 	/**
+	 * Sets this vector to (`this.x` + `vx`, `this.y` + `vy`, `this.z` + `vz`) and returns `this`.
+	 */
+	public inline function add3Eq(vx:Float, vy:Float, vz:Float):Vec3 {
+		return initi(x + vx, y + vy, z + vz);
+	}
+
+	/**
 	 * Sets this vector to `this` + `v` * `s` and returns `this`.
 	 */
 	public inline function addScaledEq(v:Vec3, s:Float):Vec3 {
@@ -141,6 +162,13 @@ class Vec3 {
 	 */
 	public inline function subEq(v:Vec3):Vec3 {
 		return initi(x - v.x, y - v.y, z - v.z);
+	}
+
+	/**
+	 * Sets this vector to (`this.x` - `vx`, `this.y` - `vy`, `this.z` - `vz`) and returns `this`.
+	 */
+	public inline function sub3Eq(vx:Float, vy:Float, vz:Float):Vec3 {
+		return initi(x - vx, y - vy, z - vz);
 	}
 
 	/**

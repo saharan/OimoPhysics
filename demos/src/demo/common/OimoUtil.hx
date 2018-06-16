@@ -40,8 +40,8 @@ class OimoUtil {
 		for (i in 0...3) {
 			if (translSds != null && translSds[i] != null) jc.translationalSpringDampers[i] = translSds[i];
 			if (translLms != null && translLms[i] != null) jc.translationalLimitMotors[i]   = translLms[i];
-			if (rotSds != null    && rotSds[i] != null)    jc.rotationalSpringDampers[i]           = rotSds[i];
-			if (rotLms != null    && rotLms[i] != null)    jc.rotationalLimitMotors[i]             = rotLms[i];
+			if (rotSds != null    && rotSds[i] != null)    jc.rotationalSpringDampers[i]    = rotSds[i];
+			if (rotLms != null    && rotLms[i] != null)    jc.rotationalLimitMotors[i]      = rotLms[i];
 		}
 		var j:GenericJoint = new GenericJoint(jc);
 		w.addJoint(j);

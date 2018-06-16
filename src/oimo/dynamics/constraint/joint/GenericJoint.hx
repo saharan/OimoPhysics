@@ -42,7 +42,8 @@ class GenericJoint extends Joint {
 	 */
 	public function new(config:GenericJointConfig) {
 		super(config, JointType.GENERIC);
-		
+
+		if (config.localBasis1.determinant() < 0 || config.localBasis2.determinant() < 0) trace("[warning] joint basis must be right handed");
 		var lb1:IMat3;
 		var lb2:IMat3;
 		M.mat3_fromMat3(lb1, config.localBasis1);
@@ -57,7 +58,7 @@ class GenericJoint extends Joint {
 		_angleX = 0;
 		_angleY = 0;
 		_angleZ = 0;
-		
+
 		translationX = 0;
 		translationY = 0;
 		translationZ = 0;
@@ -65,7 +66,7 @@ class GenericJoint extends Joint {
 		xSingular = false;
 		ySingular = false;
 		zSingular = false;
-		
+
 		_translLms = new Vector(3);
 		_translSds = new Vector(3);
 		_rotLms = new Vector(3);
@@ -156,7 +157,7 @@ class GenericJoint extends Joint {
 			M.vec3_cross(j.ang1, _relativeAnchor1, _basisX1);
 			M.vec3_cross(j.ang2, _relativeAnchor2, _basisX1);
 		}
-		
+
 		// linear Y
 		if (_translSds[1].frequency <= 0 || !isPositionPart) {
 			row = info.addRow(_impulses[1]);
@@ -168,7 +169,7 @@ class GenericJoint extends Joint {
 			M.vec3_cross(j.ang1, _relativeAnchor1, _basisY1);
 			M.vec3_cross(j.ang2, _relativeAnchor2, _basisY1);
 		}
-		
+
 		// linear Z
 		if (_translSds[2].frequency <= 0 || !isPositionPart) {
 			row = info.addRow(_impulses[2]);
@@ -268,14 +269,41 @@ class GenericJoint extends Joint {
 	}
 
 	// --- public ---
-	
+
+	/**
+	 * Returns the first (x) rotation axis of the relative Euler angles.
+	 */
+	public inline function getAxisX():Vec3 {
+		var v:Vec3 = new Vec3();
+		M.vec3_toVec3(v, _basisX1);
+		return v;
+	}
+
+	/**
+	 * Returns the second (y) rotation axis of the relative Euler angles.
+	 */
+	public inline function getAxisY():Vec3 {
+		var v:Vec3 = new Vec3();
+		M.vec3_toVec3(v, _axisY);
+		return v;
+	}
+
+	/**
+	 * Returns the third (z) rotation axis of the relative Euler angles.
+	 */
+	public inline function getAxisZ():Vec3 {
+		var v:Vec3 = new Vec3();
+		M.vec3_toVec3(v, _basisZ2);
+		return v;
+	}
+
 	/**
 	 * Returns the translational spring and damper settings along the first body's constraint basis.
 	 */
 	public inline function getTranslationalSpringDampers():Array<SpringDamper> {
 		return _translSds.toArray();
 	}
-	
+
 	/**
 	 * Returns the rotational spring and damper settings along the rotation axes of the relative x-y-z Euler angles.
 	 */
@@ -303,7 +331,7 @@ class GenericJoint extends Joint {
 	public inline function getAngles():Vec3 {
 		return new Vec3(_angleX, _angleY, _angleZ);
 	}
-	
+
 	/**
 	 * Returns the translations along the first rigid body's constraint basis.
 	 */

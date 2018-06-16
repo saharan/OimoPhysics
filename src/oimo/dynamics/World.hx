@@ -590,7 +590,7 @@ class World {
 		if (d.drawJointLimits) {
 			switch (j._type) {
 			case JointType._SPHERICAL:
-				// draw nothing more
+				// draw nothing here
 			case JointType._REVOLUTE:
 				_drawRevolute(d, cast j, anchor1, anchor2, basisX1, basisY1, basisZ1, basisX2, basisY2, basisZ2);
 			case JointType._CYLINDRICAL:
@@ -601,6 +601,8 @@ class World {
 				_drawUniversal(d, cast j, anchor1, anchor2, basisX1, basisY1, basisZ1, basisX2, basisY2, basisZ2);
 			case JointType._RAGDOLL:
 				_drawRagdoll(d, cast j, anchor1, anchor2, basisX1, basisY1, basisZ1, basisX2, basisY2, basisZ2);
+			case JointType._GENERIC:
+				_drawGeneric(d, cast j, anchor1, anchor2, basisX1, basisY1, basisZ1, basisX2, basisY2, basisZ2);
 			}
 		}
 
@@ -672,16 +674,38 @@ class World {
 		_pool.dispose(to);
 	}
 
+	@:extern
+	inline function _drawGeneric(d:DebugDraw, j:GenericJoint, anchor1:Vec3, anchor2:Vec3, basisX1:Vec3, basisY1:Vec3, basisZ1:Vec3, basisX2:Vec3, basisY2:Vec3, basisZ2:Vec3):Void {
+		var radius:Float = d.style.jointRotationalConstraintRadius;
+		var color:Vec3 = d.style.jointLineColor;
+		var txlm:TranslationalLimitMotor = j._translLms[0];
+		var tylm:TranslationalLimitMotor = j._translLms[1];
+		var tzlm:TranslationalLimitMotor = j._translLms[2];
+		var rxlm:RotationalLimitMotor = j._rotLms[0];
+		var rylm:RotationalLimitMotor = j._rotLms[1];
+		var rzlm:RotationalLimitMotor = j._rotLms[2];
+		_drawTranslationalLimit3D(d, anchor1, basisX1, basisY1, basisZ1, txlm, tylm, tzlm, color);
+		
+		var rotYAxis:Vec3 = _pool.vec3();
+		M.vec3_toVec3(rotYAxis, j._axisY);
+		var rotYBasisX:Vec3 = _pool.vec3().copyFrom(basisX1);
+		var rotYBasisY:Vec3 = _pool.vec3().copyFrom(basisX1).crossEq(rotYAxis);
+		
+		_drawRotationalLimit(d, anchor2, basisY1, basisZ1, basisY1, radius, j._angleX - rxlm.upperLimit, j._angleX - rxlm.lowerLimit, color);
+		_drawRotationalLimit(d, anchor2, rotYBasisX, rotYBasisY, rotYBasisX, radius, rylm.lowerLimit - j._angleY, rylm.upperLimit - j._angleY, color);
+		_drawRotationalLimit(d, anchor2, basisX2, basisY2, basisX2, radius, rzlm.lowerLimit - j._angleZ, rzlm.upperLimit - j._angleZ, color);
+	}
+
 	function _drawRotationalLimit(d:DebugDraw, center:Vec3, ex:Vec3, ey:Vec3, needle:Vec3, radius:Float, min:Float, max:Float, color:Vec3):Void {
 		if (min != max) {
 			var to:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(needle, radius);
 			d.line(center, to, color);
 			_pool.dispose(to);
-		}
-		if (min > max) {
-			d.ellipse(center, ex, ey, radius, radius, color);
-		} else {
-			d.arc(center, ex, ey, radius, radius, min, max, true, color);
+			if (min > max) {
+				d.ellipse(center, ex, ey, radius, radius, color);
+			} else {
+				d.arc(center, ex, ey, radius, radius, min, max, true, color);
+			}
 		}
 	}
 
@@ -693,6 +717,48 @@ class World {
 			_pool.dispose(lower);
 			_pool.dispose(upper);
 		}
+	}
+
+	function _drawTranslationalLimit3D(d:DebugDraw, center:Vec3, ex:Vec3, ey:Vec3, ez:Vec3, xlm:TranslationalLimitMotor, ylm:TranslationalLimitMotor, zlm:TranslationalLimitMotor, color:Vec3):Void {
+		var minx:Float = xlm.lowerLimit;
+		var maxx:Float = xlm.upperLimit;
+		var miny:Float = ylm.lowerLimit;
+		var maxy:Float = ylm.upperLimit;
+		var minz:Float = zlm.lowerLimit;
+		var maxz:Float = zlm.upperLimit;
+		var lower:Vec3 = _pool.vec3();
+		var upper:Vec3 = _pool.vec3();
+		var xyz:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(ex, minx).addScaledEq(ey, miny).addScaledEq(ez, minz);
+		var xyZ:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(ex, minx).addScaledEq(ey, miny).addScaledEq(ez, maxz);
+		var xYz:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(ex, minx).addScaledEq(ey, maxy).addScaledEq(ez, minz);
+		var xYZ:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(ex, minx).addScaledEq(ey, maxy).addScaledEq(ez, maxz);
+		var Xyz:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(ex, maxx).addScaledEq(ey, miny).addScaledEq(ez, minz);
+		var XyZ:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(ex, maxx).addScaledEq(ey, miny).addScaledEq(ez, maxz);
+		var XYz:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(ex, maxx).addScaledEq(ey, maxy).addScaledEq(ez, minz);
+		var XYZ:Vec3 = _pool.vec3().copyFrom(center).addScaledEq(ex, maxx).addScaledEq(ey, maxy).addScaledEq(ez, maxz);
+		// x
+		d.line(xyz, Xyz, color);
+		d.line(xYz, XYz, color);
+		d.line(xyZ, XyZ, color);
+		d.line(xYZ, XYZ, color);
+		// y
+		d.line(xyz, xYz, color);
+		d.line(Xyz, XYz, color);
+		d.line(xyZ, xYZ, color);
+		d.line(XyZ, XYZ, color);
+		// z
+		d.line(xyz, xyZ, color);
+		d.line(Xyz, XyZ, color);
+		d.line(xYz, xYZ, color);
+		d.line(XYz, XYZ, color);
+		_pool.dispose(xyz);
+		_pool.dispose(xyZ);
+		_pool.dispose(xYz);
+		_pool.dispose(xYZ);
+		_pool.dispose(Xyz);
+		_pool.dispose(XyZ);
+		_pool.dispose(XYz);
+		_pool.dispose(XYZ);
 	}
 
 	function _drawEllipseOnSphere(d:DebugDraw, center:Vec3, normal:Vec3, x:Vec3, y:Vec3, radiansX:Float, radiansY:Float, radius:Float, color:Vec3):Void {

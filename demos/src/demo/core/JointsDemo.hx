@@ -1,9 +1,5 @@
 package demo.core;
-import demo.common.DemoRenderer;
-import demo.common.DemoBase;
-import demo.common.OimoUtil;
-import demo.common.UserInput;
-import demo.common.ViewInfo;
+import demo.common.*;
 import oimo.collision.geometry.*;
 import oimo.common.*;
 import oimo.dynamics.*;
@@ -26,14 +22,13 @@ class JointsDemo extends DemoBase {
 
 		OimoUtil.addBox(world, new Vec3(0, -0.2, 0), new Vec3(6, 0.2, 6), true);
 
+		renderer.getGraphics().getDebugDraw().drawJointLimits = true;
+
 		createBallChain(new Vec3(-2, 5, -2), 0.4, 7);
 		createHingeChain(new Vec3(2, 5, -2), 0.3, 7, new Vec3(0, 0, 1));
 
-		createBoard(0, 2, 0, new RotationalLimitMotor().setLimits(-45 * MathUtil.TO_RADIANS, 45 * MathUtil.TO_RADIANS), new SpringDamper());
 		createBoard(0, 4, 0, new RotationalLimitMotor().setLimits(-45 * MathUtil.TO_RADIANS, 45 * MathUtil.TO_RADIANS), new SpringDamper().setSpring(2, 0.3));
 		createBoard(0, 6, 0, new RotationalLimitMotor().setMotor(MathUtil.TWO_PI, MathUtil.TWO_PI * 4), new SpringDamper());
-
-		renderer.getGraphics().getDebugDraw().drawJointLimits = true;
 
 		{
 			var x:Float = 2;
@@ -59,7 +54,7 @@ class JointsDemo extends DemoBase {
 			var z:Float = 3;
 			var length:Float = 1.0;
 
-			var b1:RigidBody = OimoUtil.addBox(world, new Vec3(x, y + length, z), new Vec3(0.2, 0.5, 0.2), true);
+			var b1:RigidBody = OimoUtil.addBox(world, new Vec3(x, y + length, z), new Vec3(0.2, 0.2, 0.2), true);
 			b1.setType(RigidBodyType.KINEMATIC);
 			b1.setAngularVelocity(new Vec3(0, 1.5, 0));
 			var b2:RigidBody = OimoUtil.addBox(world, new Vec3(x, y - length, z), new Vec3(0.2, 0.5, 0.2), false);
@@ -74,7 +69,7 @@ class JointsDemo extends DemoBase {
 			var hingeLimit1 = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.5, MathUtil.HALF_PI * 0.5);
 			var hingeLimit2 = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.8, MathUtil.HALF_PI * 0.8);
 
-			var b1:RigidBody = OimoUtil.addBox(world, new Vec3(x, y + length, z), new Vec3(0.2, 0.5, 0.2), true);
+			var b1:RigidBody = OimoUtil.addBox(world, new Vec3(x, y + length, z), new Vec3(0.2, 0.2, 0.2), true);
 			b1.setType(RigidBodyType.KINEMATIC);
 			b1.setAngularVelocity(new Vec3(0, 1.5, 0));
 			var b2:RigidBody = OimoUtil.addBox(world, new Vec3(x, y - length, z), new Vec3(0.2, 0.5, 0.2), false);
@@ -86,14 +81,14 @@ class JointsDemo extends DemoBase {
 			var y:Float = 3;
 			var z:Float = 3;
 			var length:Float = 1.0;
-			var rotXLimit = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.2, MathUtil.HALF_PI * 0.2);
-			var rotYLimit = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.5, MathUtil.HALF_PI * 0.5);
+			var rotXLimit = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.4, MathUtil.HALF_PI * 0.4);
+			var rotYLimit = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.2, MathUtil.HALF_PI * 0.2);
 			var rotZLimit = new RotationalLimitMotor().setLimits(-MathUtil.HALF_PI * 0.8, MathUtil.HALF_PI * 0.8);
-			var translXLimit = new TranslationalLimitMotor().setLimits(0, 0);
-			var translYLimit = new TranslationalLimitMotor().setLimits(-0.5, 0);
-			var translZLimit = new TranslationalLimitMotor().setLimits(0, 0.5);
+			var translXLimit = new TranslationalLimitMotor().setLimits(-0.2, 0.2);
+			var translYLimit = new TranslationalLimitMotor().setLimits(-0.3, 0);
+			var translZLimit = new TranslationalLimitMotor().setLimits(-0.2, 0.8);
 
-			var b1:RigidBody = OimoUtil.addBox(world, new Vec3(x, y + length, z), new Vec3(0.2, 0.5, 0.2), true);
+			var b1:RigidBody = OimoUtil.addBox(world, new Vec3(x, y + length, z), new Vec3(0.2, 0.2, 0.2), true);
 			b1.setType(RigidBodyType.KINEMATIC);
 			b1.setAngularVelocity(new Vec3(0, 1.5, 0));
 			var b2:RigidBody = OimoUtil.addBox(world, new Vec3(x, y - length, z), new Vec3(0.2, 0.5, 0.2), false);
