@@ -6,14 +6,14 @@ A lightweight 3D physics engine.
 ## [API Documentation](https://saharan.github.io/OimoPhysics/)
 
 ## Demos
-<a href="http://el-ement.com/etc/oimo/demos/"><img src="http://el-ement.com/etc/oimo/demos/thumbnail.png"></a>
+<a href="https://el-ement.com/etc/oimo/demos/"><img src="https://el-ement.com/etc/oimo/demos/thumbnail.png"></a>
 * Press `E` or `Q` to change demos
-* Click or tap text to control
+* Click or tap texts on the left to control
 
 ## Features
 * Written in Haxe
 * Exported as JavaScript (see [bin/js/](./bin/js))
-	* Public classes and methods will be exposed through `window.OIMO`.
+	* Public classes and methods are exposed through `window.OIMO`.
 	* e.g. `new OIMO.Vec3(1, 2, 3)` to create an instance of `Vec3` class.
 * Rigid body motion types
 	* Dynamic
@@ -46,8 +46,8 @@ A lightweight 3D physics engine.
 * Collision filterings
 * Collision queries
 	* AABB query
-	* ray casting
-	* convex casting
+	* Ray casting
+	* Convex casting
 
 ## Compilations
 Haxe 4.0.0 or later is required. (recommended: Haxe 4.0.5 or later)
