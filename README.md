@@ -1,4 +1,4 @@
-OimoPhysics
+OimoPhysics 1.2.1
 ---
 
 A lightweight 3D physics engine.
@@ -13,7 +13,7 @@ A lightweight 3D physics engine.
 ## Features
 * Written in Haxe
 * Exported as JavaScript (see [bin/js/](./bin/js))
-	* Public classes and methods will be exposed through `windwow.OIMO`.
+	* Public classes and methods will be exposed through `window.OIMO`.
 	* e.g. `new OIMO.Vec3(1, 2, 3)` to create an instance of `Vec3` class.
 * Rigid body motion types
 	* Dynamic
@@ -35,7 +35,7 @@ A lightweight 3D physics engine.
 	* Prismatic (a.k.a. slider)
 	* Universal
 	* Ragdoll (a.k.a. cone twist, character)
-	* Generic (a.k.a. generic 6DoF) *WIP, not applied to bin/js yet*
+	* Generic (a.k.a. 6-DoF joint)
 * Breakable joints
 * Constraint solvers
 	* Direct block MLCP solver
@@ -49,12 +49,11 @@ A lightweight 3D physics engine.
 	* ray casting
 	* convex casting
 
-## Compile JavaScript demos in Haxe
-* Use Haxe 4.0.0 or later
-* main class: `demo.js.DemoJS`
-* Try enabling compiler options if fails
-	* `-D analyzer`
-	* `-D eval-stack`
+## Compilations
+Haxe 4.0.0 or later is required. (recommended: Haxe 4.0.5 or later)
+* Use `build-js.hxml` to compile for JavaScript library.
+* Use `build-js-demos.hxml` to compile JavaScript demos.
+* Use `build-doc.hxml` to generate API documentation. [dox](https://github.com/HaxeFoundation/dox) is required.
 
 ## License
 The MIT License

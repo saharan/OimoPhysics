@@ -61,8 +61,7 @@ class UniversalJoint extends Joint {
 		_lm2 = config.limitMotor2.clone();
 	}
 
-	@:extern
-	inline function updateConstraintAxes():Void {
+	extern inline function updateConstraintAxes():Void {
 		var rot1:IMat3;
 		var rot2:IMat3;
 		M.mat3_fromCols(rot1, _basisX1, _basisY1, _basisZ1);
@@ -199,8 +198,7 @@ class UniversalJoint extends Joint {
 		}
 	}
 
-	@:extern
-	inline function computeErrors():Void {
+	extern inline function computeErrors():Void {
 		var rot1:IMat3;
 		var rot2:IMat3;
 		M.mat3_fromCols(rot1, _basisX1, _basisY1, _basisZ1);

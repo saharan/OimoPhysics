@@ -46,15 +46,13 @@ class BvhNode {
 
 	// --- internal ---
 
-	@:extern
-	public inline function _setChild(index:Int, child:BvhNode):Void {
+	extern public inline function _setChild(index:Int, child:BvhNode):Void {
 		_children[index] = child;
 		child._parent = this;
 		child._childIndex = index;
 	}
 
-	@:extern
-	public inline function _removeReferences():Void {
+	extern public inline function _removeReferences():Void {
 		_next = null;
 		_childIndex = 0;
 		_children[0] = null;
@@ -65,23 +63,20 @@ class BvhNode {
 		_proxy = null;
 	}
 
-	@:extern
-	public inline function _computeAabb():Void {
+	extern public inline function _computeAabb():Void {
 		var c1:BvhNode = _children[0];
 		var c2:BvhNode = _children[1];
 		M.vec3_min(_aabbMin, c1._aabbMin, c2._aabbMin);
 		M.vec3_max(_aabbMax, c1._aabbMax, c2._aabbMax);
 	}
 
-	@:extern
-	public inline function _computeHeight():Void {
+	extern public inline function _computeHeight():Void {
 		var h1:Int = _children[0]._height;
 		var h2:Int = _children[1]._height;
 		_height = (h1 > h2 ? h1 : h2) + 1;
 	}
 
-	@:extern
-	public inline function _perimeter():Float {
+	extern public inline function _perimeter():Float {
 		var size:IVec3;
 		M.vec3_sub(size, _aabbMax, _aabbMin);
 		var x:Float = M.vec3_get(size, 0);

@@ -124,8 +124,7 @@ class ManifoldUpdater {
 		return target;
 	}
 
-	@:extern
-	inline function quadAreaFast(p1:IVec3, p2:IVec3, p3:IVec3, p4:IVec3):Float {
+	extern inline function quadAreaFast(p1:IVec3, p2:IVec3, p3:IVec3, p4:IVec3):Float {
 		// possible diagonals (12-34, 13-24, 14-23)
 		var v12:IVec3;
 		var v34:IVec3;
@@ -188,8 +187,7 @@ class ManifoldUpdater {
 		return idx;
 	}
 
-	@:extern
-	inline function distSq(mp:ManifoldPoint, result:DetectorResultPoint, tf1:Transform, tf2:Transform):Float {
+	extern inline function distSq(mp:ManifoldPoint, result:DetectorResultPoint, tf1:Transform, tf2:Transform):Float {
 		var rp1:IVec3;
 		var rp2:IVec3;
 		M.vec3_fromVec3(rp1, result.position1);
@@ -208,16 +206,14 @@ class ManifoldUpdater {
 		return sq1 < sq2 ? sq1 : sq2;
 	}
 
-	@:extern
-	inline function saveOldData():Void {
+	extern inline function saveOldData():Void {
 		numOldPoints = _manifold._numPoints;
 		for (i in 0...numOldPoints) {
 			oldPoints[i]._copyFrom(_manifold._points[i]);
 		}
 	}
 
-	@:extern
-	inline function updateContactPointById(cp:ManifoldPoint):Void {
+	extern inline function updateContactPointById(cp:ManifoldPoint):Void {
 		for (i in 0...numOldPoints) {
 			var ocp:ManifoldPoint = oldPoints[i];
 			if (cp._id == ocp._id) {

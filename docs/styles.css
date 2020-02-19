@@ -33,7 +33,7 @@
 .nav-list {padding-right: 0;	 }
 .nav-list>li>a, .nav-list .nav-header {margin-right:0;}
 .nav-list>li>a.treeLink {padding-left:20px;}
-.nav-list a { word-wrap: break-word; font-size:14px; text-shadow: none!important;}
+.nav-list a { overflow: hidden; font-size:14px; text-shadow: none!important;}
 .nav-list>.active>a.treeLink, .nav-list>.active>a.treeLink:hover, .nav-list>.active>a.treeLink:focus {
 	background:#999;
 	color:#fff;
@@ -53,6 +53,9 @@
 footer{
 	margin-top:40px;
 	font-size:14px;
+}
+.section.site-footer {
+	border-bottom: 0px;
 }
 .copyright {
 	padding: 6px;
@@ -98,7 +101,7 @@ footer{
 }
 
 .availability {
-	color: #AB611A;
+	color: #e48931;
 	font-size: 90%;
 }
 
@@ -112,8 +115,27 @@ h3 code {
 	margin-left: -10px;
 }
 
-h3 span.label {	
+h3 span.label, .label-meta {
 	margin-right: 5px; 
+}
+
+.label.label-meta {
+	background:#5959AC;
+}
+
+/* hide meta that has doesn't belong in the API (implementation details) */
+.label-meta-impl, .label-meta-value, .label-meta-has_untyped, .label-meta-hlNative, .label-meta-access, .label-meta-allow, .label-meta-keep, .label-meta-keepInit, .label-meta-keepSub, .label-meta-dox, .label-meta-noCompletion, .label-meta-directlyUsed, .label-meta-build, .label-meta-autoBuild, .label-meta-genericBuild, .label-meta-analyzer, .label-meta-enum, .label-meta-extern {
+	display:none;
+}
+
+.label-meta.label-meta-from, .label-meta.label-meta-to {
+	background:#a93685;
+}
+
+.alert.alert-deprecated {
+	font-size: 90%;
+	margin-bottom: 10px;
+	padding: 4px 35px 4px 14px;
 }
 
 code {

@@ -33,11 +33,10 @@ class M {
 		};
 	}
 
-	@:extern
-	public static inline function error(msg:String) {
+	extern public static inline function error(msg:String) {
 		return
 			#if js
-				new js.Error(msg)
+				new js.lib.Error(msg)
 			#elseif flash
 				new flash.errors.Error(msg)
 			#elseif java

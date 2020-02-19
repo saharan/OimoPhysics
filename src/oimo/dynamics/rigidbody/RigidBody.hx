@@ -206,8 +206,7 @@ class RigidBody {
 		}
 	}
 
-	@:extern
-	public inline function _isSleepy():Bool {
+	extern public inline function _isSleepy():Bool {
 		return
 			_autoSleep &&
 			M.vec3_dot(_vel, _vel) < Setting.sleepingVelocityThreshold * Setting.sleepingVelocityThreshold &&
@@ -215,18 +214,15 @@ class RigidBody {
 		;
 	}
 
-	@:extern
-	public inline function _isAlone():Bool {
+	extern public inline function _isAlone():Bool {
 		return _numContactLinks == 0 && _numJointLinks == 0;
 	}
 
-	@:extern
-	public inline function _applyTranslation(translation:IVec3):Void {
+	extern public inline function _applyTranslation(translation:IVec3):Void {
 		M.vec3_add(_transform._position, _transform._position, translation);
 	}
 
-	@:extern
-	public inline function _applyRotation(rotation:IVec3):Void {
+	extern public inline function _applyRotation(rotation:IVec3):Void {
 		// compute derivative of the quaternion
 		var theta:Float = M.vec3_length(rotation);
 		var halfTheta:Float = theta * 0.5;
@@ -260,29 +256,25 @@ class RigidBody {
 	}
 
 	// call when added/removed/modified shapes
-	@:extern
-	public inline function _shapeModified():Void {
+	extern public inline function _shapeModified():Void {
 		updateMass();
 		_syncShapes();
 	}
 
-	@:extern
-	public inline function _syncShapes():Void {
+	extern public inline function _syncShapes():Void {
 		var s:Shape = _shapeList;
 		M.list_foreach(s, _next, {
 			M.call(s._sync(_ptransform, _transform));
 		});
 	}
 
-	@:extern
-	public inline function _applyLinearPositionImpulse(imp:IVec3):Void {
+	extern public inline function _applyLinearPositionImpulse(imp:IVec3):Void {
 		var translation:IVec3;
 		M.vec3_scale(translation, imp, _invMass);
 		M.call(_applyTranslation(translation));
 	}
 
-	@:extern
-	public inline function _applyAngularPositionImpulse(imp:IVec3):Void {
+	extern public inline function _applyAngularPositionImpulse(imp:IVec3):Void {
 		var rotation:IVec3;
 		M.vec3_mulMat3(rotation, imp, _invInertia);
 		M.call(_applyRotation(rotation));
@@ -331,8 +323,7 @@ class RigidBody {
 	}
 
 	// compute inverse mass and inertias from _mass and _localInertia
-	@:extern
-	inline function completeMassData():Void {
+	extern inline function completeMassData():Void {
 		var det:Float;
 		det = M.mat3_det(_localInertia);
 		if (_mass > 0 && det > 0 && _type == RigidBodyType._DYNAMIC) {
@@ -354,15 +345,13 @@ class RigidBody {
 		updateInvInertia();
 	}
 
-	@:extern
-	inline function updateInvInertia():Void {
+	extern inline function updateInvInertia():Void {
 		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
 		M.mat3_scaleRows(_invInertia, _invInertia, _rotFactor.x, _rotFactor.y, _rotFactor.z);
 	}
 
 	// call when the transform is externally updated
-	@:extern
-	inline function updateTransformExt():Void {
+	extern inline function updateTransformExt():Void {
 		M.transform_assign(_ptransform, _transform);
 		_syncShapes();
 		wakeUp();

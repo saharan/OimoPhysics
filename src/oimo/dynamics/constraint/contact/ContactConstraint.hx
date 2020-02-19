@@ -49,8 +49,7 @@ class ContactConstraint {
 
 	// --- internal ---
 
-	@:extern
-	public inline function _attach(s1:Shape, s2:Shape):Void {
+	extern public inline function _attach(s1:Shape, s2:Shape):Void {
 		_s1 = s1;
 		_s2 = s2;
 		_b1 = _s1._rigidBody;
@@ -59,8 +58,7 @@ class ContactConstraint {
 		_tf2 = _b2._transform;
 	}
 
-	@:extern
-	public inline function _detach():Void {
+	extern public inline function _detach():Void {
 		_s1 = null;
 		_s2 = null;
 		_b1 = null;

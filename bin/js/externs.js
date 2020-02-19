@@ -1,4 +1,4 @@
-// externs for closure compiler
+// externs for Closure Compiler
 OIMO.DebugDraw.wireframe;
 OIMO.DebugDraw.drawShapes;
 OIMO.DebugDraw.drawBvh;
@@ -202,12 +202,19 @@ OIMO.CylindricalJointConfig.translationalLimitMotor;
 OIMO.CylindricalJointConfig.translationalSpringDamper;
 OIMO.CylindricalJointConfig.rotationalLimitMotor;
 OIMO.CylindricalJointConfig.rotationalSpringDamper;
+OIMO.GenericJointConfig.localBasis1;
+OIMO.GenericJointConfig.localBasis2;
+OIMO.GenericJointConfig.translationalLimitMotors;
+OIMO.GenericJointConfig.translationalSpringDampers;
+OIMO.GenericJointConfig.rotationalLimitMotors;
+OIMO.GenericJointConfig.rotationalSpringDampers;
 OIMO.JointType.SPHERICAL;
 OIMO.JointType.REVOLUTE;
 OIMO.JointType.CYLINDRICAL;
 OIMO.JointType.PRISMATIC;
 OIMO.JointType.UNIVERSAL;
 OIMO.JointType.RAGDOLL;
+OIMO.JointType.GENERIC;
 OIMO.PrismaticJointConfig.localAxis1;
 OIMO.PrismaticJointConfig.localAxis2;
 OIMO.PrismaticJointConfig.limitMotor;

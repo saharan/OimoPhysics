@@ -12,7 +12,11 @@ import oimo.dynamics.constraint.info.joint.JointSolverInfo;
 import oimo.dynamics.constraint.info.joint.JointSolverInfoRow;
 
 /**
- * TODO: write doc
+ * A generic joint (a.k.a. 6-DoF joint) constrains two rigid bodies in
+ * highly flexible way, so that every translational and rotational axis
+ * can be locked, unlocked, springy, or powered by a motor like other
+ * joints. Note that rotation angles are measured as x-y-z Euler angles,
+ * not as z-x-z Euler angles.
  */
 @:build(oimo.m.B.bu())
 class GenericJoint extends Joint {
@@ -85,8 +89,7 @@ class GenericJoint extends Joint {
 		_rotSds[2] = config.rotationalSpringDampers[2].clone();
 	}
 
-	@:extern
-	inline function updateConstraintAxes():Void {
+	extern inline function updateConstraintAxes():Void {
 		var rot1:IMat3;
 		var rot2:IMat3;
 		M.mat3_fromCols(rot1, _basisX1, _basisY1, _basisZ1);
@@ -213,8 +216,7 @@ class GenericJoint extends Joint {
 		}
 	}
 
-	@:extern
-	inline function computeErrors():Void {
+	extern inline function computeErrors():Void {
 		var rot1:IMat3;
 		var rot2:IMat3;
 		M.mat3_fromCols(rot1, _basisX1, _basisY1, _basisZ1);

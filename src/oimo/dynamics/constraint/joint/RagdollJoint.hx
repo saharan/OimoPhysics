@@ -156,8 +156,7 @@ class RagdollJoint extends Joint {
 		}
 	}
 
-	@:extern
-	inline function computeErrors():Void {
+	extern inline function computeErrors():Void {
 		var tf1:Transform = _b1._transform;
 		var tf2:Transform = _b2._transform;
 

@@ -53,8 +53,7 @@ class ManifoldPoint {
 
 	// --- internal ---
 
-	@:extern
-	public inline function _clear():Void {
+	extern public inline function _clear():Void {
 		M.vec3_zero(_localPos1);
 		M.vec3_zero(_localPos2);
 		M.vec3_zero(_relPos1);
@@ -68,8 +67,7 @@ class ManifoldPoint {
 		_id = -1;
 	}
 
-	@:extern
-	public inline function _initialize(result:DetectorResultPoint, tf1:Transform, tf2:Transform):Void {
+	extern public inline function _initialize(result:DetectorResultPoint, tf1:Transform, tf2:Transform):Void {
 		// world position
 		M.vec3_fromVec3(_pos1, result.position1);
 		M.vec3_fromVec3(_pos2, result.position2);
@@ -91,8 +89,7 @@ class ManifoldPoint {
 		_disabled = false;
 	}
 
-	@:extern
-	public inline function _updateDepthAndPositions(result:DetectorResultPoint, tf1:Transform, tf2:Transform):Void {
+	extern public inline function _updateDepthAndPositions(result:DetectorResultPoint, tf1:Transform, tf2:Transform):Void {
 		// world position
 		M.vec3_fromVec3(_pos1, result.position1);
 		M.vec3_fromVec3(_pos2, result.position2);
@@ -108,8 +105,7 @@ class ManifoldPoint {
 		_depth = result.depth;
 	}
 
-	@:extern
-	public inline function _copyFrom(cp:ManifoldPoint):Void {
+	extern public inline function _copyFrom(cp:ManifoldPoint):Void {
 		M.vec3_assign(_localPos1, cp._localPos1);
 		M.vec3_assign(_localPos2, cp._localPos2);
 		M.vec3_assign(_relPos1, cp._relPos1);

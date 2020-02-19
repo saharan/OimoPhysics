@@ -76,8 +76,7 @@ class Shape {
 
 	// --- internal ---
 
-	@:extern
-	public inline function _sync(tf1:Transform, tf2:Transform):Void {
+	extern public inline function _sync(tf1:Transform, tf2:Transform):Void {
 		M.transform_mul(_ptransform, _localTransform, tf1);
 		M.transform_mul(_transform, _localTransform, tf2);
 

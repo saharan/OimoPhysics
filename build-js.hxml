@@ -1,0 +1,5 @@
+-cp src
+-cp exports/src
+-D analyzer-optimize
+-main export.js.Export
+-js bin/js/OimoPhysics.js

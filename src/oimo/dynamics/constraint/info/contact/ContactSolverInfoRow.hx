@@ -38,8 +38,7 @@ class ContactSolverInfoRow {
 		impulse = null;
 	}
 
-	@:extern
-	public inline function clear():Void {
+	extern public inline function clear():Void {
 		jacobianN.clear();
 		jacobianT.clear();
 		jacobianB.clear();

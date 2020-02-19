@@ -127,8 +127,7 @@ class PrismaticJoint extends Joint {
 		M.vec3_set(j.ang2, 0, 0, 1);
 	}
 
-	@:extern
-	inline function computeErrors():Void {
+	extern inline function computeErrors():Void {
 		// compute angular error
 		var rot1:IMat3;
 		var rot2:IMat3;

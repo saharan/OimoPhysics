@@ -49,8 +49,7 @@ class BvhStrategy {
 
 	// --- private ---
 
-	@:extern
-	inline function decideInsertionSimple(currentNode:BvhNode, leaf:BvhNode):Int {
+	extern inline function decideInsertionSimple(currentNode:BvhNode, leaf:BvhNode):Int {
 		var center:IVec3;
 		M.vec3_add(center, leaf._aabbMin, leaf._aabbMax);
 
@@ -68,8 +67,7 @@ class BvhStrategy {
 		return dist1 < dist2 ? 0 : 1;
 	}
 
-	@:extern
-	inline function decideInsertionMinimumSurfaceArea(currentNode:BvhNode, leaf:BvhNode):Int {
+	extern inline function decideInsertionMinimumSurfaceArea(currentNode:BvhNode, leaf:BvhNode):Int {
 		var c1:BvhNode = currentNode._children[0];
 		var c2:BvhNode = currentNode._children[1];
 
@@ -114,8 +112,7 @@ class BvhStrategy {
 		});
 	}
 
-	@:extern
-	inline function splitLeavesMean(leaves:Vector<BvhNode>, from:Int, until:Int):Int {
+	extern inline function splitLeavesMean(leaves:Vector<BvhNode>, from:Int, until:Int):Int {
 		var invN:Float = 1.0 / (until - from);
 
 		// mean := sum(min + max) / n

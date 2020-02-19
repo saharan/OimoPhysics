@@ -43,22 +43,19 @@ class Island {
 
 	// --- private ---
 
-	@:extern
-	inline function fastInvExp(x:Float):Float {
+	extern inline function fastInvExp(x:Float):Float {
 		var x2:Float = x * x;
 		return 1 / (1 + x + x2 * (1 / 2 + x * (1 / 6) + x2 * (1 / 24)));
 	}
 
-	@:extern
-	inline function addConstraintSolverSI(solver:ConstraintSolver):Void {
+	extern inline function addConstraintSolverSI(solver:ConstraintSolver):Void {
 		if (numSolversSi == solversSi.length) {
 			M.array_expand(solversSi, numSolversSi);
 		}
 		solversSi[numSolversSi++] = solver;
 	}
 
-	@:extern
-	inline function addConstraintSolverNgs(solver:ConstraintSolver):Void {
+	extern inline function addConstraintSolverNgs(solver:ConstraintSolver):Void {
 		if (numSolversNgs == solversNgs.length) {
 			M.array_expand(solversNgs, numSolversNgs);
 		}
@@ -74,8 +71,7 @@ class Island {
 		M.array_free(solversNgs, numSolversNgs);
 	}
 
-	@:extern
-	public inline function _setGravity(gravity:Vec3):Void {
+	extern public inline function _setGravity(gravity:Vec3):Void {
 		M.vec3_fromVec3(this.gravity, gravity);
 	}
 

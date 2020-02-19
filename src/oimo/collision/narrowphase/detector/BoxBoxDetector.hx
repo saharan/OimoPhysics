@@ -536,8 +536,7 @@ class BoxBoxDetector extends Detector {
 	 * Returns half of the projected length of the box with scaled bases
 	 * (`sx`, `sy`, `sz`) onto the normalized axis `axis`.
 	 */
-	@:extern
-	inline function project(axis:IVec3, sx:IVec3, sy:IVec3, sz:IVec3):Float {
+	extern inline function project(axis:IVec3, sx:IVec3, sy:IVec3, sz:IVec3):Float {
 		var dx:Float = M.vec3_dot(axis, sx);
 		var dy:Float = M.vec3_dot(axis, sy);
 		var dz:Float = M.vec3_dot(axis, sz);
@@ -550,8 +549,7 @@ class BoxBoxDetector extends Detector {
 	/**
 	 * 2D version of `project`.
 	 */
-	@:extern
-	inline function project2(axis:IVec3, sx:IVec3, sy:IVec3):Float {
+	extern inline function project2(axis:IVec3, sx:IVec3, sy:IVec3):Float {
 		var dx:Float = M.vec3_dot(axis, sx);
 		var dy:Float = M.vec3_dot(axis, sy);
 		if (dx < 0) dx = -dx;
@@ -578,8 +576,7 @@ private class IncidentVertex {
 		wz = 0;
 	}
 
-	@:extern
-	public inline function init(x:Float, y:Float, wx:Float, wy:Float, wz:Float):Void {
+	extern public inline function init(x:Float, y:Float, wx:Float, wy:Float, wz:Float):Void {
 		this.x = x;
 		this.y = y;
 		this.wx = wx;
@@ -587,8 +584,7 @@ private class IncidentVertex {
 		this.wz = wz;
 	}
 
-	@:extern
-	public inline function copyFrom(v:IncidentVertex):Void {
+	extern public inline function copyFrom(v:IncidentVertex):Void {
 		x = v.x;
 		y = v.y;
 		wx = v.wx;
@@ -596,8 +592,7 @@ private class IncidentVertex {
 		wz = v.wz;
 	}
 
-	@:extern
-	public inline function interp(v1:IncidentVertex, v2:IncidentVertex, t:Float):Void {
+	extern public inline function interp(v1:IncidentVertex, v2:IncidentVertex, t:Float):Void {
 		x = v1.x + (v2.x - v1.x) * t;
 		y = v1.y + (v2.y - v1.y) * t;
 		wx = v1.wx + (v2.wx - v1.wx) * t;
@@ -627,16 +622,14 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	public inline function init(w:Float, h:Float):Void {
+	extern public inline function init(w:Float, h:Float):Void {
 		this.w = w;
 		this.h = h;
 		numVertices = 0;
 		numTmpVertices = 0;
 	}
 
-	@:extern
-	public inline function addIncidentVertex(x:Float, y:Float, wx:Float, wy:Float, wz:Float):Void {
+	extern public inline function addIncidentVertex(x:Float, y:Float, wx:Float, wy:Float, wz:Float):Void {
 		vertices[numVertices++].init(x, y, wx, wy, wz);
 	}
 
@@ -703,8 +696,7 @@ private class FaceClipper {
 		flip();
 	}
 
-	@:extern
-	inline function clipL():Void {
+	extern inline function clipL():Void {
 		for (i in 0...numVertices) {
 			var v1:IncidentVertex = vertices[i];
 			var v2:IncidentVertex = vertices[(i + 1) % numVertices];
@@ -714,8 +706,7 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function clipR():Void {
+	extern inline function clipR():Void {
 		for (i in 0...numVertices) {
 			var v1:IncidentVertex = vertices[i];
 			var v2:IncidentVertex = vertices[(i + 1) % numVertices];
@@ -725,8 +716,7 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function clipT():Void {
+	extern inline function clipT():Void {
 		for (i in 0...numVertices) {
 			var v1:IncidentVertex = vertices[i];
 			var v2:IncidentVertex = vertices[(i + 1) % numVertices];
@@ -736,8 +726,7 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function clipB():Void {
+	extern inline function clipB():Void {
 		for (i in 0...numVertices) {
 			var v1:IncidentVertex = vertices[i];
 			var v2:IncidentVertex = vertices[(i + 1) % numVertices];
@@ -747,15 +736,13 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function flip():Void {
+	extern inline function flip():Void {
 		BoxBoxDetectorMacro.swap(vertices, tmpVertices);
 		numVertices = numTmpVertices;
 		numTmpVertices = 0;
 	}
 
-	@:extern
-	inline function clipWithParam(v1:IncidentVertex, v2:IncidentVertex, s1:Float, s2:Float):Void {
+	extern inline function clipWithParam(v1:IncidentVertex, v2:IncidentVertex, s1:Float, s2:Float):Void {
 		if (s1 > 0 && s2 > 0) {
 			add(v1);
 		} else if (s1 > 0 && s2 <= 0) {
@@ -768,13 +755,11 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function add(v:IncidentVertex):Void {
+	extern inline function add(v:IncidentVertex):Void {
 		tmpVertices[numTmpVertices++].copyFrom(v);
 	}
 
-	@:extern
-	inline function interp(v1:IncidentVertex, v2:IncidentVertex, t:Float):Void {
+	extern inline function interp(v1:IncidentVertex, v2:IncidentVertex, t:Float):Void {
 		tmpVertices[numTmpVertices++].interp(v1, v2, t);
 	}
 }

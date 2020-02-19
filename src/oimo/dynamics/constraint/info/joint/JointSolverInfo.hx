@@ -26,8 +26,7 @@ class JointSolverInfo {
 		}
 	}
 
-	@:extern
-	public inline function addRow(impulse:JointImpulse):JointSolverInfoRow {
+	extern public inline function addRow(impulse:JointImpulse):JointSolverInfoRow {
 		var row:JointSolverInfoRow = rows[numRows++];
 		row.clear();
 		row.impulse = impulse;

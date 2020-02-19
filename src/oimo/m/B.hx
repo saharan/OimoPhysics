@@ -182,7 +182,8 @@ class B {
 						return {
 							name: name,
 							type: macro:Float,
-							expr: null
+							expr: null,
+							isFinal: false
 						};
 					}));
 				}

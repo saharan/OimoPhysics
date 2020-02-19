@@ -23,23 +23,19 @@ class BasisTracker {
 		M.vec3_zero(z);
 	}
 
-	@:extern
-	public inline function trackByX():Void {
+	extern public inline function trackByX():Void {
 		trackByAxis(0);
 	}
 
-	@:extern
-	public inline function trackByY():Void {
+	extern public inline function trackByY():Void {
 		trackByAxis(1);
 	}
 
-	@:extern
-	public inline function trackByZ():Void {
+	extern public inline function trackByZ():Void {
 		trackByAxis(2);
 	}
 
-	@:extern
-	inline function trackByAxis(axis:Int):Void {
+	extern inline function trackByAxis(axis:Int):Void {
 		var invM1:Float = joint._b1._invMass;
 		var invM2:Float = joint._b2._invMass;
 		var q:IQuat;

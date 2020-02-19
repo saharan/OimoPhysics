@@ -108,13 +108,9 @@ $(document).ready(function(){
 	setPlatform(readCookie("platform") == null ? "all" : readCookie("platform"));
 	//setVersion(readCookie("version") == null ? "3_0" : readCookie("version"));
 
-	$("#search").focus();
 	$("#search").on("input", function(e){
 		searchQuery(e.target.value);
 	});
-	$(window).keypress(function(e){
-		$("#search").focus();
-	})
 	
 	$("#select-platform").selectpicker().on("change", function(e){
 		var value = $(":selected", this).val();
@@ -234,4 +230,22 @@ function searchMatch(text, queryParts) {
 		scoreSum += score + text.length;
 	}
 	return scoreSum;
+}
+
+function errorSearch() {
+	var errorURL = "";
+	if(!!window.location.pathname) {
+		errorURL = window.location.pathname;
+	}else if(!!window.location.href) {
+		errorURL = window.location.href;
+	}
+	if(!!errorURL) {
+		var searchTerm = errorURL.split("/").pop();
+		if(searchTerm.indexOf(".html") > -1) { searchTerm = searchTerm.split(".html").join(""); }
+		if(!!searchTerm) {
+			// update filter with search term
+			$("#search").val(searchTerm);
+			searchQuery(searchTerm);
+		}
+	}
 }

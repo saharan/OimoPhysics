@@ -16,8 +16,7 @@ class JointImpulse {
 		clear();
 	}
 
-	@:extern
-	public inline function clear():Void {
+	extern public inline function clear():Void {
 		impulse = 0;
 		impulseM = 0;
 		impulseP = 0;

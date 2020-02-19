@@ -23,8 +23,7 @@ class BruteForceBroadPhase extends BroadPhase {
 
 	// --- private ---
 
-	@:extern
-	inline function overlap(p1:Proxy, p2:Proxy):Bool {
+	extern inline function overlap(p1:Proxy, p2:Proxy):Bool {
 		return M.aabb_overlap(p1._aabbMin, p1._aabbMax, p2._aabbMin, p2._aabbMax);
 	}
 

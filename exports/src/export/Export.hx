@@ -1,4 +1,4 @@
-package demo;
+package export;
 
 import oimo.dynamics.common.DebugDraw;
 import oimo.collision.broadphase.BroadPhase;
@@ -27,8 +27,10 @@ import oimo.collision.geometry.SphereGeometry;
 import oimo.collision.narrowphase.CollisionMatrix;
 import oimo.collision.narrowphase.DetectorResult;
 import oimo.collision.narrowphase.DetectorResultPoint;
-import oimo.collision.narrowphase.detector.CachedDetectorData;
 import oimo.collision.narrowphase.detector.Detector;
+import oimo.collision.narrowphase.detector.BoxBoxDetector;
+import oimo.collision.narrowphase.detector.BoxBoxDetectorMacro;
+import oimo.collision.narrowphase.detector.CachedDetectorData;
 import oimo.collision.narrowphase.detector.CapsuleCapsuleDetector;
 import oimo.collision.narrowphase.detector.GjkEpaDetector;
 import oimo.collision.narrowphase.detector.SphereBoxDetector;
@@ -75,11 +77,13 @@ import oimo.dynamics.constraint.info.contact.ContactSolverInfo;
 import oimo.dynamics.constraint.info.contact.ContactSolverInfoRow;
 import oimo.dynamics.constraint.info.joint.JointSolverInfo;
 import oimo.dynamics.constraint.info.joint.JointSolverInfoRow;
+import oimo.dynamics.constraint.joint.BasisTracker;
 import oimo.dynamics.constraint.joint.Joint;
 import oimo.dynamics.constraint.joint.CylindricalJoint;
 import oimo.dynamics.constraint.joint.JointConfig;
 import oimo.dynamics.constraint.joint.CylindricalJointConfig;
-import oimo.dynamics.constraint.joint.BasisTracker;
+import oimo.dynamics.constraint.joint.GenericJoint;
+import oimo.dynamics.constraint.joint.GenericJointConfig;
 import oimo.dynamics.constraint.joint.JointImpulse;
 import oimo.dynamics.constraint.joint.JointLink;
 import oimo.dynamics.constraint.joint.JointMacro;
@@ -116,9 +120,8 @@ import oimo.dynamics.rigidbody.Shape;
 import oimo.dynamics.rigidbody.ShapeConfig;
 
 /**
- * ...
+ * this class just imports all the classes in the library
  */
 class Export {
-	static function main():Void {
-	}
+	static function main() {}
 }
