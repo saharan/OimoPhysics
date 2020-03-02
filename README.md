@@ -17,7 +17,7 @@ A lightweight 3D physics engine.
 * Exported as JavaScript (see [bin/js/](./bin/js))
 	* Public classes and methods are exposed through `window.OIMO`.
 	* e.g. `new OIMO.Vec3(1, 2, 3)` to create an instance of `Vec3` class.
-* Exported as a Node.js module with TypeScript declarations (see [package.json](./package.json) and [bin/js_modules](./bin/js_modules))
+* Exported as JavaScript (module) with TypeScript Declaration (see [package.json](./package.json) and [bin/js_modules](./bin/js_modules))
 
 ## Features
 * Rigid body with motion types
