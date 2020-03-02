@@ -54878,4 +54878,4 @@ oimo.dynamics.rigidbody.RigidBodyType._KINEMATIC = 2;
 oimo.dynamics.rigidbody.RigidBodyType.DYNAMIC = 0;
 oimo.dynamics.rigidbody.RigidBodyType.STATIC = 1;
 oimo.dynamics.rigidbody.RigidBodyType.KINEMATIC = 2;
-`export {oimo};
+export {oimo};
