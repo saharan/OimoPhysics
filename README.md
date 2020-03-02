@@ -1,11 +1,9 @@
 OimoPhysics 1.2.1
-
-![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) [![npm version](https://badge.fury.io/js/oimophysics.svg)](https://badge.fury.io/js/oimophysics)
-
 ---
 
 A lightweight 3D physics engine.
 
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) [![npm version](https://badge.fury.io/js/oimophysics.svg)](https://badge.fury.io/js/oimophysics)
 
 ## [API Documentation](https://saharan.github.io/OimoPhysics/)
 
