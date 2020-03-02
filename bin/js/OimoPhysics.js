@@ -1,5 +1,5 @@
 /*
- * OimoPhysics 1.2.1 (c) 2020 saharan, The MIT License
+ * OimoPhysics 1.2.2 (c) 2020 saharan, The MIT License
  */
 (function ($global) { "use strict";
 function $extend(from, fields) {
