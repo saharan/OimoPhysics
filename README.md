@@ -1,7 +1,11 @@
 OimoPhysics 1.2.1
+
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) [![npm version](https://badge.fury.io/js/oimophysics.svg)](https://badge.fury.io/js/oimophysics)
+
 ---
 
 A lightweight 3D physics engine.
+
 
 ## [API Documentation](https://saharan.github.io/OimoPhysics/)
 
@@ -10,12 +14,15 @@ A lightweight 3D physics engine.
 * Press `E` or `Q` to change demos
 * Click or tap texts on the left to control
 
-## Features
+## Platforms
 * Written in Haxe
 * Exported as JavaScript (see [bin/js/](./bin/js))
 	* Public classes and methods are exposed through `window.OIMO`.
 	* e.g. `new OIMO.Vec3(1, 2, 3)` to create an instance of `Vec3` class.
-* Rigid body motion types
+* Exported as a Node.js module with TypeScript declarations (see [package.json](./package.json) and [bin/js_modules](./bin/js_modules))
+
+## Features
+* Rigid body with motion types
 	* Dynamic
 	* Static
 	* Kinematic
