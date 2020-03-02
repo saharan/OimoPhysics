@@ -54,6 +54,7 @@ Haxe 4.0.0 or later is required. (recommended: Haxe 4.0.5 or later)
 * Use `build-js.hxml` to compile for JavaScript library.
 * Use `build-js-demos.hxml` to compile JavaScript demos.
 * Use `build-doc.hxml` to generate API documentation. [dox](https://github.com/HaxeFoundation/dox) is required.
+* Use `build-js-ts.hxml` to compile for JavaScript (modules) library with TypeScript declarations. Requires `hxtsdgen` library. Check comments in that file.
 
 ## License
 The MIT License
