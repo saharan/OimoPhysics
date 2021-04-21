@@ -2,6 +2,7 @@
 -cp src
 -main export.ts.Export
 -lib hxtsdgen
+-D analyzer-optimize
 -D hxtsdgen_namespaced
 -D hxtsdgen_enums_ts
 -D hxtsdgen_types_ts
