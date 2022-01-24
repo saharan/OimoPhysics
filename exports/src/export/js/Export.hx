@@ -1,6 +1,7 @@
 package export.js;
 
-import oimo.dynamics.common.DebugDraw;
+import js.Syntax;
+// paste imports from /js_imports.txt
 import oimo.collision.broadphase.BroadPhase;
 import oimo.collision.geometry.Geometry;
 import oimo.collision.geometry.ConvexGeometry;
@@ -63,6 +64,7 @@ import oimo.dynamics.callback.AabbTestCallback;
 import oimo.dynamics.callback.ContactCallback;
 import oimo.dynamics.callback.RayCastCallback;
 import oimo.dynamics.callback.RayCastClosest;
+import oimo.dynamics.common.DebugDraw;
 import oimo.dynamics.common.DebugDrawStyle;
 import oimo.dynamics.common.Performance;
 import oimo.dynamics.constraint.ConstraintSolver;
@@ -123,10 +125,10 @@ import oimo.dynamics.rigidbody.ShapeConfig;
  * main class to generate OimoPhysics.js
  */
 class Export {
-	static function main():Void {
-		untyped __js__('
+	static inline function main():Void {
+		// paste exports from /js_exports.txt
+		Syntax.code('
 			window["OIMO"] = {};
-			window["OIMO"]["DebugDraw"] = oimo_dynamics_common_DebugDraw;
 			window["OIMO"]["BroadPhase"] = oimo_collision_broadphase_BroadPhase;
 			oimo_collision_broadphase_BroadPhase.prototype["createProxy"] = oimo_collision_broadphase_BroadPhase.prototype.createProxy;
 			oimo_collision_broadphase_BroadPhase.prototype["destroyProxy"] = oimo_collision_broadphase_BroadPhase.prototype.destroyProxy;
@@ -471,6 +473,7 @@ class Export {
 			window["OIMO"]["RayCastClosest"] = oimo_dynamics_callback_RayCastClosest;
 			oimo_dynamics_callback_RayCastClosest.prototype["clear"] = oimo_dynamics_callback_RayCastClosest.prototype.clear;
 			oimo_dynamics_callback_RayCastClosest.prototype["process"] = oimo_dynamics_callback_RayCastClosest.prototype.process;
+			window["OIMO"]["DebugDraw"] = oimo_dynamics_common_DebugDraw;
 			window["OIMO"]["DebugDrawStyle"] = oimo_dynamics_common_DebugDrawStyle;
 			window["OIMO"]["Performance"] = oimo_dynamics_common_Performance;
 			window["OIMO"]["ConstraintSolver"] = oimo_dynamics_constraint_ConstraintSolver;
@@ -736,7 +739,7 @@ class Export {
 			oimo_dynamics_rigidbody_RigidBody.prototype["getWorldVectorTo"] = oimo_dynamics_rigidbody_RigidBody.prototype.getWorldVectorTo;
 			oimo_dynamics_rigidbody_RigidBody.prototype["getNumShapes"] = oimo_dynamics_rigidbody_RigidBody.prototype.getNumShapes;
 			oimo_dynamics_rigidbody_RigidBody.prototype["getShapeList"] = oimo_dynamics_rigidbody_RigidBody.prototype.getShapeList;
-			oimo_dynamics_rigidbody_RigidBody.prototype["getNumContectLinks"] = oimo_dynamics_rigidbody_RigidBody.prototype.getNumContectLinks;
+			oimo_dynamics_rigidbody_RigidBody.prototype["getNumContactLinks"] = oimo_dynamics_rigidbody_RigidBody.prototype.getNumContactLinks;
 			oimo_dynamics_rigidbody_RigidBody.prototype["getContactLinkList"] = oimo_dynamics_rigidbody_RigidBody.prototype.getContactLinkList;
 			oimo_dynamics_rigidbody_RigidBody.prototype["getNumJointLinks"] = oimo_dynamics_rigidbody_RigidBody.prototype.getNumJointLinks;
 			oimo_dynamics_rigidbody_RigidBody.prototype["getJointLinkList"] = oimo_dynamics_rigidbody_RigidBody.prototype.getJointLinkList;

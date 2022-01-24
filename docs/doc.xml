@@ -13,7 +13,8 @@
 	support field access or operators and it's bound to monomorphs. So,
 	to work with the actual value, it needs to be explicitly promoted
 	to another type.</haxe_doc>
-		<impl><class path="_Any.Any_Impl_" params="" file="C:\HaxeToolkit\haxe\std/Any.hx" private="1" module="Any"><meta><m n=":keep"/></meta></class></impl>
+		<meta><m n=":forward.variance"/></meta>
+		<impl><class path="_Any.Any_Impl_" params="" file="C:\HaxeToolkit\haxe\std/Any.hx" private="1" module="Any" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<class path="Array" params="T" file="C:\HaxeToolkit\haxe\std/Array.hx" extern="1">
 		<length public="1" set="null">
@@ -226,6 +227,16 @@
 		If `x` is not found, `this` Array is not changed and the function
 		returns false.</haxe_doc>
 		</remove>
+		<contains public="1" set="method">
+			<f a="x">
+				<c path="Array.T"/>
+				<x path="Bool"/>
+			</f>
+			<haxe_doc>Returns whether `this` Array contains `x`.
+
+		If `x` is found by checking standard equality, the function returns `true`, otherwise
+		the function returns `false`.</haxe_doc>
+		</contains>
 		<indexOf public="1" set="method">
 			<f a="x:?fromIndex">
 				<c path="Array.T"/>
@@ -270,11 +281,17 @@
 		`a[i] == a.copy()[i]` is true for any valid `i`. However,
 		`a == a.copy()` is always false.</haxe_doc>
 		</copy>
-		<iterator public="1" set="method">
-			<f a=""><t path="Iterator"><c path="Array.T"/></t></f>
+		<iterator public="1" get="inline" set="null" line="280">
+			<f a=""><c path="haxe.iterators.ArrayIterator"><c path="Array.T"/></c></f>
+			<meta><m n=":runtime"/></meta>
 			<haxe_doc>Returns an iterator of the Array values.</haxe_doc>
 		</iterator>
-		<map public="1" params="S" get="inline" set="null" line="277">
+		<keyValueIterator public="1" get="inline" set="null" line="287">
+			<f a=""><c path="haxe.iterators.ArrayKeyValueIterator"><c path="Array.T"/></c></f>
+			<meta><m n=":runtime"/></meta>
+			<haxe_doc>Returns an iterator of the Array indices and values.</haxe_doc>
+		</keyValueIterator>
+		<map public="1" params="S" get="inline" set="null" line="298">
 			<f a="f">
 				<f a="">
 					<c path="Array.T"/>
@@ -289,7 +306,7 @@
 
 		If `f` is null, the result is unspecified.</haxe_doc>
 		</map>
-		<filter public="1" get="inline" set="null" line="295">
+		<filter public="1" get="inline" set="null" line="316">
 			<f a="f">
 				<f a="">
 					<c path="Array.T"/>
@@ -325,12 +342,6 @@
 			<f a=""><x path="Void"/></f>
 			<haxe_doc>Creates a new Array.</haxe_doc>
 		</new>
-		<haxe_doc>An Array is a storage for values. You can access it using indexes or
-	with its API.
-
-	@see https://haxe.org/manual/std-Array.html
-	@see https://haxe.org/manual/lf-array-comprehension.html</haxe_doc>
-		<meta><m n=":directlyUsed"/></meta>
 	</class>
 	<abstract path="Class" params="T" file="C:\HaxeToolkit\haxe\std/Class.hx">
 		<this><x path="Class"><c path="Class.T"/></x></this>
@@ -549,7 +560,7 @@
 
 	@see https://haxe.org/manual/types-enum-instance.html</haxe_doc>
 		<meta><m n=":coreType"/></meta>
-		<impl><class path="_EnumValue.EnumValue_Impl_" params="" file="C:\HaxeToolkit\haxe\std/EnumValue.hx" private="1" module="EnumValue"><meta><m n=":keep"/></meta></class></impl>
+		<impl><class path="_EnumValue.EnumValue_Impl_" params="" file="C:\HaxeToolkit\haxe\std/EnumValue.hx" private="1" module="EnumValue" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<typedef path="Map" params="K:V" file="C:\HaxeToolkit\haxe\std/Map.hx"><x path="haxe.ds.Map">
 	<c path="Map.K"/>
@@ -569,13 +580,13 @@
 		<PI public="1" set="null" static="1">
 			<x path="Float"/>
 			<haxe_doc>Represents the ratio of the circumference of a circle to its diameter,
-		specified by the constant, π. `PI` is approximately 3.141592653589793.</haxe_doc>
+		specified by the constant, π. `PI` is approximately `3.141592653589793`.</haxe_doc>
 		</PI>
 		<NEGATIVE_INFINITY public="1" set="null" static="1">
 			<x path="Float"/>
 			<haxe_doc>A special `Float` constant which denotes negative infinity.
 
-		For example, this is the result of -1.0 / 0.0.
+		For example, this is the result of `-1.0 / 0.0`.
 
 		Operations with `NEGATIVE_INFINITY` as an operand may result in
 		`NEGATIVE_INFINITY`, `POSITIVE_INFINITY` or `NaN`.
@@ -587,7 +598,7 @@
 			<x path="Float"/>
 			<haxe_doc>A special `Float` constant which denotes positive infinity.
 
-		For example, this is the result of 1.0 / 0.0.
+		For example, this is the result of `1.0 / 0.0`.
 
 		Operations with `POSITIVE_INFINITY` as an operand may result in
 		`NEGATIVE_INFINITY`, `POSITIVE_INFINITY` or `NaN`.
@@ -599,9 +610,9 @@
 			<x path="Float"/>
 			<haxe_doc>A special `Float` constant which denotes an invalid number.
 
-		NaN stands for "Not a Number". It occurs when a mathematically incorrect
+		`NaN` stands for "Not a Number". It occurs when a mathematically incorrect
 		operation is executed, such as taking the square root of a negative
-		number: Math.sqrt(-1).
+		number: `Math.sqrt(-1)`.
 
 		All further operations with `NaN` as an operand will result in `NaN`.
 
@@ -617,13 +628,9 @@
 			</f>
 			<haxe_doc>Returns the absolute value of `v`.
 
-		If `v` is positive or 0, the result is unchanged. Otherwise the result
-		is -`v`.
-
-		If `v` is `NEGATIVE_INFINITY` or `POSITIVE_INFINITY`, the result is
-		`POSITIVE_INFINITY`.
-
-		If `v` is `NaN`, the result is `NaN`.</haxe_doc>
+		- If `v` is positive or `0`, the result is unchanged. Otherwise the result is `-v`.
+		- If `v` is `NEGATIVE_INFINITY` or `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
+		- If `v` is `NaN`, the result is `NaN`.</haxe_doc>
 		</abs>
 		<min public="1" set="method" static="1">
 			<f a="a:b">
@@ -633,9 +640,9 @@
 			</f>
 			<haxe_doc>Returns the smaller of values `a` and `b`.
 
-		If `a` or `b` are `NaN`, the result is `NaN`.
-		If `a` or `b` are `NEGATIVE_INFINITY`, the result is `NEGATIVE_INFINITY`.
-		If `a` and `b` are `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.</haxe_doc>
+		- If `a` or `b` are `NaN`, the result is `NaN`.
+		- If `a` or `b` are `NEGATIVE_INFINITY`, the result is `NEGATIVE_INFINITY`.
+		- If `a` and `b` are `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.</haxe_doc>
 		</min>
 		<max public="1" set="method" static="1">
 			<f a="a:b">
@@ -645,9 +652,9 @@
 			</f>
 			<haxe_doc>Returns the greater of values `a` and `b`.
 
-		If `a` or `b` are `NaN`, the result is `NaN`.
-		If `a` or `b` are `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
-		If `a` and `b` are `NEGATIVE_INFINITY`, the result is `NEGATIVE_INFINITY`.</haxe_doc>
+		- If `a` or `b` are `NaN`, the result is `NaN`.
+		- If `a` or `b` are `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
+		- If `a` and `b` are `NEGATIVE_INFINITY`, the result is `NEGATIVE_INFINITY`.</haxe_doc>
 		</max>
 		<sin public="1" set="method" static="1">
 			<f a="v">
@@ -724,11 +731,11 @@
 			</f>
 			<haxe_doc>Returns Euler's number, raised to the power of `v`.
 
-		exp(1.0) is approximately 2.718281828459.
+		`exp(1.0)` is approximately `2.718281828459`.
 
-		If `v` is `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
-		If `v` is `NEGATIVE_INFINITY`, the result is `0.0`.
-		If `v` is `NaN`, the result is `NaN`.</haxe_doc>
+		- If `v` is `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
+		- If `v` is `NEGATIVE_INFINITY`, the result is `0.0`.
+		- If `v` is `NaN`, the result is `NaN`.</haxe_doc>
 		</exp>
 		<log public="1" set="method" static="1">
 			<f a="v">
@@ -740,10 +747,9 @@
 		This is the mathematical inverse operation of exp,
 		i.e. `log(exp(v)) == v` always holds.
 
-		If `v` is negative (including `NEGATIVE_INFINITY`) or `NaN`, the result
-		is `NaN`.
-		If `v` is `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
-		If `v` is `0.0`, the result is `NEGATIVE_INFINITY`.</haxe_doc>
+		- If `v` is negative (including `NEGATIVE_INFINITY`) or `NaN`, the result is `NaN`.
+		- If `v` is `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
+		- If `v` is `0.0`, the result is `NEGATIVE_INFINITY`.</haxe_doc>
 		</log>
 		<pow public="1" set="method" static="1">
 			<f a="v:exp">
@@ -760,10 +766,9 @@
 			</f>
 			<haxe_doc>Returns the square root of `v`.
 
-		If `v` is negative (including `NEGATIVE_INFINITY`) or `NaN`, the result
-		is `NaN`.
-		If `v` is `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
-		If `v` is `0.0`, the result is `0.0`.</haxe_doc>
+		- If `v` is negative (including `NEGATIVE_INFINITY`) or `NaN`, the result is `NaN`.
+		- If `v` is `POSITIVE_INFINITY`, the result is `POSITIVE_INFINITY`.
+		- If `v` is `0.0`, the result is `0.0`.</haxe_doc>
 		</sqrt>
 		<round public="1" set="method" static="1">
 			<f a="v">
@@ -799,8 +804,8 @@
 		</ceil>
 		<random public="1" set="method" static="1">
 			<f a=""><x path="Float"/></f>
-			<haxe_doc>Returns a pseudo-random number which is greater than or equal to 0.0,
-		and less than 1.0.</haxe_doc>
+			<haxe_doc>Returns a pseudo-random number which is greater than or equal to `0.0`,
+		and less than `1.0`.</haxe_doc>
 		</random>
 		<ffloor public="1" set="method" static="1">
 			<f a="v">
@@ -888,10 +893,7 @@
 		If the field is defined as a property, its accessors are ignored. Refer
 		to `Reflect.getProperty` for a function supporting property accessors.
 
-		If `field` is null, the result is unspecified.
-
-		(As3) If used on a property field, the getter will be invoked. It is
-		not possible to obtain the value directly.</haxe_doc>
+		If `field` is null, the result is unspecified.</haxe_doc>
 		</field>
 		<setField public="1" set="method" static="1">
 			<f a="o:field:value">
@@ -905,10 +907,7 @@
 		If `o` has no field named `field`, this function is only guaranteed to
 		work for anonymous structures.
 
-		If `o` or `field` are null, the result is unspecified.
-
-		(As3) If used on a property field, the setter will be invoked. It is
-		not possible to set the value directly.</haxe_doc>
+		If `o` or `field` are null, the result is unspecified.</haxe_doc>
 		</setField>
 		<getProperty public="1" set="method" static="1">
 			<f a="o:field">
@@ -1107,10 +1106,23 @@
 				<d/>
 				<x path="Bool"/>
 			</f>
-			<haxe_doc>Tells if a value `v` is of the type `t`. Returns `false` if `v` or `t` are null.
+			<meta><m n=":deprecated"><e>"Std.is is deprecated. Use Std.isOfType instead."</e></m></meta>
+			<haxe_doc>DEPRECATED. Use `Std.isOfType(v, t)` instead.
+
+		Tells if a value `v` is of the type `t`. Returns `false` if `v` or `t` are null.
 
 		If `t` is a class or interface with `@:generic` meta, the result is `false`.</haxe_doc>
 		</is>
+		<isOfType public="1" set="method" static="1">
+			<f a="v:t">
+				<d/>
+				<d/>
+				<x path="Bool"/>
+			</f>
+			<haxe_doc>Tells if a value `v` is of the type `t`. Returns `false` if `v` or `t` are null.
+
+		If `t` is a class or interface with `@:generic` meta, the result is `false`.</haxe_doc>
+		</isOfType>
 		<downcast public="1" params="T:S" set="method" static="1">
 			<f a="value:c">
 				<c path="downcast.T"/>
@@ -1428,10 +1440,11 @@
 		String.
 
 		If `startIndex` is given, the search is performed within the substring
-		of `this` String starting from `startIndex` (if `startIndex` is posivite
-		or 0) or `max(this.length + startIndex, 0)` (if `startIndex` is negative).
+		of `this` String starting from `startIndex`.
 
 		If `startIndex` exceeds `this.length`, -1 is returned.
+
+		If `startIndex` is negative, the result is unspecifed.
 
 		Otherwise the search is performed within `this` String. In either case,
 		the returned position is relative to the beginning of `this` String.
@@ -1451,6 +1464,8 @@
 		of `this` String from 0 to `startIndex + str.length`. Otherwise the search
 		is performed within `this` String. In either case, the returned position
 		is relative to the beginning of `this` String.
+
+		If `startIndex` is negative, the result is unspecifed.
 
 		If `str` cannot be found, -1 is returned.</haxe_doc>
 		</lastIndexOf>
@@ -1601,12 +1616,9 @@
 		<haxe_doc>A String buffer is an efficient way to build a big string by appending small
 	elements together.
 
-	Its cross-platform implementation uses String concatenation internally, but
-	StringBuf may be optimized for different targets.
-
 	Unlike String, an instance of StringBuf is not immutable in the sense that
 	it can be passed as argument to functions which modify it by appending more
-	values. However, the internal buffer cannot be modified.</haxe_doc>
+	values.</haxe_doc>
 		<meta><m n=":coreApi"/></meta>
 	</class>
 	<class path="Sys" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/Sys.hx">
@@ -1809,9 +1821,7 @@
 
 		The order of the fields in the returned Array is unspecified.
 
-		If `c` is null, the result is unspecified.
-
-		(As3) This method only returns instance fields that are public.</haxe_doc>
+		If `c` is null, the result is unspecified.</haxe_doc>
 		</getInstanceFields>
 		<getClassFields public="1" set="method" static="1">
 			<f a="c">
@@ -1824,9 +1834,7 @@
 
 		The order of the fields in the returned Array is unspecified.
 
-		If `c` is null, the result is unspecified.
-
-		(As3) This method only returns class fields that are public.</haxe_doc>
+		If `c` is null, the result is unspecified.</haxe_doc>
 		</getClassFields>
 		<getEnumConstructs public="1" set="method" static="1">
 			<f a="e">
@@ -1958,6 +1966,363 @@
 </f></new>
 		<meta><m n=":directlyUsed"/></meta>
 	</class>
+	<abstract path="eval.integers.Int64" params="" file="C:\HaxeToolkit\haxe\std/eval/integers/Int64.hx">
+		<from><icast field="ofHxInt64"><x path="haxe.Int64"/></icast></from>
+		<this><x path="eval.integers.Int64"/></this>
+		<to><icast field="toHxInt64"><x path="haxe.Int64"/></icast></to>
+		<haxe_doc>Signed 64-bit integer type and operations.</haxe_doc>
+		<meta><m n=":coreType"/></meta>
+		<impl><class path="eval.integers._Int64.Int64_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/integers/Int64.hx" private="1" module="eval.integers.Int64" final="1"><meta><m n=":keep"/></meta></class></impl>
+	</abstract>
+	<abstract path="eval.integers.UInt64" params="" file="C:\HaxeToolkit\haxe\std/eval/integers/UInt64.hx">
+		<this><x path="eval.integers.UInt64"/></this>
+		<haxe_doc>Unsigned 64-bit integer type and operations.</haxe_doc>
+		<meta><m n=":coreType"/></meta>
+		<impl><class path="eval.integers._UInt64.UInt64_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/integers/UInt64.hx" private="1" module="eval.integers.UInt64" final="1"><meta><m n=":keep"/></meta></class></impl>
+	</abstract>
+	<abstract path="eval.luv.Async" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Async.hx">
+		<this><x path="eval.luv.Async"/></this>
+		<to><icast><x path="eval.luv.Handle"/></icast></to>
+		<haxe_doc>Inter-loop communication.
+
+	@see https://aantron.github.io/luv/luv/Luv/Async</haxe_doc>
+		<meta>
+			<m n=":using"><e>eval.luv.Handle</e></m>
+			<m n=":coreType"/>
+		</meta>
+		<impl><class path="eval.luv._Async.Async_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Async.hx" private="1" module="eval.luv.Async" final="1">
+	<init public="1" set="method" static="1">
+		<f a="loop:callback">
+			<x path="eval.luv.Loop"/>
+			<f a="async">
+				<x path="eval.luv.Async"/>
+				<x path="Void"/>
+			</f>
+			<e path="eval.luv.Result"><x path="eval.luv.Async"/></e>
+		</f>
+		<meta><m n=":noExpr"/></meta>
+		<haxe_doc>Allocates and initializes an async handle.
+
+		The handle should be cleaned up with `eval.luv.Handle.close` when no longer needed.</haxe_doc>
+	</init>
+	<meta>
+		<m n=":keep"/>
+		<m n=":directlyUsed"/>
+		<m n=":using"><e>eval.luv.Handle</e></m>
+	</meta>
+</class></impl>
+	</abstract>
+	<class path="eval.luv._Async.Async_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Async.hx" private="1" module="eval.luv.Async" final="1">
+		<init public="1" set="method" static="1">
+			<f a="loop:callback">
+				<x path="eval.luv.Loop"/>
+				<f a="async">
+					<x path="eval.luv.Async"/>
+					<x path="Void"/>
+				</f>
+				<e path="eval.luv.Result"><x path="eval.luv.Async"/></e>
+			</f>
+			<meta><m n=":noExpr"/></meta>
+			<haxe_doc>Allocates and initializes an async handle.
+
+		The handle should be cleaned up with `eval.luv.Handle.close` when no longer needed.</haxe_doc>
+		</init>
+		<meta>
+			<m n=":keep"/>
+			<m n=":directlyUsed"/>
+			<m n=":using"><e>eval.luv.Handle</e></m>
+		</meta>
+	</class>
+	<abstract path="eval.luv.SocketHandle" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Handle.hx" module="eval.luv.Handle">
+		<this><x path="eval.luv.SocketHandle"/></this>
+		<meta><m n=":coreType"/></meta>
+	</abstract>
+	<abstract path="eval.luv.Handle" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Handle.hx">
+		<this><x path="eval.luv.Handle"/></this>
+		<haxe_doc>Handles.
+
+	@see https://aantron.github.io/luv/luv/Luv/Handle</haxe_doc>
+		<meta><m n=":coreType"/></meta>
+		<impl><class path="eval.luv._Handle.Handle_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Handle.hx" private="1" module="eval.luv.Handle" final="1">
+	<unref public="1" set="method" static="1">
+		<f a="handle">
+			<x path="eval.luv.Handle"/>
+			<x path="Void"/>
+		</f>
+		<meta><m n=":noExpr"/></meta>
+		<haxe_doc>Un-reference the given handle.
+
+		@see https://aantron.github.io/luv/luv/Luv/Handle/#val-unref</haxe_doc>
+	</unref>
+	<meta>
+		<m n=":keep"/>
+		<m n=":directlyUsed"/>
+	</meta>
+</class></impl>
+	</abstract>
+	<class path="eval.luv._Handle.Handle_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Handle.hx" private="1" module="eval.luv.Handle" final="1">
+		<unref public="1" set="method" static="1">
+			<f a="handle">
+				<x path="eval.luv.Handle"/>
+				<x path="Void"/>
+			</f>
+			<meta><m n=":noExpr"/></meta>
+			<haxe_doc>Un-reference the given handle.
+
+		@see https://aantron.github.io/luv/luv/Luv/Handle/#val-unref</haxe_doc>
+		</unref>
+		<meta>
+			<m n=":keep"/>
+			<m n=":directlyUsed"/>
+		</meta>
+	</class>
+	<abstract path="eval.luv.RunMode" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Loop.hx" module="eval.luv.Loop">
+		<this><x path="Int"/></this>
+		<meta><m n=":enum"/></meta>
+		<impl><class path="eval.luv._Loop.RunMode_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Loop.hx" private="1" module="eval.luv.Loop" final="1"><meta>
+	<m n=":keep"/>
+	<m n=":enum"/>
+</meta></class></impl>
+	</abstract>
+	<abstract path="eval.luv.LoopOption" params="T" file="C:\HaxeToolkit\haxe\std/eval/luv/Loop.hx" module="eval.luv.Loop">
+		<this><x path="Int"/></this>
+		<haxe_doc>Configuration options.
+	@see http://docs.libuv.org/en/v1.x/loop.html#c.uv_loop_configure</haxe_doc>
+		<meta><m n=":enum"/></meta>
+		<impl><class path="eval.luv._Loop.LoopOption_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Loop.hx" private="1" module="eval.luv.Loop" final="1"><meta>
+	<m n=":keep"/>
+	<m n=":enum"/>
+</meta></class></impl>
+	</abstract>
+	<abstract path="eval.luv.Loop" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Loop.hx">
+		<from><icast field="fromHaxeEventLoop"><c path="sys.thread.EventLoop"/></icast></from>
+		<this><x path="eval.luv.Loop"/></this>
+		<haxe_doc>Event loops.
+
+	@see https://aantron.github.io/luv/luv/Luv/Loop
+
+	Haxe event loops define an implicit cast to libuv loops. That is, you can use
+	`sys.thread.Thread.current().events` in any place where `eval.luv.Loop` is
+	expected.</haxe_doc>
+		<meta><m n=":coreType"/></meta>
+		<impl><class path="eval.luv._Loop.Loop_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Loop.hx" private="1" module="eval.luv.Loop" final="1">
+	<init public="1" set="method" static="1">
+		<f a=""><e path="eval.luv.Result"><x path="eval.luv.Loop"/></e></f>
+		<meta><m n=":noExpr"/></meta>
+		<haxe_doc>Allocates and initializes a new event loop.</haxe_doc>
+	</init>
+	<run public="1" set="method" static="1">
+		<f a="this:mode">
+			<x path="eval.luv.Loop"/>
+			<x path="eval.luv.RunMode"/>
+			<x path="Bool"/>
+		</f>
+		<meta><m n=":noExpr"/></meta>
+		<haxe_doc>Runs an event loop.</haxe_doc>
+	</run>
+	<meta>
+		<m n=":keep"/>
+		<m n=":directlyUsed"/>
+	</meta>
+</class></impl>
+	</abstract>
+	<class path="eval.luv._Loop.Loop_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Loop.hx" private="1" module="eval.luv.Loop" final="1">
+		<init public="1" set="method" static="1">
+			<f a=""><e path="eval.luv.Result"><x path="eval.luv.Loop"/></e></f>
+			<meta><m n=":noExpr"/></meta>
+			<haxe_doc>Allocates and initializes a new event loop.</haxe_doc>
+		</init>
+		<run public="1" set="method" static="1">
+			<f a="this:mode">
+				<x path="eval.luv.Loop"/>
+				<x path="eval.luv.RunMode"/>
+				<x path="Bool"/>
+			</f>
+			<meta><m n=":noExpr"/></meta>
+			<haxe_doc>Runs an event loop.</haxe_doc>
+		</run>
+		<meta>
+			<m n=":keep"/>
+			<m n=":directlyUsed"/>
+		</meta>
+	</class>
+	<class path="haxe.Exception" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/Exception.hx">
+		<thrown set="method" line="25" static="1"><f a="value">
+	<x path="Any"/>
+	<x path="Any"/>
+</f></thrown>
+		<message public="1" get="accessor" set="null">
+			<c path="String"/>
+			<haxe_doc>Exception message.</haxe_doc>
+		</message>
+		<native public="1" get="accessor" set="null">
+			<x path="Any"/>
+			<haxe_doc>Native exception, which caused this exception.</haxe_doc>
+		</native>
+		<__exceptionMessage>
+			<c path="String"/>
+			<meta><m n=":noCompletion"/></meta>
+		</__exceptionMessage>
+		<__nativeStack>
+			<x path="haxe.CallStack"/>
+			<meta><m n=":noCompletion"/></meta>
+		</__nativeStack>
+		<__skipStack expr="0">
+			<x path="Int"/>
+			<meta>
+				<m n=":value"><e>0</e></m>
+				<m n=":noCompletion"/>
+				<m n=":ifFeature"><e>"haxe.Exception.get_stack"</e></m>
+			</meta>
+		</__skipStack>
+		<__nativeException>
+			<x path="Any"/>
+			<meta><m n=":noCompletion"/></meta>
+		</__nativeException>
+		<__previousException>
+			<x path="Null"><c path="haxe.Exception"/></x>
+			<meta><m n=":noCompletion"/></meta>
+		</__previousException>
+		<toString public="1" set="method" line="52">
+			<f a=""><c path="String"/></f>
+			<meta><m n=":ifFeature"><e>"haxe.Exception.thrown"</e></m></meta>
+			<haxe_doc>Returns exception message.</haxe_doc>
+		</toString>
+		<get_message set="method" line="66"><f a=""><c path="String"/></f></get_message>
+		<get_native final="1" set="method" line="74"><f a=""><x path="Any"/></f></get_native>
+		<new public="1" set="method" line="35">
+			<f a="message:?previous:?native">
+				<c path="String"/>
+				<c path="haxe.Exception"/>
+				<x path="Any"/>
+				<x path="Void"/>
+			</f>
+			<haxe_doc>Create a new Exception instance.
+
+		The `previous` argument could be used for exception chaining.
+
+		The `native` argument is for internal usage only.
+		There is no need to provide `native` argument manually and no need to keep it
+		upon extending `haxe.Exception` unless you know what you're doing.</haxe_doc>
+		</new>
+		<haxe_doc><![CDATA[Base class for exceptions.
+
+	If this class (or derivatives) is used to catch an exception, then
+	`haxe.CallStack.exceptionStack()` will not return a stack for the exception
+	caught. Use `haxe.Exception.stack` property instead:
+	```haxe
+	try {
+		throwSomething();
+	} catch(e:Exception) {
+		trace(e.stack);
+	}
+	```
+
+	Custom exceptions should extend this class:
+	```haxe
+	class MyException extends haxe.Exception {}
+	//...
+	throw new MyException('terrible exception');
+	```
+
+	`haxe.Exception` is also a wildcard type to catch any exception:
+	```haxe
+	try {
+		throw 'Catch me!';
+	} catch(e:haxe.Exception) {
+		trace(e.message); // Output: Catch me!
+	}
+	```
+
+	To rethrow an exception just throw it again.
+	Haxe will try to rethrow an original native exception whenever possible.
+	```haxe
+	try {
+		var a:Array<Int> = null;
+		a.push(1); // generates target-specific null-pointer exception
+	} catch(e:haxe.Exception) {
+		throw e; // rethrows native exception instead of haxe.Exception
+	}
+	```]]></haxe_doc>
+		<meta>
+			<m n=":keep"/>
+			<m n=":directlyUsed"/>
+			<m n=":coreApi"/>
+		</meta>
+	</class>
+	<class path="eval.luv.LuvException" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/LuvException.hx">
+		<extends path="haxe.Exception"/>
+		<error final="1" public="1">
+			<x path="eval.luv.UVError"/>
+			<haxe_doc>The error.</haxe_doc>
+		</error>
+		<new public="1" set="method" line="15">
+			<f a="error:?message:?previous">
+				<x path="eval.luv.UVError"/>
+				<c path="String"/>
+				<c path="haxe.Exception"/>
+				<x path="Void"/>
+			</f>
+			<haxe_doc>Instantiates an error with given message and position.</haxe_doc>
+		</new>
+		<haxe_doc>Exceptions thrown by functions in `eval.luv` package.</haxe_doc>
+		<meta>
+			<m n=":keep"/>
+			<m n=":directlyUsed"/>
+		</meta>
+	</class>
+	<enum path="eval.luv.Result" params="T" file="C:\HaxeToolkit\haxe\std/eval/luv/Result.hx">
+		<Ok a="value">
+			<c path="eval.luv.Result.T"/>
+			<haxe_doc>Operation completed successfully.</haxe_doc>
+		</Ok>
+		<Error a="e">
+			<x path="eval.luv.UVError"/>
+			<haxe_doc>Operation failed.</haxe_doc>
+		</Error>
+		<haxe_doc>Outcome of an operation.</haxe_doc>
+		<meta><m n=":using"><e>eval.luv.Result.ResultTools</e></m></meta>
+	</enum>
+	<abstract path="eval.luv.NoData" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Result.hx" module="eval.luv.Result">
+		<this><d/></this>
+		<meta><m n=":enum"/></meta>
+		<impl><class path="eval.luv._Result.NoData_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Result.hx" private="1" module="eval.luv.Result" final="1"><meta>
+	<m n=":keep"/>
+	<m n=":enum"/>
+</meta></class></impl>
+	</abstract>
+	<abstract path="eval.luv.Timer" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Timer.hx">
+		<this><x path="eval.luv.Timer"/></this>
+		<to><icast><x path="eval.luv.Handle"/></icast></to>
+		<haxe_doc>Timers.
+
+	@see https://aantron.github.io/luv/luv/Luv/Timer</haxe_doc>
+		<meta>
+			<m n=":using"><e>eval.luv.Handle</e></m>
+			<m n=":coreType"/>
+		</meta>
+		<impl><class path="eval.luv._Timer.Timer_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/Timer.hx" private="1" module="eval.luv.Timer" final="1"><meta>
+	<m n=":keep"/>
+	<m n=":using"><e>eval.luv.Handle</e></m>
+</meta></class></impl>
+	</abstract>
+	<abstract path="eval.luv.UVError" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/UVError.hx">
+		<this><x path="Int"/></this>
+		<haxe_doc>Error handling.
+
+	@see https://aantron.github.io/luv/luv/Luv/Error</haxe_doc>
+		<meta><m n=":enum"/></meta>
+		<impl><class path="eval.luv._UVError.UVError_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/UVError.hx" private="1" module="eval.luv.UVError" extern="1" final="1"><meta>
+	<m n=":keep"/>
+	<m n=":directlyUsed"/>
+	<m n=":enum"/>
+</meta></class></impl>
+	</abstract>
+	<class path="eval.luv._UVError.UVError_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/luv/UVError.hx" private="1" module="eval.luv.UVError" extern="1" final="1"><meta>
+	<m n=":keep"/>
+	<m n=":directlyUsed"/>
+	<m n=":enum"/>
+</meta></class>
 	<class path="eval.vm.Context" params="" file="C:\HaxeToolkit\haxe\std/eval/vm/Context.hx" extern="1">
 		<addBreakpoint public="1" set="method" static="1"><f a="file:line">
 	<c path="String"/>
@@ -2057,6 +2422,10 @@
 	<c path="sendMessage.T"/>
 	<x path="Void"/>
 </f></sendMessage>
+		<events get="null" set="null">
+			<x path="Null"><c path="sys.thread.EventLoop"/></x>
+			<meta><m n=":allow"><e>sys.thread.Thread</e></m></meta>
+		</events>
 		<new public="1" set="method">
 			<f a="f">
 				<f a=""><x path="Void"/></f>
@@ -2067,14 +2436,48 @@
 		Exceptions caused while executing `f` are printed to stderr and are not
 		propagated to the parent thread.</haxe_doc>
 		</new>
+		<meta><m n=":directlyUsed"/></meta>
 	</class>
 	<class path="export.Export" params="" file="exports/src/export/Export.hx">
 		<main set="method" line="126" static="1">
 			<f a=""><x path="Void"/></f>
-			<meta><m n=":keep"/></meta>
+			<meta>
+				<m n=":keep"/>
+				<m n=":keep"/>
+			</meta>
 		</main>
 		<haxe_doc>* this class just imports all the classes in the library</haxe_doc>
 	</class>
+	<enum path="haxe.StackItem" params="" file="C:\HaxeToolkit\haxe\std/haxe/CallStack.hx" module="haxe.CallStack">
+		<CFunction/>
+		<Module a="m"><c path="String"/></Module>
+		<FilePos a="s:file:line:?column">
+			<x path="Null"><e path="haxe.StackItem"/></x>
+			<c path="String"/>
+			<x path="Int"/>
+			<x path="Int"/>
+		</FilePos>
+		<Method a="classname:method">
+			<x path="Null"><c path="String"/></x>
+			<c path="String"/>
+		</Method>
+		<LocalFunction a="?v"><x path="Int"/></LocalFunction>
+		<haxe_doc>Elements return by `CallStack` methods.</haxe_doc>
+	</enum>
+	<abstract path="haxe.CallStack" params="" file="C:\HaxeToolkit\haxe\std/haxe/CallStack.hx">
+		<from><icast><c path="Array"><e path="haxe.StackItem"/></c></icast></from>
+		<this><c path="Array"><e path="haxe.StackItem"/></c></this>
+		<haxe_doc>Get information about the call stack.</haxe_doc>
+		<meta>
+			<m n=":allow"><e>haxe.Exception</e></m>
+			<m n=":using"><e>haxe.CallStack</e></m>
+		</meta>
+		<impl><class path="haxe._CallStack.CallStack_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/CallStack.hx" private="1" module="haxe.CallStack" final="1"><meta>
+	<m n=":keep"/>
+	<m n=":using"><e>haxe.CallStack</e></m>
+	<m n=":allow"><e>haxe.Exception</e></m>
+</meta></class></impl>
+	</abstract>
 	<abstract path="haxe.Function" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" module="haxe.Constraints">
 		<this><d/></this>
 		<haxe_doc>This type unifies with any function type.
@@ -2082,7 +2485,7 @@
 	It is intended to be used as a type parameter constraint. If used as a real
 	type, the underlying type will be `Dynamic`.</haxe_doc>
 		<meta><m n=":callable"/></meta>
-		<impl><class path="haxe._Constraints.Function_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" private="1" module="haxe.Constraints"><meta><m n=":keep"/></meta></class></impl>
+		<impl><class path="haxe._Constraints.Function_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" private="1" module="haxe.Constraints" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<abstract path="haxe.FlatEnum" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" module="haxe.Constraints">
 		<this><d/></this>
@@ -2091,7 +2494,15 @@
 
 	It is intended to be used as a type parameter constraint. If used as a real
 	type, the underlying type will be `Dynamic`.</haxe_doc>
-		<impl><class path="haxe._Constraints.FlatEnum_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" private="1" module="haxe.Constraints"><meta><m n=":keep"/></meta></class></impl>
+		<impl><class path="haxe._Constraints.FlatEnum_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" private="1" module="haxe.Constraints" final="1"><meta><m n=":keep"/></meta></class></impl>
+	</abstract>
+	<abstract path="haxe.NotVoid" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" module="haxe.Constraints">
+		<this><d/></this>
+		<haxe_doc>This type unifies with anything but `Void`.
+
+	It is intended to be used as a type parameter constraint. If used as a real
+	type, the underlying type will be `Dynamic`.</haxe_doc>
+		<impl><class path="haxe._Constraints.NotVoid_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" private="1" module="haxe.Constraints" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<abstract path="haxe.Constructible" params="T" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" module="haxe.Constraints">
 		<this><d/></this>
@@ -2107,114 +2518,8 @@
 
 	It is intended to be used as a type parameter constraint. If used as a real
 	type, the underlying type will be `Dynamic`.]]></haxe_doc>
-		<impl><class path="haxe._Constraints.Constructible_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" private="1" module="haxe.Constraints"><meta><m n=":keep"/></meta></class></impl>
+		<impl><class path="haxe._Constraints.Constructible_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Constraints.hx" private="1" module="haxe.Constraints" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
-	<class path="sys.thread.Mutex" params="" file="C:\HaxeToolkit\haxe\std/sys/thread/Mutex.hx" extern="1">
-		<acquire public="1" set="method">
-			<f a=""><x path="Void"/></f>
-			<haxe_doc>The current thread acquire the mutex or wait if not available.
-		The same thread can acquire several times the same mutex but
-		must release it as many times it has been acquired.</haxe_doc>
-		</acquire>
-		<tryAcquire public="1" set="method">
-			<f a=""><x path="Bool"/></f>
-			<haxe_doc>Try to acquire the mutex, returns true if acquire or false
-		if it's already locked by another thread.</haxe_doc>
-		</tryAcquire>
-		<release public="1" set="method">
-			<f a=""><x path="Void"/></f>
-			<haxe_doc>Release a mutex that has been acquired by the current thread.
-		The behavior is undefined if the current thread does not own
-		the mutex.</haxe_doc>
-		</release>
-		<new public="1" set="method">
-			<f a=""><x path="Void"/></f>
-			<haxe_doc>Creates a mutex.</haxe_doc>
-		</new>
-		<haxe_doc>Creates a mutex, which can be used to acquire a temporary lock
-	to access some ressource. The main difference with a lock is
-	that a mutex must always be released by the owner thread.</haxe_doc>
-		<meta><m n=":directlyUsed"/></meta>
-	</class>
-	<class path="sys.thread.Lock" params="" file="C:\HaxeToolkit\haxe\std/sys/thread/Lock.hx" extern="1">
-		<wait public="1" set="method">
-			<f a="?timeout">
-				<x path="Float"/>
-				<x path="Bool"/>
-			</f>
-			<haxe_doc>Waits for the lock to be released, or `timeout` (in seconds)
-		to expire. Returns `true` if the lock is released and `false`
-		if a time-out occurs.</haxe_doc>
-		</wait>
-		<release public="1" set="method">
-			<f a=""><x path="Void"/></f>
-			<haxe_doc>Releases the lock once.
-
-		The thread does not need to own the lock in order to release
-		it. Each call to `release` allows exactly one call to `wait`
-		to execute.</haxe_doc>
-		</release>
-		<new public="1" set="method">
-			<f a=""><x path="Void"/></f>
-			<haxe_doc>Creates a new Lock which is initially locked.</haxe_doc>
-		</new>
-		<haxe_doc>A Lock allows blocking execution until it has been unlocked. It keeps track
-	of how often `release` has been called, and blocks exactly as many `wait`
-	calls.
-
-	The order of the `release` and `wait` calls is irrelevant. That is, a Lock
-	can be released before anyone waits for it. In that case, the `wait` call
-	will execute immediately.
-
-	Usage example:
-
-	```
-		var lock = new Lock();
-		var elements = [1, 2, 3];
-		for (element in elements) {
-			// Create one thread per element
-			new Thread(function() {
-				trace(element);
-				Sys.sleep(1);
-				// Release once per thread = 3 times
-				lock.release();
-			});
-		}
-		for (_ in elements) {
-			// Wait 3 times
-			lock.wait();
-		}
-		trace("All threads finished");
-	```</haxe_doc>
-		<meta><m n=":directlyUsed"/></meta>
-	</class>
-	<class path="haxe.EntryPoint" params="" file="C:\HaxeToolkit\haxe\std/haxe/EntryPoint.hx">
-		<sleepLock expr="new Lock()" line="37" static="1">
-			<c path="sys.thread.Lock"/>
-			<meta><m n=":value"><e>new Lock()</e></m></meta>
-		</sleepLock>
-		<mutex expr="new Mutex()" line="38" static="1">
-			<c path="sys.thread.Mutex"/>
-			<meta><m n=":value"><e>new Mutex()</e></m></meta>
-		</mutex>
-		<pending expr="new Array&lt;Void&gt;()" line="40" static="1">
-			<c path="Array"><f a=""><x path="Void"/></f></c>
-			<meta><m n=":value"><e><![CDATA[new Array<Void>()]]></e></m></meta>
-		</pending>
-		<threadCount public="1" set="null" expr="0" line="41" static="1">
-			<x path="Int"/>
-			<meta><m n=":value"><e>0</e></m></meta>
-		</threadCount>
-		<processEvents set="method" line="85" static="1"><f a=""><x path="Float"/></f></processEvents>
-		<run public="1" set="method" line="108" static="1">
-			<f a=""><x path="Void"/></f>
-			<meta><m n=":keep"/></meta>
-			<haxe_doc>Start the main loop. Depending on the platform, this can return immediately or will only return when the application exits.</haxe_doc>
-		</run>
-		<haxe_doc>If `haxe.MainLoop` is kept from DCE, then we will insert an `haxe.EntryPoint.run()` call just at then end of `main()`.
-	This class can be redefined by custom frameworks so they can handle their own main loop logic.</haxe_doc>
-		<meta><m n=":keep"/></meta>
-	</class>
 	<class path="haxe.EnumTools" params="" file="C:\HaxeToolkit\haxe\std/haxe/EnumTools.hx" extern="1">
 		<getName public="1" params="T" get="inline" set="null" line="52" static="1">
 			<f a="e">
@@ -2375,7 +2680,8 @@
 		</to>
 		<haxe_doc>Int32 provides a 32-bit integer with consistent overflow behavior across
 	all platforms.</haxe_doc>
-		<impl><class path="haxe._Int32.Int32_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Int32.hx" private="1" module="haxe.Int32"><meta><m n=":keep"/></meta></class></impl>
+		<meta><m n=":transitive"/></meta>
+		<impl><class path="haxe._Int32.Int32_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Int32.hx" private="1" module="haxe.Int32" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<abstract path="haxe.Int64" params="" file="C:\HaxeToolkit\haxe\std/haxe/Int64.hx">
 		<from>
@@ -2386,17 +2692,8 @@
 		<to><icast><t path="haxe._Int64.__Int64"/></icast></to>
 		<haxe_doc>A cross-platform signed 64-bit integer.
 	Int64 instances can be created from two 32-bit words using `Int64.make()`.</haxe_doc>
-		<impl><class path="haxe._Int64.Int64_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Int64.hx" private="1" module="haxe.Int64">
-	<high public="1" get="accessor" set="null" static="1">
-		<x path="haxe.Int32"/>
-		<meta><m n=":impl"/></meta>
-	</high>
-	<low public="1" get="accessor" set="null" static="1">
-		<x path="haxe.Int32"/>
-		<meta><m n=":impl"/></meta>
-	</low>
-	<meta><m n=":keep"/></meta>
-</class></impl>
+		<meta><m n=":transitive"/></meta>
+		<impl><class path="haxe._Int64.Int64_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/Int64.hx" private="1" module="haxe.Int64" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<typedef path="haxe._Int64.__Int64" params="" file="C:\HaxeToolkit\haxe\std/haxe/Int64.hx" private="1" module="haxe.Int64">
 		<c path="haxe._Int64.___Int64"/>
@@ -2443,37 +2740,23 @@
 			<m n=":directlyUsed"/>
 		</meta>
 	</class>
-	<class path="haxe.MainEvent" params="" file="C:\HaxeToolkit\haxe\std/haxe/MainLoop.hx" module="haxe.MainLoop">
-		<f><f a=""><x path="Void"/></f></f>
-		<prev><c path="haxe.MainEvent"/></prev>
-		<next><c path="haxe.MainEvent"/></next>
-		<isBlocking public="1" expr="true">
-			<x path="Bool"/>
-			<meta><m n=":value"><e>true</e></m></meta>
-			<haxe_doc>Tells if the event can lock the process from exiting (default:true)</haxe_doc>
-		</isBlocking>
-		<nextRun public="1" set="null"><x path="Float"/></nextRun>
-		<priority public="1" set="null"><x path="Int"/></priority>
-		<new set="method" line="18"><f a="f:p">
-	<f a=""><x path="Void"/></f>
-	<x path="Int"/>
-	<x path="Void"/>
-</f></new>
-		<meta><m n=":keep"/></meta>
-	</class>
-	<class path="haxe.MainLoop" params="" file="C:\HaxeToolkit\haxe\std/haxe/MainLoop.hx">
-		<pending static="1"><c path="haxe.MainEvent"/></pending>
-		<threadCount public="1" get="null" set="null" static="1"><x path="Int"/></threadCount>
-		<hasEvents public="1" set="method" line="66" static="1"><f a=""><x path="Bool"/></f></hasEvents>
-		<sortEvents set="method" line="99" static="1"><f a=""><x path="Void"/></f></sortEvents>
-		<tick set="method" line="164" static="1">
-			<f a=""><x path="Float"/></f>
-			<haxe_doc>Run the pending events. Return the time for next event.</haxe_doc>
-		</tick>
+	<class path="haxe.NativeStackTrace" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/NativeStackTrace.hx">
+		<saveStack public="1" get="inline" set="null" line="12" static="1">
+			<f a="exception">
+				<x path="Any"/>
+				<x path="Void"/>
+			</f>
+			<meta><m n=":ifFeature"><e>"haxe.NativeStackTrace.exceptionStack"</e></m></meta>
+		</saveStack>
+		<callStack public="1" set="method" line="15" static="1"><f a=""><c path="Array"><e path="haxe.StackItem"/></c></f></callStack>
+		<_callStack set="method" line="20" static="1"><f a=""><c path="Array"><e path="haxe.StackItem"/></c></f></_callStack>
+		<exceptionStack public="1" set="method" line="25" static="1"><f a=""><c path="Array"><e path="haxe.StackItem"/></c></f></exceptionStack>
+		<haxe_doc>Do not use manually.</haxe_doc>
 		<meta>
 			<m n=":keep"/>
 			<m n=":directlyUsed"/>
-			<m n=":access"><e>haxe.MainEvent</e></m>
+			<m n=":dox"><e>hide</e></m>
+			<m n=":noCompletion"/>
 		</meta>
 	</class>
 	<typedef path="haxe.PosInfos" params="" file="C:\HaxeToolkit\haxe\std/haxe/PosInfos.hx">
@@ -2497,6 +2780,35 @@
 	This can be used to track positions of calls in e.g. a unit testing
 	framework.</haxe_doc>
 	</typedef>
+	<class path="haxe.ValueException" params="" file="C:\HaxeToolkit\haxe\std/haxe/ValueException.hx">
+		<extends path="haxe.Exception"/>
+		<value public="1" set="null">
+			<x path="Any"/>
+			<haxe_doc>Thrown value.</haxe_doc>
+		</value>
+		<new public="1" set="method" line="23"><f a="value:?previous:?native">
+	<x path="Any"/>
+	<c path="haxe.Exception"/>
+	<x path="Any"/>
+	<x path="Void"/>
+</f></new>
+		<haxe_doc>An exception containing arbitrary value.
+
+	This class is automatically used for throwing values, which don't extend `haxe.Exception`
+	or native exception type.
+	For example:
+	```haxe
+	throw "Terrible error";
+	```
+	will be compiled to
+	```haxe
+	throw new ValueException("Terrible error");
+	```</haxe_doc>
+		<meta>
+			<m n=":keep"/>
+			<m n=":directlyUsed"/>
+		</meta>
+	</class>
 	<abstract path="haxe.ds.HashMap" params="K:V" file="C:\HaxeToolkit\haxe\std/haxe/ds/HashMap.hx">
 		<this><c path="haxe.ds._HashMap.HashMapData">
 	<c path="haxe.ds.HashMap.K"/>
@@ -2507,7 +2819,7 @@
 	See `Map` for documentation details.
 
 	@see https://haxe.org/manual/std-Map.html</haxe_doc>
-		<impl><class path="haxe.ds._HashMap.HashMap_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/HashMap.hx" private="1" module="haxe.ds.HashMap"><meta><m n=":keep"/></meta></class></impl>
+		<impl><class path="haxe.ds._HashMap.HashMap_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/HashMap.hx" private="1" module="haxe.ds.HashMap" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<class path="haxe.ds.IntMap" params="T" file="C:\HaxeToolkit\haxe\std/haxe/ds/IntMap.hx" extern="1">
 		<implements path="haxe.IMap">
@@ -2626,8 +2938,11 @@
 	Map is an abstract type, it is not available at runtime.
 
 	@see https://haxe.org/manual/std-Map.html]]></haxe_doc>
-		<meta><m n=":multiType"><e>@:followWithAbstracts K</e></m></meta>
-		<impl><class path="haxe.ds._Map.Map_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/Map.hx" private="1" module="haxe.ds.Map"><meta><m n=":keep"/></meta></class></impl>
+		<meta>
+			<m n=":transitive"/>
+			<m n=":multiType"><e>@:followWithAbstracts K</e></m>
+		</meta>
+		<impl><class path="haxe.ds._Map.Map_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/Map.hx" private="1" module="haxe.ds.Map" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<class path="haxe.ds.ObjectMap" params="K:V" file="C:\HaxeToolkit\haxe\std/haxe/ds/ObjectMap.hx" extern="1">
 		<implements path="haxe.IMap">
@@ -2716,6 +3031,7 @@
 	<abstract path="haxe.ds.ReadOnlyArray" params="T" file="C:\HaxeToolkit\haxe\std/haxe/ds/ReadOnlyArray.hx">
 		<from><icast><c path="Array"><c path="haxe.ds.ReadOnlyArray.T"/></c></icast></from>
 		<this><c path="Array"><c path="haxe.ds.ReadOnlyArray.T"/></c></this>
+		<to><icast><t path="Iterable"><c path="haxe.ds.ReadOnlyArray.T"/></t></icast></to>
 		<haxe_doc>`ReadOnlyArray` is an abstract over an ordinary `Array` which only exposes
 	APIs that don't modify the instance, hence "read-only".
 
@@ -2723,25 +3039,19 @@
 	Other code holding a reference to the underlying `Array` can still modify it,
 	and the reference can be obtained with a `cast`.</haxe_doc>
 		<meta><m n=":forward">
-	<e>concat</e>
 	<e>copy</e>
 	<e>filter</e>
 	<e>indexOf</e>
 	<e>iterator</e>
+	<e>keyValueIterator</e>
 	<e>join</e>
 	<e>lastIndexOf</e>
 	<e>map</e>
 	<e>slice</e>
+	<e>contains</e>
 	<e>toString</e>
 </m></meta>
-		<impl><class path="haxe.ds._ReadOnlyArray.ReadOnlyArray_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/ReadOnlyArray.hx" private="1" module="haxe.ds.ReadOnlyArray">
-	<length public="1" get="accessor" set="null" static="1">
-		<x path="Int"/>
-		<meta><m n=":impl"/></meta>
-		<haxe_doc>The length of `this` Array.</haxe_doc>
-	</length>
-	<meta><m n=":keep"/></meta>
-</class></impl>
+		<impl><class path="haxe.ds._ReadOnlyArray.ReadOnlyArray_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/ReadOnlyArray.hx" private="1" module="haxe.ds.ReadOnlyArray" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<class path="haxe.ds.StringMap" params="T" file="C:\HaxeToolkit\haxe\std/haxe/ds/StringMap.hx" extern="1">
 		<implements path="haxe.IMap">
@@ -2828,14 +3138,7 @@
 	targets, and is never slower.
 
 	@see https://haxe.org/manual/std-vector.html</haxe_doc>
-		<impl><class path="haxe.ds._Vector.Vector_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/Vector.hx" private="1" module="haxe.ds.Vector">
-	<length public="1" get="accessor" set="null" static="1">
-		<x path="Int"/>
-		<meta><m n=":impl"/></meta>
-		<haxe_doc>Returns the length of `this` Vector.</haxe_doc>
-	</length>
-	<meta><m n=":keep"/></meta>
-</class></impl>
+		<impl><class path="haxe.ds._Vector.Vector_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/Vector.hx" private="1" module="haxe.ds.Vector" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<class path="haxe.io.Bytes" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/io/Bytes.hx" extern="1">
 		<alloc public="1" set="method" static="1"><f a="length">
@@ -3006,9 +3309,20 @@
 		<this><c path="haxe.io.Bytes"/></this>
 		<to><icast><c path="haxe.io.Bytes"/></icast></to>
 		<meta><m n=":forward"/></meta>
-		<impl><class path="haxe.io._BytesData.NativeBytesDataAbstract_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/io/BytesData.hx" private="1" module="haxe.io.BytesData"><meta><m n=":keep"/></meta></class></impl>
+		<impl><class path="haxe.io._BytesData.NativeBytesDataAbstract_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/io/BytesData.hx" private="1" module="haxe.io.BytesData" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<typedef path="haxe.io.BytesData" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/io/BytesData.hx"><x path="haxe.io._BytesData.NativeBytesDataAbstract"/></typedef>
+	<enum path="haxe.io.Error" params="" file="C:\HaxeToolkit\haxe\std/haxe/io/Error.hx">
+		<Blocked><haxe_doc>The IO is set into nonblocking mode and some data cannot be read or written</haxe_doc></Blocked>
+		<Overflow><haxe_doc>An integer value is outside its allowed range</haxe_doc></Overflow>
+		<OutsideBounds><haxe_doc>An operation on Bytes is outside of its valid range</haxe_doc></OutsideBounds>
+		<Custom a="e">
+			<d/>
+			<haxe_doc>Other errors</haxe_doc>
+		</Custom>
+		<haxe_doc>The possible IO errors that can occur</haxe_doc>
+		<meta><m n=":keep"/></meta>
+	</enum>
 	<class path="haxe.io.Input" params="" file="C:\HaxeToolkit\haxe\std/haxe/io/Input.hx">
 		<haxe_doc>An Input is an abstract reader. See other classes in the `haxe.io` package
 	for several possible implementations.
@@ -3022,6 +3336,30 @@
 	have to override the `writeByte` and maybe the `write`, `flush` and `close`
 	methods. See `File.write` and `String.write` for two ways of creating an
 	Output.</haxe_doc>
+		<meta><m n=":keep"/></meta>
+	</class>
+	<class path="haxe.iterators.ArrayIterator" params="T" file="C:\HaxeToolkit\haxe\std/haxe/iterators/ArrayIterator.hx">
+		<array final="1"><c path="Array"><c path="haxe.iterators.ArrayIterator.T"/></c></array>
+		<current expr="0">
+			<x path="Int"/>
+			<meta><m n=":value"><e>0</e></m></meta>
+		</current>
+		<hasNext public="1" get="inline" set="null" line="44">
+			<f a=""><x path="Bool"/></f>
+			<haxe_doc>See `Iterator.hasNext`</haxe_doc>
+		</hasNext>
+		<next public="1" get="inline" set="null" line="52">
+			<f a=""><c path="haxe.iterators.ArrayIterator.T"/></f>
+			<haxe_doc>See `Iterator.next`</haxe_doc>
+		</next>
+		<new public="1" get="inline" set="null" line="35">
+			<f a="array">
+				<c path="Array"><c path="haxe.iterators.ArrayIterator.T"/></c>
+				<x path="Void"/>
+			</f>
+			<haxe_doc>Create a new `ArrayIterator`.</haxe_doc>
+		</new>
+		<haxe_doc><![CDATA[This iterator is used only when `Array<T>` is passed to `Iterable<T>`]]></haxe_doc>
 		<meta><m n=":keep"/></meta>
 	</class>
 	<typedef path="haxe.macro.Position" params="" file="C:\HaxeToolkit\haxe\std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
@@ -3074,6 +3412,7 @@
 			</guard>
 			<expr>
 				<x path="Null"><t path="haxe.macro.Expr"/></x>
+				<meta><m n=":optional"/></meta>
 				<haxe_doc>The expression of the case, if available.</haxe_doc>
 			</expr>
 		</a>
@@ -3084,12 +3423,18 @@
 		<a>
 			<type>
 				<x path="Null"><e path="haxe.macro.ComplexType"/></x>
+				<meta><m n=":optional"/></meta>
 				<haxe_doc>The type-hint of the variable, if available.</haxe_doc>
 			</type>
 			<name>
 				<c path="String"/>
 				<haxe_doc>The name of the variable.</haxe_doc>
 			</name>
+			<meta>
+				<x path="Null"><t path="haxe.macro.Metadata"/></x>
+				<meta><m n=":optional"/></meta>
+				<haxe_doc>Metadata associatied with the variable, if available.</haxe_doc>
+			</meta>
 			<isFinal>
 				<x path="Null"><x path="Bool"/></x>
 				<meta><m n=":optional"/></meta>
@@ -3097,6 +3442,7 @@
 			</isFinal>
 			<expr>
 				<x path="Null"><t path="haxe.macro.Expr"/></x>
+				<meta><m n=":optional"/></meta>
 				<haxe_doc>The expression of the variable, if available.</haxe_doc>
 			</expr>
 		</a>
@@ -3106,7 +3452,8 @@
 	<typedef path="haxe.macro.Catch" params="" file="C:\HaxeToolkit\haxe\std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
 		<a>
 			<type>
-				<e path="haxe.macro.ComplexType"/>
+				<x path="Null"><e path="haxe.macro.ComplexType"/></x>
+				<meta><m n=":optional"/></meta>
 				<haxe_doc>The type of the catch.</haxe_doc>
 			</type>
 			<name>
@@ -3119,7 +3466,7 @@
 			</expr>
 		</a>
 		<haxe_doc>Represents a catch in the AST.
-	@https://haxe.org/manual/expression-try-catch.html</haxe_doc>
+	@see https://haxe.org/manual/expression-try-catch.html</haxe_doc>
 	</typedef>
 	<typedef path="haxe.macro.ObjectField" params="" file="C:\HaxeToolkit\haxe\std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
 		<a>
@@ -3145,7 +3492,7 @@
 				<x path="Null"><c path="String"/></x>
 				<meta><m n=":optional"/></meta>
 				<haxe_doc>Sub is set on module sub-type access:
-		`pack.Module.Type` has name = Module, sub = Type, if available.</haxe_doc>
+		`pack.Module.Type` has `name = "Module"`, `sub = "Type"`, if available.</haxe_doc>
 			</sub>
 			<params>
 				<x path="Null"><c path="Array"><e path="haxe.macro.TypeParam"/></c></x>
@@ -3191,6 +3538,7 @@
 		<a>
 			<ret>
 				<x path="Null"><e path="haxe.macro.ComplexType"/></x>
+				<meta><m n=":optional"/></meta>
 				<haxe_doc>The return type-hint of the function, if available.</haxe_doc>
 			</ret>
 			<params>
@@ -3200,6 +3548,7 @@
 			</params>
 			<expr>
 				<x path="Null"><t path="haxe.macro.Expr"/></x>
+				<meta><m n=":optional"/></meta>
 				<haxe_doc>The expression of the function body, if available.</haxe_doc>
 			</expr>
 			<args>
@@ -3218,6 +3567,7 @@
 			</value>
 			<type>
 				<x path="Null"><e path="haxe.macro.ComplexType"/></x>
+				<meta><m n=":optional"/></meta>
 				<haxe_doc>The type-hint of the function argument, if available.</haxe_doc>
 			</type>
 			<opt>
@@ -3435,6 +3785,10 @@
 				<x path="Bool"/>
 				<haxe_doc>Whether or not the class field is extern.</haxe_doc>
 			</isExtern>
+			<isAbstract>
+				<x path="Bool"/>
+				<haxe_doc>Whether or not the class field is abstract.</haxe_doc>
+			</isAbstract>
 			<expr set="method">
 				<f a=""><x path="Null"><t path="haxe.macro.TypedExpr"/></x></f>
 				<haxe_doc>Returns the typed expression of the class field.</haxe_doc>
@@ -3587,6 +3941,10 @@
 				<x path="Bool"/>
 				<haxe_doc>Whether or not the type is extern.</haxe_doc>
 			</isExtern>
+			<isAbstract>
+				<x path="Bool"/>
+				<haxe_doc>If true the class is abstract and cannot be instantiated directly.</haxe_doc>
+			</isAbstract>
 			<interfaces>
 				<c path="Array"><a>
 	<t><t path="haxe.macro.Ref"><t path="haxe.macro.ClassType"/></t></t>
@@ -5598,12 +5956,12 @@
 	</class>
 	<class path="oimo.collision.narrowphase.detector.BoxBoxDetector" params="" file="src/oimo/collision/narrowphase/detector/BoxBoxDetector.hx">
 		<extends path="oimo.collision.narrowphase.detector.Detector"/>
-		<EDGE_BIAS_MULT get="inline" set="null" expr="1.0" line="16" static="1">
+		<EDGE_BIAS_MULT get="inline" set="null" expr="1.0" line="17" static="1">
 			<x path="Float"/>
 			<meta><m n=":value"><e>1.0</e></m></meta>
 		</EDGE_BIAS_MULT>
 		<clipper><c path="oimo.collision.narrowphase.detector._BoxBoxDetector.FaceClipper"/></clipper>
-		<detectImpl set="method" line="28" override="1"><f a="result:geom1:geom2:tf1:tf2:cachedData">
+		<detectImpl set="method" line="29" override="1"><f a="result:geom1:geom2:tf1:tf2:cachedData">
 	<c path="oimo.collision.narrowphase.DetectorResult"/>
 	<c path="oimo.collision.geometry.Geometry"/>
 	<c path="oimo.collision.geometry.Geometry"/>
@@ -5612,7 +5970,7 @@
 	<c path="oimo.collision.narrowphase.detector.CachedDetectorData"/>
 	<x path="Void"/>
 </f></detectImpl>
-		<new public="1" set="method" line="23">
+		<new public="1" set="method" line="24">
 			<f a=""><x path="Void"/></f>
 			<haxe_doc>* Default constructor.</haxe_doc>
 		</new>
@@ -5628,7 +5986,7 @@
 		<wx public="1"><x path="Float"/></wx>
 		<wy public="1"><x path="Float"/></wy>
 		<wz public="1"><x path="Float"/></wz>
-		<new public="1" set="method" line="571"><f a=""><x path="Void"/></f></new>
+		<new public="1" set="method" line="577"><f a=""><x path="Void"/></f></new>
 		<meta><m n=":directlyUsed"/></meta>
 	</class>
 	<class path="oimo.collision.narrowphase.detector._BoxBoxDetector.FaceClipper" params="" file="src/oimo/collision/narrowphase/detector/BoxBoxDetector.hx" private="1" module="oimo.collision.narrowphase.detector.BoxBoxDetector">
@@ -5638,15 +5996,15 @@
 		<vertices public="1"><x path="haxe.ds.Vector"><c path="oimo.collision.narrowphase.detector._BoxBoxDetector.IncidentVertex"/></x></vertices>
 		<numTmpVertices><x path="Int"/></numTmpVertices>
 		<tmpVertices><x path="haxe.ds.Vector"><c path="oimo.collision.narrowphase.detector._BoxBoxDetector.IncidentVertex"/></x></tmpVertices>
-		<clip public="1" set="method" line="639">
+		<clip public="1" set="method" line="646">
 			<f a=""><x path="Void"/></f>
 			<haxe_doc>* Clips the incident face by the reference face, generates up to eight vertices.</haxe_doc>
 		</clip>
-		<reduce public="1" set="method" line="653">
+		<reduce public="1" set="method" line="660">
 			<f a=""><x path="Void"/></f>
 			<haxe_doc>* Reduces vertices up to four.</haxe_doc>
 		</reduce>
-		<new public="1" set="method" line="612"><f a=""><x path="Void"/></f></new>
+		<new public="1" set="method" line="619"><f a=""><x path="Void"/></f></new>
 		<meta><m n=":directlyUsed"/></meta>
 	</class>
 	<class path="oimo.collision.narrowphase.detector.BoxBoxDetectorMacro" params="" file="src/oimo/collision/narrowphase/detector/BoxBoxDetectorMacro.hx"><meta>
@@ -6933,7 +7291,7 @@
 			<x path="Float"/>
 			<haxe_doc>* The element at row 2 column 2.</haxe_doc>
 		</e22>
-		<init public="1" get="inline" set="null" line="115">
+		<init public="1" get="inline" set="null" line="119">
 			<f a="e00:e01:e02:e10:e11:e12:e20:e21:e22">
 				<x path="Float"/>
 				<x path="Float"/>
@@ -7245,7 +7603,7 @@
 			<f a=""><c path="String"/></f>
 			<haxe_doc>* Returns the string representation of the matrix.</haxe_doc>
 		</toString>
-		<new public="1" get="inline" set="null" line="67">
+		<new public="1" get="inline" set="null" line="71">
 			<f a="?e00:?e01:?e02:?e10:?e11:?e12:?e20:?e21:?e22" v="1:0:0:0:1:0:0:0:1">
 				<x path="Float"/>
 				<x path="Float"/>
@@ -7336,7 +7694,7 @@
 			<x path="Float"/>
 			<haxe_doc>* The element at row 3 column 3.</haxe_doc>
 		</e33>
-		<init public="1" get="inline" set="null" line="169">
+		<init public="1" get="inline" set="null" line="174">
 			<f a="e00:e01:e02:e03:e10:e11:e12:e13:e20:e21:e22:e23:e30:e31:e32:e33">
 				<x path="Float"/>
 				<x path="Float"/>
@@ -7683,7 +8041,7 @@
 			<f a=""><c path="String"/></f>
 			<haxe_doc>* Returns the string representation of the matrix.</haxe_doc>
 		</toString>
-		<new public="1" get="inline" set="null" line="98">
+		<new public="1" get="inline" set="null" line="103">
 			<f a="?e00:?e01:?e02:?e03:?e10:?e11:?e12:?e13:?e20:?e21:?e22:?e23:?e30:?e31:?e32:?e33" v="1:0:0:0:0:1:0:0:0:0:1:0:0:0:0:1">
 				<x path="Float"/>
 				<x path="Float"/>
@@ -13391,23 +13749,23 @@
 			<x path="Any"/>
 			<haxe_doc>* Extra field that users can use for their own purposes.</haxe_doc>
 		</userData>
-		<_integrate public="1" set="method" line="141">
+		<_integrate public="1" set="method" line="142">
 			<f a="dt">
 				<x path="Float"/>
 				<x path="Void"/>
 			</f>
 			<meta><m n=":dox"><e>hide</e></m></meta>
 		</_integrate>
-		<_integratePseudoVelocity public="1" set="method" line="182">
+		<_integratePseudoVelocity public="1" set="method" line="183">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":dox"><e>hide</e></m></meta>
 		</_integratePseudoVelocity>
-		<updateMass set="method" line="285"><f a=""><x path="Void"/></f></updateMass>
-		<getPosition public="1" get="inline" set="null" line="365">
+		<updateMass set="method" line="284"><f a=""><x path="Void"/></f></updateMass>
+		<getPosition public="1" get="inline" set="null" line="364">
 			<f a=""><c path="oimo.common.Vec3"/></f>
 			<haxe_doc>* Returns the world position of the rigid body.</haxe_doc>
 		</getPosition>
-		<getPositionTo public="1" get="inline" set="null" line="376">
+		<getPositionTo public="1" get="inline" set="null" line="375">
 			<f a="position">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
@@ -13416,25 +13774,25 @@
 	 *
 	 * This does not create a new instance of `Vec3`.</haxe_doc>
 		</getPositionTo>
-		<setPosition public="1" get="inline" set="null" line="383">
+		<setPosition public="1" get="inline" set="null" line="382">
 			<f a="position">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Sets the world position of the rigid body to `position`.</haxe_doc>
 		</setPosition>
-		<translate public="1" get="inline" set="null" line="391">
+		<translate public="1" get="inline" set="null" line="390">
 			<f a="translation">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Translates the position of the rigid body by `translation`.</haxe_doc>
 		</translate>
-		<getRotation public="1" get="inline" set="null" line="401">
+		<getRotation public="1" get="inline" set="null" line="400">
 			<f a=""><c path="oimo.common.Mat3"/></f>
 			<haxe_doc>* Returns the rotation matrix of the rigid body.</haxe_doc>
 		</getRotation>
-		<getRotationTo public="1" get="inline" set="null" line="412">
+		<getRotationTo public="1" get="inline" set="null" line="411">
 			<f a="rotation">
 				<c path="oimo.common.Mat3"/>
 				<x path="Void"/>
@@ -13443,39 +13801,39 @@
 	 *
 	 * This does not create a new instance of `Mat3`.</haxe_doc>
 		</getRotationTo>
-		<setRotation public="1" get="inline" set="null" line="419">
+		<setRotation public="1" get="inline" set="null" line="418">
 			<f a="rotation">
 				<c path="oimo.common.Mat3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Sets the rotation matrix of the rigid body to `rotation`.</haxe_doc>
 		</setRotation>
-		<setRotationXyz public="1" get="inline" set="null" line="429">
+		<setRotationXyz public="1" get="inline" set="null" line="428">
 			<f a="eulerAngles">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Sets the rotation of the rigid body by Euler angles `eulerAngles` in radians.</haxe_doc>
 		</setRotationXyz>
-		<rotate public="1" get="inline" set="null" line="441">
+		<rotate public="1" get="inline" set="null" line="440">
 			<f a="rotation">
 				<c path="oimo.common.Mat3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Rotates the rigid body by the rotation matrix `rotation`.</haxe_doc>
 		</rotate>
-		<rotateXyz public="1" get="inline" set="null" line="453">
+		<rotateXyz public="1" get="inline" set="null" line="452">
 			<f a="eulerAngles">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Rotates the rigid body by Euler angles `eulerAngles` in radians.</haxe_doc>
 		</rotateXyz>
-		<getOrientation public="1" get="inline" set="null" line="467">
+		<getOrientation public="1" get="inline" set="null" line="466">
 			<f a=""><c path="oimo.common.Quat"/></f>
 			<haxe_doc>* Returns the rotation of the rigid body as a quaternion.</haxe_doc>
 		</getOrientation>
-		<getOrientationTo public="1" get="inline" set="null" line="480">
+		<getOrientationTo public="1" get="inline" set="null" line="479">
 			<f a="orientation">
 				<c path="oimo.common.Quat"/>
 				<x path="Void"/>
@@ -13484,18 +13842,18 @@
 	 *
 	 * This does not create a new instance of `Quat`.</haxe_doc>
 		</getOrientationTo>
-		<setOrientation public="1" get="inline" set="null" line="489">
+		<setOrientation public="1" get="inline" set="null" line="488">
 			<f a="quaternion">
 				<c path="oimo.common.Quat"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Sets the rotation of the rigid body from a quaternion `quaternion`.</haxe_doc>
 		</setOrientation>
-		<getTransform public="1" get="inline" set="null" line="501">
+		<getTransform public="1" get="inline" set="null" line="500">
 			<f a=""><c path="oimo.common.Transform"/></f>
 			<haxe_doc>* Returns the transform of the rigid body.</haxe_doc>
 		</getTransform>
-		<getTransformTo public="1" get="inline" set="null" line="510">
+		<getTransformTo public="1" get="inline" set="null" line="509">
 			<f a="transform">
 				<c path="oimo.common.Transform"/>
 				<x path="Void"/>
@@ -13504,7 +13862,7 @@
 	 *
 	 * This does not create a new instance of `Transform`.</haxe_doc>
 		</getTransformTo>
-		<setTransform public="1" get="inline" set="null" line="519">
+		<setTransform public="1" get="inline" set="null" line="518">
 			<f a="transform">
 				<c path="oimo.common.Transform"/>
 				<x path="Void"/>
@@ -13513,17 +13871,17 @@
 	 *
 	 * This does not keep any references to `transform`.</haxe_doc>
 		</setTransform>
-		<getMass public="1" get="inline" set="null" line="532">
+		<getMass public="1" get="inline" set="null" line="531">
 			<f a=""><x path="Float"/></f>
 			<haxe_doc>* Returns the mass of the rigid body.
 	 *
 	 * If the rigid body has infinite mass, `0` will be returned.</haxe_doc>
 		</getMass>
-		<getLocalInertia public="1" get="inline" set="null" line="539">
+		<getLocalInertia public="1" get="inline" set="null" line="538">
 			<f a=""><c path="oimo.common.Mat3"/></f>
 			<haxe_doc>* Returns the moment of inertia tensor in local space.</haxe_doc>
 		</getLocalInertia>
-		<getLocalInertiaTo public="1" get="inline" set="null" line="550">
+		<getLocalInertiaTo public="1" get="inline" set="null" line="549">
 			<f a="inertia">
 				<c path="oimo.common.Mat3"/>
 				<x path="Void"/>
@@ -13532,11 +13890,11 @@
 	 *
 	 * This does not create a new instance of `Mat3`</haxe_doc>
 		</getLocalInertiaTo>
-		<getMassData public="1" get="inline" set="null" line="557">
+		<getMassData public="1" get="inline" set="null" line="556">
 			<f a=""><c path="oimo.dynamics.rigidbody.MassData"/></f>
 			<haxe_doc>* Returns the mass data of the rigid body.</haxe_doc>
 		</getMassData>
-		<getMassDataTo public="1" get="inline" set="null" line="569">
+		<getMassDataTo public="1" get="inline" set="null" line="568">
 			<f a="massData">
 				<c path="oimo.dynamics.rigidbody.MassData"/>
 				<x path="Void"/>
@@ -13545,7 +13903,7 @@
 	 *
 	 * This does not create a new instance of `MassData`.</haxe_doc>
 		</getMassDataTo>
-		<setMassData public="1" get="inline" set="null" line="581">
+		<setMassData public="1" get="inline" set="null" line="580">
 			<f a="massData">
 				<c path="oimo.dynamics.rigidbody.MassData"/>
 				<x path="Void"/>
@@ -13556,11 +13914,11 @@
 	 * - some shapes are added or removed
 	 * - the type of the rigid body is changed</haxe_doc>
 		</setMassData>
-		<getRotationFactor public="1" get="inline" set="null" line="591">
+		<getRotationFactor public="1" get="inline" set="null" line="590">
 			<f a=""><c path="oimo.common.Vec3"/></f>
 			<haxe_doc>* Returns the rotation factor of the rigid body.</haxe_doc>
 		</getRotationFactor>
-		<setRotationFactor public="1" get="inline" set="null" line="602">
+		<setRotationFactor public="1" get="inline" set="null" line="601">
 			<f a="rotationFactor">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
@@ -13571,11 +13929,11 @@
 	 * angular velocity in **global space** along X, Y and Z axis will scale by `rotationFactor.x`,
 	 * `rotationFactor.y` and `rotationFactor.z` times respectively.</haxe_doc>
 		</setRotationFactor>
-		<getLinearVelocity public="1" get="inline" set="null" line="612">
+		<getLinearVelocity public="1" get="inline" set="null" line="611">
 			<f a=""><c path="oimo.common.Vec3"/></f>
 			<haxe_doc>* Returns the linear velocity of the rigid body.</haxe_doc>
 		</getLinearVelocity>
-		<getLinearVelocityTo public="1" get="inline" set="null" line="623">
+		<getLinearVelocityTo public="1" get="inline" set="null" line="622">
 			<f a="linearVelocity">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
@@ -13584,18 +13942,18 @@
 	 *
 	 * This does not create a new intrance of `Vec3`.</haxe_doc>
 		</getLinearVelocityTo>
-		<setLinearVelocity public="1" get="inline" set="null" line="630">
+		<setLinearVelocity public="1" get="inline" set="null" line="629">
 			<f a="linearVelocity">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Sets the linear velocity of the rigid body.</haxe_doc>
 		</setLinearVelocity>
-		<getAngularVelocity public="1" get="inline" set="null" line="642">
+		<getAngularVelocity public="1" get="inline" set="null" line="641">
 			<f a=""><c path="oimo.common.Vec3"/></f>
 			<haxe_doc>* Returns the angular velocity of the rigid body.</haxe_doc>
 		</getAngularVelocity>
-		<getAngularVelocityTo public="1" get="inline" set="null" line="653">
+		<getAngularVelocityTo public="1" get="inline" set="null" line="652">
 			<f a="angularVelocity">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
@@ -13604,28 +13962,28 @@
 	 *
 	 * This does not create a new intrance of `Vec3`.</haxe_doc>
 		</getAngularVelocityTo>
-		<setAngularVelocity public="1" get="inline" set="null" line="660">
+		<setAngularVelocity public="1" get="inline" set="null" line="659">
 			<f a="angularVelocity">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Sets the angular velocity of the rigid body.</haxe_doc>
 		</setAngularVelocity>
-		<addLinearVelocity public="1" get="inline" set="null" line="672">
+		<addLinearVelocity public="1" get="inline" set="null" line="671">
 			<f a="linearVelocityChange">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Adds `linearVelocityChange` to the linear velcity of the rigid body.</haxe_doc>
 		</addLinearVelocity>
-		<addAngularVelocity public="1" get="inline" set="null" line="684">
+		<addAngularVelocity public="1" get="inline" set="null" line="683">
 			<f a="angularVelocityChange">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Adds `angularVelocityChange` to the angular velcity of the rigid body.</haxe_doc>
 		</addAngularVelocity>
-		<applyImpulse public="1" set="method" line="698">
+		<applyImpulse public="1" set="method" line="697">
 			<f a="impulse:positionInWorld">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
@@ -13635,7 +13993,7 @@
 	 *
 	 * This changes both the linear velocity and the angular velocity.</haxe_doc>
 		</applyImpulse>
-		<applyLinearImpulse public="1" set="method" line="721">
+		<applyLinearImpulse public="1" set="method" line="720">
 			<f a="impulse">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
@@ -13644,7 +14002,7 @@
 	 *
 	 * This does not change the angular velocity.</haxe_doc>
 		</applyLinearImpulse>
-		<applyAngularImpulse public="1" set="method" line="733">
+		<applyAngularImpulse public="1" set="method" line="732">
 			<f a="impulse">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
@@ -13653,7 +14011,7 @@
 	 *
 	 * This does not change the linear velocity.</haxe_doc>
 		</applyAngularImpulse>
-		<applyForce public="1" set="method" line="744">
+		<applyForce public="1" set="method" line="743">
 			<f a="force:positionInWorld">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
@@ -13661,25 +14019,25 @@
 			</f>
 			<haxe_doc>* Applies the force `force` to `positionInWorld` in world position.</haxe_doc>
 		</applyForce>
-		<applyForceToCenter public="1" set="method" line="764">
+		<applyForceToCenter public="1" set="method" line="763">
 			<f a="force">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Applies the force `force` to the center of mass.</haxe_doc>
 		</applyForceToCenter>
-		<applyTorque public="1" set="method" line="776">
+		<applyTorque public="1" set="method" line="775">
 			<f a="torque">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Applies the torque `torque`.</haxe_doc>
 		</applyTorque>
-		<getLinearContactImpulse public="1" get="inline" set="null" line="788">
+		<getLinearContactImpulse public="1" get="inline" set="null" line="787">
 			<f a=""><c path="oimo.common.Vec3"/></f>
 			<haxe_doc>* Returns the total linear impulse applied by contact constraints.</haxe_doc>
 		</getLinearContactImpulse>
-		<getLinearContactImpulseTo public="1" get="inline" set="null" line="799">
+		<getLinearContactImpulseTo public="1" get="inline" set="null" line="798">
 			<f a="linearContactImpulse">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
@@ -13688,11 +14046,11 @@
 	 *
 	 * This does not create a new instance of `Vec3`.</haxe_doc>
 		</getLinearContactImpulseTo>
-		<getAngularContactImpulse public="1" get="inline" set="null" line="806">
+		<getAngularContactImpulse public="1" get="inline" set="null" line="805">
 			<f a=""><c path="oimo.common.Vec3"/></f>
 			<haxe_doc>* Returns the total angular impulse applied by contact constraints.</haxe_doc>
 		</getAngularContactImpulse>
-		<getAngularContactImpulseTo public="1" get="inline" set="null" line="817">
+		<getAngularContactImpulseTo public="1" get="inline" set="null" line="816">
 			<f a="angularContactImpulse">
 				<c path="oimo.common.Vec3"/>
 				<x path="Void"/>
@@ -13701,11 +14059,11 @@
 	 *
 	 * This does not create a new instance of `Vec3`.</haxe_doc>
 		</getAngularContactImpulseTo>
-		<getGravityScale public="1" get="inline" set="null" line="824">
+		<getGravityScale public="1" get="inline" set="null" line="823">
 			<f a=""><x path="Float"/></f>
 			<haxe_doc>* Returns the gravity scaling factor of the rigid body.</haxe_doc>
 		</getGravityScale>
-		<setGravityScale public="1" get="inline" set="null" line="833">
+		<setGravityScale public="1" get="inline" set="null" line="832">
 			<f a="gravityScale">
 				<x path="Float"/>
 				<x path="Void"/>
@@ -13714,14 +14072,14 @@
 	 *
 	 * If `0` is set, the rigid body will not be affected by gravity.</haxe_doc>
 		</setGravityScale>
-		<getLocalPoint public="1" get="inline" set="null" line="841">
+		<getLocalPoint public="1" get="inline" set="null" line="840">
 			<f a="worldPoint">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
 			</f>
 			<haxe_doc>* Returns the local coordinates of the point `worldPoint` in world coodinates.</haxe_doc>
 		</getLocalPoint>
-		<getLocalPointTo public="1" get="inline" set="null" line="856">
+		<getLocalPointTo public="1" get="inline" set="null" line="855">
 			<f a="worldPoint:localPoint">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
@@ -13731,14 +14089,14 @@
 	 *
 	 * This does not create a new instance of `Vec3`.</haxe_doc>
 		</getLocalPointTo>
-		<getLocalVector public="1" get="inline" set="null" line="867">
+		<getLocalVector public="1" get="inline" set="null" line="866">
 			<f a="worldVector">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
 			</f>
 			<haxe_doc>* Returns the local coordinates of the vector `worldVector` in world coodinates.</haxe_doc>
 		</getLocalVector>
-		<getLocalVectorTo public="1" get="inline" set="null" line="881">
+		<getLocalVectorTo public="1" get="inline" set="null" line="880">
 			<f a="worldVector:localVector">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
@@ -13748,14 +14106,14 @@
 	 *
 	 * This does not create a new instance of `Vec3`.</haxe_doc>
 		</getLocalVectorTo>
-		<getWorldPoint public="1" get="inline" set="null" line="891">
+		<getWorldPoint public="1" get="inline" set="null" line="890">
 			<f a="localPoint">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
 			</f>
 			<haxe_doc>* Returns the world coordinates of the point `localPoint` in local coodinates.</haxe_doc>
 		</getWorldPoint>
-		<getWorldPointTo public="1" get="inline" set="null" line="906">
+		<getWorldPointTo public="1" get="inline" set="null" line="905">
 			<f a="localPoint:worldPoint">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
@@ -13765,14 +14123,14 @@
 	 *
 	 * This does not create a new instance of `Vec3`.</haxe_doc>
 		</getWorldPointTo>
-		<getWorldVector public="1" get="inline" set="null" line="917">
+		<getWorldVector public="1" get="inline" set="null" line="916">
 			<f a="localVector">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
 			</f>
 			<haxe_doc>* Returns the world coordinates of the vector `localVector` in local coodinates.</haxe_doc>
 		</getWorldVector>
-		<getWorldVectorTo public="1" get="inline" set="null" line="931">
+		<getWorldVectorTo public="1" get="inline" set="null" line="930">
 			<f a="localVector:worldVector">
 				<c path="oimo.common.Vec3"/>
 				<c path="oimo.common.Vec3"/>
@@ -13782,51 +14140,51 @@
 	 *
 	 * This does not create a new instance of `Vec3`.</haxe_doc>
 		</getWorldVectorTo>
-		<getNumShapes public="1" get="inline" set="null" line="941">
+		<getNumShapes public="1" get="inline" set="null" line="940">
 			<f a=""><x path="Int"/></f>
 			<haxe_doc>* Returns the number of the shapes added.</haxe_doc>
 		</getNumShapes>
-		<getShapeList public="1" get="inline" set="null" line="948">
+		<getShapeList public="1" get="inline" set="null" line="947">
 			<f a=""><c path="oimo.dynamics.rigidbody.Shape"/></f>
 			<haxe_doc>* Returns the list of the shapes of the rigid body.</haxe_doc>
 		</getShapeList>
-		<getNumContectLinks public="1" get="inline" set="null" line="955">
+		<getNumContactLinks public="1" get="inline" set="null" line="954">
 			<f a=""><x path="Int"/></f>
 			<haxe_doc>* Returns the number of the contact lists the rigid body is involved.</haxe_doc>
-		</getNumContectLinks>
-		<getContactLinkList public="1" get="inline" set="null" line="962">
+		</getNumContactLinks>
+		<getContactLinkList public="1" get="inline" set="null" line="961">
 			<f a=""><c path="oimo.dynamics.ContactLink"/></f>
 			<haxe_doc>* Returns the list of the contact links the rigid body is involved.</haxe_doc>
 		</getContactLinkList>
-		<getNumJointLinks public="1" get="inline" set="null" line="969">
+		<getNumJointLinks public="1" get="inline" set="null" line="968">
 			<f a=""><x path="Int"/></f>
 			<haxe_doc>* Returns the number of the joint links the rigid body is attached.</haxe_doc>
 		</getNumJointLinks>
-		<getJointLinkList public="1" get="inline" set="null" line="976">
+		<getJointLinkList public="1" get="inline" set="null" line="975">
 			<f a=""><c path="oimo.dynamics.constraint.joint.JointLink"/></f>
 			<haxe_doc>* Returns the list of the joint links the rigid body is attached.</haxe_doc>
 		</getJointLinkList>
-		<addShape public="1" set="method" line="983">
+		<addShape public="1" set="method" line="982">
 			<f a="shape">
 				<c path="oimo.dynamics.rigidbody.Shape"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Adds the shape to the rigid body.</haxe_doc>
 		</addShape>
-		<removeShape public="1" set="method" line="1000">
+		<removeShape public="1" set="method" line="999">
 			<f a="shape">
 				<c path="oimo.dynamics.rigidbody.Shape"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Removes the shape from the rigid body.</haxe_doc>
 		</removeShape>
-		<getType public="1" get="inline" set="null" line="1019">
+		<getType public="1" get="inline" set="null" line="1018">
 			<f a=""><x path="Int"/></f>
 			<haxe_doc>* Returns the rigid body's type of behaviour.
 	 *
 	 * See `RigidBodyType` class for details.</haxe_doc>
 		</getType>
-		<setType public="1" set="method" line="1028">
+		<setType public="1" set="method" line="1027">
 			<f a="type">
 				<x path="Int"/>
 				<x path="Void"/>
@@ -13835,28 +14193,28 @@
 	 *
 	 * See `RigidBodyType` class for details.</haxe_doc>
 		</setType>
-		<wakeUp public="1" get="inline" set="null" line="1038">
+		<wakeUp public="1" get="inline" set="null" line="1037">
 			<f a=""><x path="Void"/></f>
 			<haxe_doc>* Sets the rigid body's sleep flag false.
 	 *
 	 * This also resets the sleeping timer of the rigid body.</haxe_doc>
 		</wakeUp>
-		<sleep public="1" get="inline" set="null" line="1048">
+		<sleep public="1" get="inline" set="null" line="1047">
 			<f a=""><x path="Void"/></f>
 			<haxe_doc>* Sets the rigid body's sleep flag true.
 	 *
 	 * This also resets the sleeping timer of the rigid body.</haxe_doc>
 		</sleep>
-		<isSleeping public="1" get="inline" set="null" line="1056">
+		<isSleeping public="1" get="inline" set="null" line="1055">
 			<f a=""><x path="Bool"/></f>
 			<haxe_doc>* Returns whether the rigid body is sleeping.</haxe_doc>
 		</isSleeping>
-		<getSleepTime public="1" get="inline" set="null" line="1064">
+		<getSleepTime public="1" get="inline" set="null" line="1063">
 			<f a=""><x path="Float"/></f>
 			<haxe_doc>* Returns how long the rigid body is stopping moving. This returns `0` if the body
 	 * has already slept.</haxe_doc>
 		</getSleepTime>
-		<setAutoSleep public="1" get="inline" set="null" line="1073">
+		<setAutoSleep public="1" get="inline" set="null" line="1072">
 			<f a="autoSleepEnabled">
 				<x path="Bool"/>
 				<x path="Void"/>
@@ -13865,41 +14223,41 @@
 	 *
 	 * If auto sleep is enabled, the rigid body will automatically sleep when needed.</haxe_doc>
 		</setAutoSleep>
-		<getLinearDamping public="1" get="inline" set="null" line="1081">
+		<getLinearDamping public="1" get="inline" set="null" line="1080">
 			<f a=""><x path="Float"/></f>
 			<haxe_doc>* Returns the linear damping.</haxe_doc>
 		</getLinearDamping>
-		<setLinearDamping public="1" get="inline" set="null" line="1088">
+		<setLinearDamping public="1" get="inline" set="null" line="1087">
 			<f a="damping">
 				<x path="Float"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Sets the linear damping to `damping`.</haxe_doc>
 		</setLinearDamping>
-		<getAngularDamping public="1" get="inline" set="null" line="1095">
+		<getAngularDamping public="1" get="inline" set="null" line="1094">
 			<f a=""><x path="Float"/></f>
 			<haxe_doc>* Returns the angular damping.</haxe_doc>
 		</getAngularDamping>
-		<setAngularDamping public="1" get="inline" set="null" line="1102">
+		<setAngularDamping public="1" get="inline" set="null" line="1101">
 			<f a="damping">
 				<x path="Float"/>
 				<x path="Void"/>
 			</f>
 			<haxe_doc>* Sets the angular damping to `damping`.</haxe_doc>
 		</setAngularDamping>
-		<getPrev public="1" get="inline" set="null" line="1111">
+		<getPrev public="1" get="inline" set="null" line="1110">
 			<f a=""><c path="oimo.dynamics.rigidbody.RigidBody"/></f>
 			<haxe_doc>* Returns the previous rigid body in the world.
 	 *
 	 * If the previous one does not exist, `null` will be returned.</haxe_doc>
 		</getPrev>
-		<getNext public="1" get="inline" set="null" line="1120">
+		<getNext public="1" get="inline" set="null" line="1119">
 			<f a=""><c path="oimo.dynamics.rigidbody.RigidBody"/></f>
 			<haxe_doc>* Returns the next rigid body in the world.
 	 *
 	 * If the next one does not exist, `null` will be returned.</haxe_doc>
 		</getNext>
-		<new public="1" set="method" line="81">
+		<new public="1" set="method" line="82">
 			<f a="config">
 				<c path="oimo.dynamics.rigidbody.RigidBodyConfig"/>
 				<x path="Void"/>
@@ -14301,8 +14659,86 @@
 			<m n=":coreApi"/>
 		</meta>
 	</class>
-	<abstract path="sys.thread.Thread" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/Thread.hx">
-		<this><c path="eval.vm.NativeThread"/></this>
-		<impl><class path="sys.thread._Thread.Thread_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/Thread.hx" private="1" module="sys.thread.Thread"><meta><m n=":keep"/></meta></class></impl>
+	<abstract path="sys.thread.EventHandler" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/EventLoop.hx" module="sys.thread.EventLoop">
+		<from><icast><c path="sys.thread._EventLoop.RegularEvent"/></icast></from>
+		<this><c path="sys.thread._EventLoop.RegularEvent"/></this>
+		<to><icast><c path="sys.thread._EventLoop.RegularEvent"/></icast></to>
+		<impl><class path="sys.thread._EventLoop.EventHandler_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/EventLoop.hx" private="1" module="sys.thread.EventLoop" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
+	<class path="sys.thread.EventLoop" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/EventLoop.hx">
+		<handle final="1">
+			<x path="eval.luv.Loop"/>
+			<meta><m n=":allow"><e>eval.luv.Loop</e></m></meta>
+		</handle>
+		<wakeup final="1"><x path="eval.luv.Async"/></wakeup>
+		<pending expr="[]">
+			<c path="Array"><f a=""><x path="Void"/></f></c>
+			<meta><m n=":value"><e>[]</e></m></meta>
+		</pending>
+		<loop public="1" set="method" line="129">
+			<f a=""><x path="Void"/></f>
+			<haxe_doc>Execute all pending events.
+		Wait and execute as many events as many times `promiseEvent()` was called.
+		Runs until all repeating events are cancelled and no more events is expected.
+
+		Depending on a target platform this method may be non-reentrant. It must
+		not be called from event callbacks.</haxe_doc>
+		</loop>
+		<consumePending set="method" line="135"><f a="?_">
+	<x path="eval.luv.Async"/>
+	<x path="Void"/>
+</f></consumePending>
+		<new public="1" set="method" line="43"><f a=""><x path="Void"/></f></new>
+		<haxe_doc>An event loop implementation used for `sys.thread.Thread`</haxe_doc>
+		<meta>
+			<m n=":keep"/>
+			<m n=":directlyUsed"/>
+			<m n=":coreApi"/>
+		</meta>
+	</class>
+	<class path="sys.thread.Mutex" params="" file="C:\HaxeToolkit\haxe\std/sys/thread/Mutex.hx" extern="1">
+		<acquire public="1" set="method">
+			<f a=""><x path="Void"/></f>
+			<haxe_doc>The current thread acquire the mutex or wait if not available.
+		The same thread can acquire several times the same mutex but
+		must release it as many times it has been acquired.</haxe_doc>
+		</acquire>
+		<tryAcquire public="1" set="method">
+			<f a=""><x path="Bool"/></f>
+			<haxe_doc>Try to acquire the mutex, returns true if acquire or false
+		if it's already locked by another thread.</haxe_doc>
+		</tryAcquire>
+		<release public="1" set="method">
+			<f a=""><x path="Void"/></f>
+			<haxe_doc>Release a mutex that has been acquired by the current thread.
+		The behavior is undefined if the current thread does not own
+		the mutex.</haxe_doc>
+		</release>
+		<new public="1" set="method">
+			<f a=""><x path="Void"/></f>
+			<haxe_doc>Creates a mutex.</haxe_doc>
+		</new>
+		<haxe_doc>Creates a mutex, which can be used to acquire a temporary lock
+	to access some ressource. The main difference with a lock is
+	that a mutex must always be released by the owner thread.</haxe_doc>
+	</class>
+	<typedef path="sys.thread._Thread.ThreadImpl" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/Thread.hx" private="1" module="sys.thread.Thread"><c path="eval.vm.NativeThread"/></typedef>
+	<abstract path="sys.thread.Thread" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/Thread.hx">
+		<from><icast><t path="sys.thread._Thread.ThreadImpl"/></icast></from>
+		<this><t path="sys.thread._Thread.ThreadImpl"/></this>
+		<impl><class path="sys.thread._Thread.Thread_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/Thread.hx" private="1" module="sys.thread.Thread" final="1">
+	<processEvents set="method" line="102" static="1">
+		<f a=""><x path="Void"/></f>
+		<meta><m n=":keep"/></meta>
+	</processEvents>
+	<meta><m n=":keep"/></meta>
+</class></impl>
+	</abstract>
+	<class path="sys.thread._Thread.Thread_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/thread/Thread.hx" private="1" module="sys.thread.Thread" final="1">
+		<processEvents set="method" line="102" static="1">
+			<f a=""><x path="Void"/></f>
+			<meta><m n=":keep"/></meta>
+		</processEvents>
+		<meta><m n=":keep"/></meta>
+	</class>
 </haxe>

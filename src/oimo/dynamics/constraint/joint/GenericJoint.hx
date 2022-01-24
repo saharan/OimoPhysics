@@ -310,7 +310,7 @@ class GenericJoint extends Joint {
 	 * Returns the rotational spring and damper settings along the rotation axes of the relative x-y-z Euler angles.
 	 */
 	public inline function getRotationalSpringDampers():Array<SpringDamper> {
-		return _translSds.toArray();
+		return _rotSds.toArray();
 	}
 
 	/**

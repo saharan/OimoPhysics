@@ -55,7 +55,7 @@ A lightweight 3D physics engine.
 	* Convex casting
 
 ## Compilations
-Haxe 4.0.0 or later is required. (recommended: Haxe 4.0.5 or later)
+Haxe 4.2.0 or later is required. (recommended: Haxe 4.2.4 or later)
 * Use `build-js.hxml` to compile for JavaScript library.
 * Use `build-js-demos.hxml` to compile JavaScript demos.
 * Use `build-doc.hxml` to generate API documentation. [dox](https://github.com/HaxeFoundation/dox) is required.
