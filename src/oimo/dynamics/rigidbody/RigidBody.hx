@@ -963,7 +963,7 @@ class RigidBody {
 	/**
 	 * Returns the number of the contact lists the rigid body is involved.
 	 */
-	public inline function getNumContectLinks():Int {
+	public inline function getNumContactLinks():Int {
 		return _numContactLinks;
 	}
 
