@@ -1,4 +1,5 @@
 package oimo.collision.narrowphase.detector;
+
 import haxe.ds.Vector;
 import oimo.collision.geometry.*;
 import oimo.collision.narrowphase.*;
@@ -391,27 +392,27 @@ class BoxBoxDetector extends Detector {
 		var refH:Float;
 
 		switch (mId) {
-		case 0: // x+ or x-
-			M.vec3_assign(refCenter, sx1);
-			M.vec3_assign(refNormal, x1);
-			M.vec3_assign(refX, y1);
-			M.vec3_assign(refY, z1);
-			refW = h1;
-			refH = d1;
-		case 1: // y+ or y-
-			M.vec3_assign(refCenter, sy1);
-			M.vec3_assign(refNormal, y1);
-			M.vec3_assign(refX, z1);
-			M.vec3_assign(refY, x1);
-			refW = d1;
-			refH = w1;
-		case _: // z+ or z-
-			M.vec3_assign(refCenter, sz1);
-			M.vec3_assign(refNormal, z1);
-			M.vec3_assign(refX, x1);
-			M.vec3_assign(refY, y1);
-			refW = w1;
-			refH = h1;
+			case 0: // x+ or x-
+				M.vec3_assign(refCenter, sx1);
+				M.vec3_assign(refNormal, x1);
+				M.vec3_assign(refX, y1);
+				M.vec3_assign(refY, z1);
+				refW = h1;
+				refH = d1;
+			case 1: // y+ or y-
+				M.vec3_assign(refCenter, sy1);
+				M.vec3_assign(refNormal, y1);
+				M.vec3_assign(refX, z1);
+				M.vec3_assign(refY, x1);
+				refW = d1;
+				refH = w1;
+			case _: // z+ or z-
+				M.vec3_assign(refCenter, sz1);
+				M.vec3_assign(refNormal, z1);
+				M.vec3_assign(refX, x1);
+				M.vec3_assign(refY, y1);
+				refW = w1;
+				refH = h1;
 		}
 
 		if (mSign < 0) { // x- or y- or z-
@@ -464,18 +465,18 @@ class BoxBoxDetector extends Detector {
 		var incV4:IVec3;
 
 		switch (incId) {
-		case 0:
-			BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "x+");
-		case 1:
-			BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "x-");
-		case 2:
-			BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "y+");
-		case 3:
-			BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "y-");
-		case 4:
-			BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "z+");
-		case _:
-			BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "z-");
+			case 0:
+				BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "x+");
+			case 1:
+				BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "x-");
+			case 2:
+				BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "y+");
+			case 3:
+				BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "y-");
+			case 4:
+				BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "z+");
+			case _:
+				BoxBoxDetectorMacro.getBoxFace(incV1, incV2, incV3, incV4, sx2, sy2, sz2, "z-");
 		}
 
 		M.vec3_add(incV1, incV1, c12);
@@ -536,26 +537,29 @@ class BoxBoxDetector extends Detector {
 	 * Returns half of the projected length of the box with scaled bases
 	 * (`sx`, `sy`, `sz`) onto the normalized axis `axis`.
 	 */
-	@:extern
-	inline function project(axis:IVec3, sx:IVec3, sy:IVec3, sz:IVec3):Float {
+	extern inline function project(axis:IVec3, sx:IVec3, sy:IVec3, sz:IVec3):Float {
 		var dx:Float = M.vec3_dot(axis, sx);
 		var dy:Float = M.vec3_dot(axis, sy);
 		var dz:Float = M.vec3_dot(axis, sz);
-		if (dx < 0) dx = -dx;
-		if (dy < 0) dy = -dy;
-		if (dz < 0) dz = -dz;
+		if (dx < 0)
+			dx = -dx;
+		if (dy < 0)
+			dy = -dy;
+		if (dz < 0)
+			dz = -dz;
 		return dx + dy + dz;
 	}
 
 	/**
 	 * 2D version of `project`.
 	 */
-	@:extern
-	inline function project2(axis:IVec3, sx:IVec3, sy:IVec3):Float {
+	extern inline function project2(axis:IVec3, sx:IVec3, sy:IVec3):Float {
 		var dx:Float = M.vec3_dot(axis, sx);
 		var dy:Float = M.vec3_dot(axis, sy);
-		if (dx < 0) dx = -dx;
-		if (dy < 0) dy = -dy;
+		if (dx < 0)
+			dx = -dx;
+		if (dy < 0)
+			dy = -dy;
 		return dx + dy;
 	}
 }
@@ -578,8 +582,7 @@ private class IncidentVertex {
 		wz = 0;
 	}
 
-	@:extern
-	public inline function init(x:Float, y:Float, wx:Float, wy:Float, wz:Float):Void {
+	extern public inline function init(x:Float, y:Float, wx:Float, wy:Float, wz:Float):Void {
 		this.x = x;
 		this.y = y;
 		this.wx = wx;
@@ -587,8 +590,7 @@ private class IncidentVertex {
 		this.wz = wz;
 	}
 
-	@:extern
-	public inline function copyFrom(v:IncidentVertex):Void {
+	extern public inline function copyFrom(v:IncidentVertex):Void {
 		x = v.x;
 		y = v.y;
 		wx = v.wx;
@@ -596,8 +598,7 @@ private class IncidentVertex {
 		wz = v.wz;
 	}
 
-	@:extern
-	public inline function interp(v1:IncidentVertex, v2:IncidentVertex, t:Float):Void {
+	extern public inline function interp(v1:IncidentVertex, v2:IncidentVertex, t:Float):Void {
 		x = v1.x + (v2.x - v1.x) * t;
 		y = v1.y + (v2.y - v1.y) * t;
 		wx = v1.wx + (v2.wx - v1.wx) * t;
@@ -611,6 +612,7 @@ private class FaceClipper {
 	public var h:Float;
 	public var numVertices:Int;
 	public var vertices:Vector<IncidentVertex>;
+
 	var numTmpVertices:Int;
 	var tmpVertices:Vector<IncidentVertex>;
 
@@ -627,16 +629,14 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	public inline function init(w:Float, h:Float):Void {
+	extern public inline function init(w:Float, h:Float):Void {
 		this.w = w;
 		this.h = h;
 		numVertices = 0;
 		numTmpVertices = 0;
 	}
 
-	@:extern
-	public inline function addIncidentVertex(x:Float, y:Float, wx:Float, wy:Float, wz:Float):Void {
+	extern public inline function addIncidentVertex(x:Float, y:Float, wx:Float, wy:Float, wz:Float):Void {
 		vertices[numVertices++].init(x, y, wx, wy, wz);
 	}
 
@@ -658,7 +658,8 @@ private class FaceClipper {
 	 * Reduces vertices up to four.
 	 */
 	public function reduce():Void {
-		if (numVertices < 4) return;
+		if (numVertices < 4)
+			return;
 
 		// TODO: maximize area
 		var max1:Float = MathUtil.NEGATIVE_INFINITY;
@@ -678,21 +679,32 @@ private class FaceClipper {
 			var v:IncidentVertex = vertices[i];
 			var dot1:Float = v.x * e1x + v.y * e1y;
 			var dot2:Float = v.x * e2x + v.y * e2y;
-			if (dot1 > max1) {
+			if (i == 0) { // issue #32
 				max1 = dot1;
 				max1V = v;
-			}
-			if (dot1 < min1) {
 				min1 = dot1;
 				min1V = v;
-			}
-			if (dot2 > max2) {
 				max2 = dot2;
 				max2V = v;
-			}
-			if (dot2 < min2) {
 				min2 = dot2;
 				min2V = v;
+			} else {
+				if (dot1 > max1) {
+					max1 = dot1;
+					max1V = v;
+				}
+				if (dot1 < min1) {
+					min1 = dot1;
+					min1V = v;
+				}
+				if (dot2 > max2) {
+					max2 = dot2;
+					max2V = v;
+				}
+				if (dot2 < min2) {
+					min2 = dot2;
+					min2V = v;
+				}
 			}
 		}
 
@@ -703,8 +715,7 @@ private class FaceClipper {
 		flip();
 	}
 
-	@:extern
-	inline function clipL():Void {
+	extern inline function clipL():Void {
 		for (i in 0...numVertices) {
 			var v1:IncidentVertex = vertices[i];
 			var v2:IncidentVertex = vertices[(i + 1) % numVertices];
@@ -714,8 +725,7 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function clipR():Void {
+	extern inline function clipR():Void {
 		for (i in 0...numVertices) {
 			var v1:IncidentVertex = vertices[i];
 			var v2:IncidentVertex = vertices[(i + 1) % numVertices];
@@ -725,8 +735,7 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function clipT():Void {
+	extern inline function clipT():Void {
 		for (i in 0...numVertices) {
 			var v1:IncidentVertex = vertices[i];
 			var v2:IncidentVertex = vertices[(i + 1) % numVertices];
@@ -736,8 +745,7 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function clipB():Void {
+	extern inline function clipB():Void {
 		for (i in 0...numVertices) {
 			var v1:IncidentVertex = vertices[i];
 			var v2:IncidentVertex = vertices[(i + 1) % numVertices];
@@ -747,15 +755,13 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function flip():Void {
+	extern inline function flip():Void {
 		BoxBoxDetectorMacro.swap(vertices, tmpVertices);
 		numVertices = numTmpVertices;
 		numTmpVertices = 0;
 	}
 
-	@:extern
-	inline function clipWithParam(v1:IncidentVertex, v2:IncidentVertex, s1:Float, s2:Float):Void {
+	extern inline function clipWithParam(v1:IncidentVertex, v2:IncidentVertex, s1:Float, s2:Float):Void {
 		if (s1 > 0 && s2 > 0) {
 			add(v1);
 		} else if (s1 > 0 && s2 <= 0) {
@@ -768,13 +774,11 @@ private class FaceClipper {
 		}
 	}
 
-	@:extern
-	inline function add(v:IncidentVertex):Void {
+	extern inline function add(v:IncidentVertex):Void {
 		tmpVertices[numTmpVertices++].copyFrom(v);
 	}
 
-	@:extern
-	inline function interp(v1:IncidentVertex, v2:IncidentVertex, t:Float):Void {
+	extern inline function interp(v1:IncidentVertex, v2:IncidentVertex, t:Float):Void {
 		tmpVertices[numTmpVertices++].interp(v1, v2, t);
 	}
 }

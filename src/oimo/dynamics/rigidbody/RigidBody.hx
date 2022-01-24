@@ -1,4 +1,5 @@
 package oimo.dynamics.rigidbody;
+
 import oimo.collision.geometry.*;
 import oimo.common.*;
 import oimo.dynamics.*;
@@ -140,42 +141,42 @@ class RigidBody {
 
 	public function _integrate(dt:Float):Void {
 		switch (_type) {
-		case RigidBodyType._DYNAMIC, RigidBodyType._KINEMATIC:
-			var translation:IVec3;
-			var rotation:IVec3;
-			M.vec3_scale(translation, _vel, dt);
-			M.vec3_scale(rotation, _angVel, dt);
+			case RigidBodyType._DYNAMIC, RigidBodyType._KINEMATIC:
+				var translation:IVec3;
+				var rotation:IVec3;
+				M.vec3_scale(translation, _vel, dt);
+				M.vec3_scale(rotation, _angVel, dt);
 
-			var translationLengthSq:Float = M.vec3_dot(translation, translation);
-			var rotationLengthSq:Float = M.vec3_dot(rotation, rotation);
+				var translationLengthSq:Float = M.vec3_dot(translation, translation);
+				var rotationLengthSq:Float = M.vec3_dot(rotation, rotation);
 
-			if (translationLengthSq == 0 && rotationLengthSq == 0) {
-				return; // no need of integration
-			}
+				if (translationLengthSq == 0 && rotationLengthSq == 0) {
+					return; // no need of integration
+				}
 
-			// limit linear velocity
-			if (translationLengthSq > Setting.maxTranslationPerStep * Setting.maxTranslationPerStep) {
-				var l:Float = Setting.maxTranslationPerStep / MathUtil.sqrt(translationLengthSq);
-				M.vec3_scale(_vel, _vel, l);
-				M.vec3_scale(translation, translation, l);
-			}
+				// limit linear velocity
+				if (translationLengthSq > Setting.maxTranslationPerStep * Setting.maxTranslationPerStep) {
+					var l:Float = Setting.maxTranslationPerStep / MathUtil.sqrt(translationLengthSq);
+					M.vec3_scale(_vel, _vel, l);
+					M.vec3_scale(translation, translation, l);
+				}
 
-			// limit angular velocity
-			if (rotationLengthSq > Setting.maxRotationPerStep * Setting.maxRotationPerStep) {
-				var l:Float = Setting.maxRotationPerStep / MathUtil.sqrt(rotationLengthSq);
-				M.vec3_scale(_angVel, _angVel, l);
-				M.vec3_scale(rotation, rotation, l);
-			}
+				// limit angular velocity
+				if (rotationLengthSq > Setting.maxRotationPerStep * Setting.maxRotationPerStep) {
+					var l:Float = Setting.maxRotationPerStep / MathUtil.sqrt(rotationLengthSq);
+					M.vec3_scale(_angVel, _angVel, l);
+					M.vec3_scale(rotation, rotation, l);
+				}
 
-			// update the transform
-			M.call(_applyTranslation(translation));
-			M.call(_applyRotation(rotation));
+				// update the transform
+				M.call(_applyTranslation(translation));
+				M.call(_applyRotation(rotation));
 
-		case RigidBodyType._STATIC:
-			M.vec3_zero(_vel);
-			M.vec3_zero(_angVel);
-			M.vec3_zero(_pseudoVel);
-			M.vec3_zero(_angPseudoVel);
+			case RigidBodyType._STATIC:
+				M.vec3_zero(_vel);
+				M.vec3_zero(_angVel);
+				M.vec3_zero(_pseudoVel);
+				M.vec3_zero(_angPseudoVel);
 		}
 	}
 
@@ -187,51 +188,45 @@ class RigidBody {
 		}
 
 		switch (_type) {
-		case RigidBodyType._DYNAMIC, RigidBodyType._KINEMATIC:
-			var translation:IVec3;
-			var rotation:IVec3;
-			M.vec3_assign(translation, _pseudoVel);
-			M.vec3_assign(rotation, _angPseudoVel);
+			case RigidBodyType._DYNAMIC, RigidBodyType._KINEMATIC:
+				var translation:IVec3;
+				var rotation:IVec3;
+				M.vec3_assign(translation, _pseudoVel);
+				M.vec3_assign(rotation, _angPseudoVel);
 
-			// clear pseudo velocity
-			M.vec3_zero(_pseudoVel);
-			M.vec3_zero(_angPseudoVel);
+				// clear pseudo velocity
+				M.vec3_zero(_pseudoVel);
+				M.vec3_zero(_angPseudoVel);
 
-			// update the transform
-			M.call(_applyTranslation(translation));
-			M.call(_applyRotation(rotation));
-		case RigidBodyType._STATIC:
-			M.vec3_zero(_pseudoVel);
-			M.vec3_zero(_angPseudoVel);
+				// update the transform
+				M.call(_applyTranslation(translation));
+				M.call(_applyRotation(rotation));
+			case RigidBodyType._STATIC:
+				M.vec3_zero(_pseudoVel);
+				M.vec3_zero(_angPseudoVel);
 		}
 	}
 
-	@:extern
-	public inline function _isSleepy():Bool {
-		return
-			_autoSleep &&
-			M.vec3_dot(_vel, _vel) < Setting.sleepingVelocityThreshold * Setting.sleepingVelocityThreshold &&
-			M.vec3_dot(_angVel, _angVel) < Setting.sleepingAngularVelocityThreshold * Setting.sleepingAngularVelocityThreshold
-		;
+	extern public inline function _isSleepy():Bool {
+		return _autoSleep
+			&& M.vec3_dot(_vel, _vel) < Setting.sleepingVelocityThreshold * Setting.sleepingVelocityThreshold
+			&& M.vec3_dot(_angVel, _angVel) < Setting.sleepingAngularVelocityThreshold * Setting.sleepingAngularVelocityThreshold;
 	}
 
-	@:extern
-	public inline function _isAlone():Bool {
+	extern public inline function _isAlone():Bool {
 		return _numContactLinks == 0 && _numJointLinks == 0;
 	}
 
-	@:extern
-	public inline function _applyTranslation(translation:IVec3):Void {
+	extern public inline function _applyTranslation(translation:IVec3):Void {
 		M.vec3_add(_transform._position, _transform._position, translation);
 	}
 
-	@:extern
-	public inline function _applyRotation(rotation:IVec3):Void {
+	extern public inline function _applyRotation(rotation:IVec3):Void {
 		// compute derivative of the quaternion
 		var theta:Float = M.vec3_length(rotation);
 		var halfTheta:Float = theta * 0.5;
 		var rotationToSinAxisFactor:Float; // sin(halfTheta) / theta;
-		var cosHalfTheta:Float;            // cos(halfTheta)
+		var cosHalfTheta:Float; // cos(halfTheta)
 		if (halfTheta < 0.5) {
 			// use Maclaurin expansion
 			var ht2:Float = halfTheta * halfTheta;
@@ -260,29 +255,25 @@ class RigidBody {
 	}
 
 	// call when added/removed/modified shapes
-	@:extern
-	public inline function _shapeModified():Void {
+	extern public inline function _shapeModified():Void {
 		updateMass();
 		_syncShapes();
 	}
 
-	@:extern
-	public inline function _syncShapes():Void {
+	extern public inline function _syncShapes():Void {
 		var s:Shape = _shapeList;
 		M.list_foreach(s, _next, {
 			M.call(s._sync(_ptransform, _transform));
 		});
 	}
 
-	@:extern
-	public inline function _applyLinearPositionImpulse(imp:IVec3):Void {
+	extern public inline function _applyLinearPositionImpulse(imp:IVec3):Void {
 		var translation:IVec3;
 		M.vec3_scale(translation, imp, _invMass);
 		M.call(_applyTranslation(translation));
 	}
 
-	@:extern
-	public inline function _applyAngularPositionImpulse(imp:IVec3):Void {
+	extern public inline function _applyAngularPositionImpulse(imp:IVec3):Void {
 		var rotation:IVec3;
 		M.vec3_mulMat3(rotation, imp, _invInertia);
 		M.call(_applyRotation(rotation));
@@ -331,8 +322,7 @@ class RigidBody {
 	}
 
 	// compute inverse mass and inertias from _mass and _localInertia
-	@:extern
-	inline function completeMassData():Void {
+	extern inline function completeMassData():Void {
 		var det:Float;
 		det = M.mat3_det(_localInertia);
 		if (_mass > 0 && det > 0 && _type == RigidBodyType._DYNAMIC) {
@@ -354,15 +344,13 @@ class RigidBody {
 		updateInvInertia();
 	}
 
-	@:extern
-	inline function updateInvInertia():Void {
+	extern inline function updateInvInertia():Void {
 		M.mat3_transformInertia(_invInertia, _invLocalInertia, _transform._rotation);
 		M.mat3_scaleRows(_invInertia, _invInertia, _rotFactor.x, _rotFactor.y, _rotFactor.z);
 	}
 
 	// call when the transform is externally updated
-	@:extern
-	inline function updateTransformExt():Void {
+	extern inline function updateTransformExt():Void {
 		M.transform_assign(_ptransform, _transform);
 		_syncShapes();
 		wakeUp();
@@ -1131,5 +1119,4 @@ class RigidBody {
 	public inline function getNext():RigidBody {
 		return _next;
 	}
-
 }

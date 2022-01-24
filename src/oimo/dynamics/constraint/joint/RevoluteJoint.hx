@@ -133,8 +133,7 @@ class RevoluteJoint extends Joint {
 		M.vec3_assign(j.ang2, _basis.z);
 	}
 
-	@:extern
-	inline function computeErrors():Void {
+	extern inline function computeErrors():Void {
 		var cos:Float;
 
 		// compute angular error along Y and Z

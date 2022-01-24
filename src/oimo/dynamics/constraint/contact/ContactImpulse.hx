@@ -28,8 +28,7 @@ class ContactImpulse {
 		clear();
 	}
 
-	@:extern
-	public inline function clear():Void {
+	extern public inline function clear():Void {
 		impulseN = 0;
 		impulseT = 0;
 		impulseB = 0;

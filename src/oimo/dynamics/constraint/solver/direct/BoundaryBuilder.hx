@@ -63,8 +63,7 @@ class BoundaryBuilder {
 		}
 	}
 
-	@:extern
-	inline function addBoundary():Boundary {
+	extern inline function addBoundary():Boundary {
 		if (boundaries[numBoundaries] == null) {
 			boundaries[numBoundaries] = new Boundary(maxRows);
 		}

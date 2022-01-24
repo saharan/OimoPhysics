@@ -37,26 +37,22 @@ class EpaPolyhedron {
 
 	// --- private ---
 
-	@:extern
-	inline function pickTriangle():EpaTriangle {
+	extern inline function pickTriangle():EpaTriangle {
 		return M.singleList_pick(_trianglePool, _next, new EpaTriangle());
 	}
 
-	@:extern
-	inline function poolTriangle(t:EpaTriangle):Void {
+	extern inline function poolTriangle(t:EpaTriangle):Void {
 		t.removeReferences();
 		M.singleList_pool(_trianglePool, _next, t);
 	}
 
-	@:extern
-	inline function setAdjacentTriangle(t1:EpaTriangle, t2:EpaTriangle):Void {
+	extern inline function setAdjacentTriangle(t1:EpaTriangle, t2:EpaTriangle):Void {
 		if (!t1.setAdjacentTriangle(t2)) {
 			_status = EpaPolyhedronState.INVALID_TRIANGLE;
 		}
 	}
 
-	@:extern
-	inline function initTriangle(t:EpaTriangle, vertex1:EpaVertex, vertex2:EpaVertex, vertex3:EpaVertex, center:Vec3, autoCheck:Bool = false):Void {
+	extern inline function initTriangle(t:EpaTriangle, vertex1:EpaVertex, vertex2:EpaVertex, vertex3:EpaVertex, center:Vec3, autoCheck:Bool = false):Void {
 		if (!t.init(vertex1, vertex2, vertex3, center, autoCheck)) {
 			_status = EpaPolyhedronState.INVALID_TRIANGLE;
 		}
@@ -136,16 +132,14 @@ class EpaPolyhedron {
 		removeTriangle(base);
 	}
 
-	@:extern
-	inline function addTriangle(t:EpaTriangle):Void {
+	extern inline function addTriangle(t:EpaTriangle):Void {
 		_numTriangles++;
 		GjkEpaLog.log("triangle added " + _numTriangles + ", id: " + t.id);
 		GjkEpaLog.run(t.dump());
 		M.list_push(_triangleList, _triangleListLast, _prev, _next, t);
 	}
 
-	@:extern
-	inline function removeTriangle(t:EpaTriangle):Void {
+	extern inline function removeTriangle(t:EpaTriangle):Void {
 		_numTriangles--;
 		GjkEpaLog.log("triangle removed " + _numTriangles + ", id: " + t.id);
 		M.list_remove(_triangleList, _triangleListLast, _prev, _next, t);
@@ -154,19 +148,16 @@ class EpaPolyhedron {
 
 	// --- internal ---
 
-	@:extern
-	public inline function _pickVertex():EpaVertex {
+	extern public inline function _pickVertex():EpaVertex {
 		return M.singleList_pick(_vertexPool, _next, new EpaVertex());
 	}
 
-	@:extern
-	public inline function _poolVertex(v:EpaVertex):Void {
+	extern public inline function _poolVertex(v:EpaVertex):Void {
 		v.removeReferences();
 		M.singleList_pool(_vertexPool, _next, v);
 	}
 
-	@:extern
-	public inline function _clear():Void {
+	extern public inline function _clear():Void {
 		while (_numTriangles > 0) {
 			removeTriangle(_triangleList);
 		}
@@ -210,8 +201,7 @@ class EpaPolyhedron {
 		return _status == EpaPolyhedronState.OK;
 	}
 
-	@:extern
-	public inline function _getBestTriangle():EpaTriangle {
+	extern public inline function _getBestTriangle():EpaTriangle {
 		var f:EpaTriangle = _triangleList;
 		var mind:Float = MathUtil.POSITIVE_INFINITY;
 		var minf:EpaTriangle = null;

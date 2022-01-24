@@ -38,8 +38,7 @@ class OMain {
 		__timer.run();
 	}
 
-	@:extern
-	inline function __addEventListeners():Void {
+	extern inline function __addEventListeners():Void {
 		if (__state != 2) throw "invalid call";
 		var touchCount:Int = 0;
 		var firstTouchId:Int = -1;
@@ -137,8 +136,7 @@ class OMain {
 		throw "override this";
 	}
 
-	@:extern
-	inline function initFullScreen(frameRate:Int):Void {
+	extern inline function initFullScreen(frameRate:Int):Void {
 		if (__state != 0) throw "invalid call";
 		__state = 1;
 
@@ -169,88 +167,72 @@ class OMain {
 		__timer = new OTimer(frameRate, __loop);
 	}
 
-	@:extern
-	inline function get_width():Int {
+	extern inline function get_width():Int {
 		return __width;
 	}
 
-	@:extern
-	inline function get_height():Int {
+	extern inline function get_height():Int {
 		return __height;
 	}
 
 	// ----------------------------------------------- utils
 
-	@:extern
-	public inline function sqrt(a:Float):Float {
+	extern public inline function sqrt(a:Float):Float {
 		return Math.sqrt(a);
 	}
 
-	@:extern
-	public inline function pow(a:Float, b:Float):Float {
+	extern public inline function pow(a:Float, b:Float):Float {
 		return Math.pow(a, b);
 	}
 
-	@:extern
-	public inline function round(a:Float):Int {
+	extern public inline function round(a:Float):Int {
 		return a < 0 ? Std.int(a - 0.5) : Std.int(a + 0.5);
 	}
 
-	@:extern
-	public inline function min(a:Float, b:Float):Float {
+	extern public inline function min(a:Float, b:Float):Float {
 		return a < b ? a : b;
 	}
 
-	@:extern
-	public inline function max(a:Float, b:Float):Float {
+	extern public inline function max(a:Float, b:Float):Float {
 		return a > b ? a : b;
 	}
 
-	@:extern
-	public inline function abs(a:Float):Float {
+	extern public inline function abs(a:Float):Float {
 		return a > 0 ? a : -a;
 	}
 
-	@:extern
-	public inline function clamp(a:Float, min:Float, max:Float):Float {
+	extern public inline function clamp(a:Float, min:Float, max:Float):Float {
 		return a > max ? max : a < min ? min : a;
 	}
 
-	@:extern
-	public inline function mini(a:Int, b:Int):Int {
+	extern public inline function mini(a:Int, b:Int):Int {
 		return a < b ? a : b;
 	}
 
-	@:extern
-	public inline function maxi(a:Int, b:Int):Int {
+	extern public inline function maxi(a:Int, b:Int):Int {
 		return a > b ? a : b;
 	}
 
-	@:extern
-	public inline function absi(a:Int):Int {
+	extern public inline function absi(a:Int):Int {
 		return a > 0 ? a : -a;
 	}
 
-	@:extern
-	public inline function clampi(a:Int, min:Int, max:Int):Int {
+	extern public inline function clampi(a:Int, min:Int, max:Int):Int {
 		return a > max ? max : a < min ? min : a;
 	}
 
-	@:extern
-	public inline function smoothstep(x:Float, edge0:Float, edge1:Float):Float {
+	extern public inline function smoothstep(x:Float, edge0:Float, edge1:Float):Float {
 		var t:Float = (x - edge0) / (edge1 - edge0);
 		if (t > 1) t = 1;
 		else if (t < 0) t = 0;
 		return t * t * (3 - 2 * t);
 	}
 
-	@:extern
-	public inline function rand(min:Float, max:Float):Float {
+	extern public inline function rand(min:Float, max:Float):Float {
 		return Math.random() * (max - min) + min;
 	}
 
-	@:extern
-	public inline function distance(x:Float, y:Float):Float {
+	extern public inline function distance(x:Float, y:Float):Float {
 		return Math.sqrt(x * x + y * y);
 	}
 }

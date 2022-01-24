@@ -250,8 +250,7 @@ class PgsJointConstraintSolver extends ConstraintSolver {
 		M.vec3_scale(joint._appliedTorque, ang, timeStep.invDt);
 	}
 
-	@:extern
-	inline function updatePositionData():Void {
+	extern inline function updatePositionData():Void {
 		joint._syncAnchors();
 		joint._getPositionSolverInfo(info);
 

@@ -31,8 +31,7 @@ class BvhBroadPhase extends BroadPhase {
 
 	// --- private ---
 
-	@:extern
-	inline function addToMovedProxy(bvhProxy:BvhProxy):Void {
+	extern inline function addToMovedProxy(bvhProxy:BvhProxy):Void {
 		// add to the buffer
 		if (bvhProxy._moved) return;
 		bvhProxy._moved = true;
@@ -45,8 +44,7 @@ class BvhBroadPhase extends BroadPhase {
 		movedProxies[numMovedProxies++] = bvhProxy;
 	}
 
-	@:extern
-	inline function updateProxy(p:BvhProxy, aabb:Aabb, displacement:Vec3):Void {
+	extern inline function updateProxy(p:BvhProxy, aabb:Aabb, displacement:Vec3):Void {
 		// set tight AABB
 		p._setAabb(aabb);
 

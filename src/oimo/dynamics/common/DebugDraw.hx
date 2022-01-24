@@ -146,8 +146,7 @@ class DebugDraw {
 		return macro p.dispose($obj);
 	}
 
-	@:extern
-	inline function initSphereCoords():Void {
+	extern inline function initSphereCoords():Void {
 		// theta
 		var nt:Int = SPHERE_THETA_DIVISION;
 		var dt:Float = MathUtil.PI / nt;
@@ -178,8 +177,7 @@ class DebugDraw {
 		}
 	}
 
-	@:extern
-	inline function initCircleCoords():Void {
+	extern inline function initCircleCoords():Void {
 		circleCoords = new Vector<Vec3>(CIRCLE_THETA_DIVISION);
 		circleCoordsShift = new Vector<Vec3>(CIRCLE_THETA_DIVISION);
 		tmpCircleVerts1 = new Vector<Vec3>(CIRCLE_THETA_DIVISION);
@@ -196,8 +194,7 @@ class DebugDraw {
 		}
 	}
 
-	@:extern
-	inline function sphericalCoord(origin:Vec3, x:Vec3, y:Vec3, z:Vec3, r:Float, theta:Float, phi:Float):Vec3 {
+	extern inline function sphericalCoord(origin:Vec3, x:Vec3, y:Vec3, z:Vec3, r:Float, theta:Float, phi:Float):Vec3 {
 		var v:Vec3 = cartesianCoord(origin, x, y, z,
 			r * MathUtil.sin(theta) * MathUtil.cos(phi),
 			r * MathUtil.cos(theta),
@@ -206,8 +203,7 @@ class DebugDraw {
 		return v;
 	}
 
-	// @:extern // uncommenting this line causes error in version 4.0.0-preview.1
-	inline function polarCoord(origin:Vec3, x:Vec3, y:Vec3, r:Float, theta:Float):Vec3 {
+	extern inline function polarCoord(origin:Vec3, x:Vec3, y:Vec3, r:Float, theta:Float):Vec3 {
 		var v:Vec3 = cartesianCoord2D(origin, x, y,
 			r * MathUtil.cos(theta),
 			r * MathUtil.sin(theta)

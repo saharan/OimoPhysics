@@ -517,8 +517,7 @@ class GjkEpa {
 		gjkCache.prevClosestDir.copyFrom(closest).negateEq();
 	}
 
-	///@:extern
-	/*inline*/ function shrinkSimplex(vertexBits:Int):Void {
+	function shrinkSimplex(vertexBits:Int):Void {
 		simplexSize = vertexBits;
 		simplexSize = (simplexSize & 5) + (simplexSize >> 1 & 5);
 		simplexSize = (simplexSize & 3) + (simplexSize >> 2 & 3);
@@ -578,15 +577,13 @@ class GjkEpa {
 		}
 	}
 
-	@:extern
-	inline function computeSupportingVertex():Void {
+	extern inline function computeSupportingVertex():Void {
 		computeWitnessPoint1(false);
 		computeWitnessPoint2(false);
 		s[simplexSize].copyFrom(w1[simplexSize]).subEq(w2[simplexSize]);
 	}
 
-	@:extern
-	inline function computeConvexCastSupportingVertex():Void {
+	extern inline function computeConvexCastSupportingVertex():Void {
 		if (c1 != null) {
 			computeWitnessPoint1(true);
 		} else {
@@ -651,8 +648,7 @@ class GjkEpa {
 		M.vec3_toVec3(dir, idir);
 	}
 
-	///@:extern
-	/*inline*/ function pointToTetrahedron():Void {
+	function pointToTetrahedron():Void {
 		for (i in 0...3) {
 			dir.copyFrom(baseDirs[i]);
 
@@ -672,8 +668,7 @@ class GjkEpa {
 		}
 	}
 
-	///@:extern
-	/*inline*/ function lineToTetrahedron():Void {
+	function lineToTetrahedron():Void {
 		var oldDir:IVec3;
 		M.vec3_fromVec3(oldDir, dir);
 
@@ -708,8 +703,7 @@ class GjkEpa {
 		M.vec3_toVec3(dir, oldDir);
 	}
 
-	///@:extern
-	/*inline*/ function triangleToTetrahedron():Void {
+	function triangleToTetrahedron():Void {
 		var oldDir:IVec3;
 		M.vec3_fromVec3(oldDir, dir);
 

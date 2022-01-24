@@ -251,8 +251,7 @@ class PgsContactConstraintSolver extends ConstraintSolver {
 		M.vec3_assign(_b2._angVel, av2);
 	}
 
-	@:extern
-	inline function updatePositionData():Void {
+	extern inline function updatePositionData():Void {
 		constraint._syncManifold();
 		constraint._getPositionSolverInfo(info);
 

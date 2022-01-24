@@ -70,8 +70,7 @@ class Contact {
 
 	// --- private ---
 
-	@:extern
-	inline function attachLinks():Void {
+	extern inline function attachLinks():Void {
 		M.list_push(_b1._contactLinkList, _b1._contactLinkListLast, _prev, _next, _link1);
 		M.list_push(_b2._contactLinkList, _b2._contactLinkListLast, _prev, _next, _link2);
 		_b1._numContactLinks++;
@@ -82,8 +81,7 @@ class Contact {
 		_link2._contact = this;
 	}
 
-	@:extern
-	inline function detachLinks():Void {
+	extern inline function detachLinks():Void {
 		M.list_remove(_b1._contactLinkList, _b1._contactLinkListLast, _prev, _next, _link1);
 		M.list_remove(_b2._contactLinkList, _b2._contactLinkListLast, _prev, _next, _link2);
 		_b1._numContactLinks--;
@@ -94,8 +92,7 @@ class Contact {
 		_link2._contact = null;
 	}
 
-	@:extern
-	inline function sendBeginContact():Void {
+	extern inline function sendBeginContact():Void {
 		var cc1:ContactCallback = _s1._contactCallback;
 		var cc2:ContactCallback = _s2._contactCallback;
 		if (cc1 == cc2) {
@@ -105,8 +102,7 @@ class Contact {
 		if (cc2 != null) cc2.beginContact(this);
 	}
 
-	@:extern
-	inline function sendEndContact():Void {
+	extern inline function sendEndContact():Void {
 		var cc1:ContactCallback = _s1._contactCallback;
 		var cc2:ContactCallback = _s2._contactCallback;
 		if (cc1 == cc2) {
@@ -116,8 +112,7 @@ class Contact {
 		if (cc2 != null) cc2.endContact(this);
 	}
 
-	@:extern
-	inline function sendPreSolve():Void {
+	extern inline function sendPreSolve():Void {
 		var cc1:ContactCallback = _s1._contactCallback;
 		var cc2:ContactCallback = _s2._contactCallback;
 		if (cc1 == cc2) {
@@ -127,8 +122,7 @@ class Contact {
 		if (cc2 != null) cc2.preSolve(this);
 	}
 
-	@:extern
-	inline function sendPostSolve():Void {
+	extern inline function sendPostSolve():Void {
 		var cc1:ContactCallback = _s1._contactCallback;
 		var cc2:ContactCallback = _s2._contactCallback;
 		if (cc1 == cc2) {
@@ -140,8 +134,7 @@ class Contact {
 
 	// --- internal ---
 
-	@:extern
-	public inline function _attach(s1:Shape, s2:Shape, detector:Detector):Void {
+	extern public inline function _attach(s1:Shape, s2:Shape, detector:Detector):Void {
 		_s1 = s1;
 		_s2 = s2;
 		_b1 = s1._rigidBody;
@@ -154,8 +147,7 @@ class Contact {
 		_contactConstraint._attach(s1, s2);
 	}
 
-	@:extern
-	public inline function _detach():Void {
+	extern public inline function _detach():Void {
 		if (_touching) {
 			// touching in the last frame
 			sendEndContact();

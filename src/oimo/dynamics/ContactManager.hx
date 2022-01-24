@@ -193,8 +193,7 @@ class ContactManager {
 		});
 	}
 
-	@:extern
-	public inline function _updateManifolds():Void {
+	extern public inline function _updateManifolds():Void {
 		var c:Contact = _contactList;
 		M.list_foreach(c, _next, {
 			if (!c._shouldBeSkipped) {
@@ -203,8 +202,7 @@ class ContactManager {
 		});
 	}
 
-	@:extern
-	public inline function _destroyContact(contact:Contact):Void {
+	extern public inline function _destroyContact(contact:Contact):Void {
 		M.list_remove(_contactList, _contactListLast, _prev, _next, contact);
 		contact._detach();
 

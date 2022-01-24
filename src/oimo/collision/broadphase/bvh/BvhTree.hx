@@ -48,8 +48,7 @@ class BvhTree {
 	 * Inserts the proxy.
 	 * This creates a leaf connected to the proxy and inserts it to the tree and `leafList`.
 	 */
-	@:extern
-	public inline function _insertProxy(proxy:BvhProxy):Void {
+	extern public inline function _insertProxy(proxy:BvhProxy):Void {
 		var leaf:BvhNode = pick();
 		leaf._proxy = proxy;
 		proxy._leaf = leaf;
@@ -67,8 +66,7 @@ class BvhTree {
 	 * Deletes the proxy.
 	 * This also deletes the leaf connected to the proxy from the tree and `leafList`.
 	 */
-	@:extern
-	public inline function _deleteProxy(proxy:BvhProxy):Void {
+	extern public inline function _deleteProxy(proxy:BvhProxy):Void {
 		var leaf:BvhNode = proxy._leaf;
 
 		_numLeaves--;
@@ -84,16 +82,14 @@ class BvhTree {
 	 * Clears whole the tree.
 	 * All leaves are disposed and deleted from `leafList`.
 	 */
-	@:extern
-	public inline function _clear():Void {
+	extern public inline function _clear():Void {
 		if (_root == null) return;
 		deleteRecursive(_root);
 		_root = null;
 		_numLeaves = 0;
 	}
 
-	@:extern
-	public inline function _optimize(count:Int):Void {
+	extern public inline function _optimize(count:Int):Void {
 		if (_root == null) return;
 		for (i in 0...count) {
 			var leaf:BvhNode = _root;
@@ -108,8 +104,7 @@ class BvhTree {
 		}
 	}
 
-	@:extern
-	public inline function _buildTopDown():Void {
+	extern public inline function _buildTopDown():Void {
 		if (_root == null) return;
 		decompose();
 
@@ -138,8 +133,7 @@ class BvhTree {
 	 * Makes the tree empty, but leaf nodes are not disposed and are reusable.
 	 * The tree must be reconstructed using `leafList` after the call of this method.
 	 */
-	@:extern
-	inline function decompose():Void {
+	extern inline function decompose():Void {
 		if (_root == null) return;
 		decomposeRecursive(_root);
 		_root = null;
@@ -197,8 +191,7 @@ class BvhTree {
 		return balance + getBalanceRecursive(root._children[0]) + getBalanceRecursive(root._children[1]);
 	}
 
-	@:extern
-	inline function insertLeaf(leaf:BvhNode):Void {
+	extern inline function insertLeaf(leaf:BvhNode):Void {
 		assertBeLeaf(leaf);
 		if (_root == null) { // the tree is empty
 			_root = leaf;
@@ -244,8 +237,7 @@ class BvhTree {
 		}
 	}
 
-	@:extern
-	inline function deleteLeaf(leaf:BvhNode):Void {
+	extern inline function deleteLeaf(leaf:BvhNode):Void {
 		assertBeLeaf(leaf);
 		if (_root == leaf) { // the tree has only the leaf
 			_root = null;
@@ -280,8 +272,7 @@ class BvhTree {
 	/**
 	 * Balances and returns the node at the same position of `node`.
 	 */
-	@:extern
-	inline function balance(node:BvhNode):BvhNode {
+	extern inline function balance(node:BvhNode):BvhNode {
 		var nh:Int = node._height;
 		if (nh < 2) {
 			return node;
@@ -434,20 +425,17 @@ class BvhTree {
 		return node;
 	}
 
-	@:extern
-	inline function assertBeLeaf(leaf:BvhNode):Void {
+	extern inline function assertBeLeaf(leaf:BvhNode):Void {
 		M.assert(leaf._proxy != null && leaf._proxy._leaf == leaf && leaf._children[0] == null && leaf._children[1] == null && leaf._height == 0);
 	}
 
-	@:extern
-	inline function pool(node:BvhNode):Void {
+	extern inline function pool(node:BvhNode):Void {
 		M.assert(node._proxy == null || node._proxy._leaf == null);
 		node._removeReferences();
 		M.singleList_pool(_nodePool, _next, node);
 	}
 
-	@:extern
-	inline function pick():BvhNode {
+	extern inline function pick():BvhNode {
 		return M.singleList_pick(_nodePool, _next, new BvhNode());
 	}
 
