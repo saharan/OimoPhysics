@@ -38,8 +38,7 @@ class Proxy {
 
 	// --- internal ---
 
-	@:extern
-	public inline function _setAabb(aabb:Aabb):Void {
+	extern public inline function _setAabb(aabb:Aabb):Void {
 		M.vec3_assign(_aabbMin, aabb._min);
 		M.vec3_assign(_aabbMax, aabb._max);
 	}

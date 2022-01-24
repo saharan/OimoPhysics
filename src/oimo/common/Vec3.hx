@@ -58,8 +58,7 @@ class Vec3 {
 		return initi(0, 0, 0);
 	}
 
-	@:extern
-	inline function initi(x:Float, y:Float, z:Float):Vec3 {
+	extern inline function initi(x:Float, y:Float, z:Float):Vec3 {
 		var tx:Float = x;
 		var ty:Float = y;
 		var tz:Float = z;

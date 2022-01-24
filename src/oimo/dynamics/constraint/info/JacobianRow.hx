@@ -25,8 +25,7 @@ class JacobianRow {
 		flag = 0;
 	}
 
-	@:extern
-	public inline function clear():Void {
+	extern public inline function clear():Void {
 		M.vec3_zero(lin1);
 		M.vec3_zero(lin2);
 		M.vec3_zero(ang1);
@@ -43,13 +42,11 @@ class JacobianRow {
 		}
 	}
 
-	@:extern
-	public inline function isLinearSet():Bool {
+	extern public inline function isLinearSet():Bool {
 		return flag & BIT_LINEAR_SET != 0;
 	}
 
-	@:extern
-	public inline function isAngularSet():Bool {
+	extern public inline function isAngularSet():Bool {
 		return flag & BIT_ANGULAR_SET != 0;
 	}
 

@@ -498,8 +498,7 @@ class Joint {
 
 	// --- internal ---
 
-	@:extern
-	public inline function _getWarmStartingFactor():Float {
+	extern public inline function _getWarmStartingFactor():Float {
 		switch (_positionCorrectionAlgorithm) {
 		case PositionCorrectionAlgorithm.BAUMGARTE:
 			return Setting.jointWarmStartingFactorForBaungarte;
@@ -556,8 +555,7 @@ class Joint {
 		}
 	}
 
-	@:extern
-	public inline function _attachLinks():Void {
+	extern public inline function _attachLinks():Void {
 		_link1._other = _b2;
 		_link2._other = _b1;
 		M.list_push(_b1._jointLinkList, _b1._jointLinkListLast, _prev, _next, _link1);
@@ -568,8 +566,7 @@ class Joint {
 		_b2.wakeUp();
 	}
 
-	@:extern
-	public inline function _detachLinks():Void {
+	extern public inline function _detachLinks():Void {
 		M.list_remove(_b1._jointLinkList, _b1._jointLinkListLast, _prev, _next, _link1);
 		M.list_remove(_b2._jointLinkList, _b2._jointLinkListLast, _prev, _next, _link2);
 		_link1._other = null;

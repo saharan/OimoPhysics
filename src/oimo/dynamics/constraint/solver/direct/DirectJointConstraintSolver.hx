@@ -67,8 +67,7 @@ class DirectJointConstraintSolver extends ConstraintSolver {
 		}
 	}
 
-	@:extern
-	inline function applyImpulses(impulses:Vector<Float>):Void {
+	extern inline function applyImpulses(impulses:Vector<Float>):Void {
 		var linearSet:Bool = false;
 		var angularSet:Bool = false;
 		var lv1:IVec3;
@@ -106,8 +105,7 @@ class DirectJointConstraintSolver extends ConstraintSolver {
 		}
 	}
 
-	@:extern
-	inline function applySplitImpulses(impulses:Vector<Float>):Void {
+	extern inline function applySplitImpulses(impulses:Vector<Float>):Void {
 		var linearSet:Bool = false;
 		var angularSet:Bool = false;
 		var lv1:IVec3;
@@ -145,8 +143,7 @@ class DirectJointConstraintSolver extends ConstraintSolver {
 		}
 	}
 
-	@:extern
-	inline function applyPositionImpulses(impulses:Vector<Float>):Void {
+	extern inline function applyPositionImpulses(impulses:Vector<Float>):Void {
 		var linearSet:Bool = false;
 		var angularSet:Bool = false;
 		var lv1:IVec3;
@@ -364,8 +361,7 @@ class DirectJointConstraintSolver extends ConstraintSolver {
 		M.vec3_scale(joint._appliedTorque, ang, timeStep.invDt);
 	}
 
-	@:extern
-	inline function updatePositionData():Void {
+	extern inline function updatePositionData():Void {
 		joint._syncAnchors();
 		joint._getPositionSolverInfo(info);
 

@@ -81,8 +81,7 @@ class Mat3 {
 		numCreations++;
 	}
 
-	@:extern
-	inline function _init(
+	extern inline function _init(
 		e00:Float, e01:Float, e02:Float,
 		e10:Float, e11:Float, e12:Float,
 		e20:Float, e21:Float, e22:Float

@@ -1,21 +1,26 @@
-OimoPhysics
+OimoPhysics 1.2.2
 ---
 
 A lightweight 3D physics engine.
 
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) [![npm version](https://badge.fury.io/js/oimophysics.svg)](https://badge.fury.io/js/oimophysics)
+
 ## [API Documentation](https://saharan.github.io/OimoPhysics/)
 
 ## Demos
-<a href="http://el-ement.com/etc/oimo/demos/"><img src="http://el-ement.com/etc/oimo/demos/thumbnail.png"></a>
+<a href="https://el-ement.com/etc/oimo/demos/"><img src="https://el-ement.com/etc/oimo/demos/thumbnail.png"></a>
 * Press `E` or `Q` to change demos
-* Click or tap text to control
+* Click or tap texts on the left to control
 
-## Features
+## Platforms
 * Written in Haxe
 * Exported as JavaScript (see [bin/js/](./bin/js))
-	* Public classes and methods will be exposed through `windwow.OIMO`.
+	* Public classes and methods are exposed through `window.OIMO`.
 	* e.g. `new OIMO.Vec3(1, 2, 3)` to create an instance of `Vec3` class.
-* Rigid body motion types
+* Exported as JavaScript (module) with TypeScript Declaration (see [package.json](./package.json) and [bin/js_modules](./bin/js_modules))
+
+## Features
+* Rigid body with motion types
 	* Dynamic
 	* Static
 	* Kinematic
@@ -35,7 +40,7 @@ A lightweight 3D physics engine.
 	* Prismatic (a.k.a. slider)
 	* Universal
 	* Ragdoll (a.k.a. cone twist, character)
-	* Generic (a.k.a. generic 6DoF) *WIP, not applied to bin/js yet*
+	* Generic (a.k.a. 6-DoF joint)
 * Breakable joints
 * Constraint solvers
 	* Direct block MLCP solver
@@ -46,15 +51,15 @@ A lightweight 3D physics engine.
 * Collision filterings
 * Collision queries
 	* AABB query
-	* ray casting
-	* convex casting
+	* Ray casting
+	* Convex casting
 
-## Compile JavaScript demos in Haxe
-* Use Haxe 4.0.0 or later
-* main class: `demo.js.DemoJS`
-* Try enabling compiler options if fails
-	* `-D analyzer`
-	* `-D eval-stack`
+## Compilations
+Haxe 4.2.0 or later is required. (recommended: Haxe 4.2.4 or later)
+* Use `build-js.hxml` to compile for JavaScript library.
+* Use `build-js-demos.hxml` to compile JavaScript demos.
+* Use `build-doc.hxml` to generate API documentation. [dox](https://github.com/HaxeFoundation/dox) is required.
+* Use `build-js-ts.hxml` to compile for JavaScript (modules) library with TypeScript declarations. Requires `hxtsdgen` library. Check comments in that file.
 
 ## License
 The MIT License

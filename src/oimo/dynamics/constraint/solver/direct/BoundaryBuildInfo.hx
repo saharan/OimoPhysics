@@ -26,32 +26,27 @@ class BoundaryBuildInfo {
 		iUnbounded = new Vector<Int>(size);
 	}
 
-	@:extern
-	public inline function clear():Void {
+	extern public inline function clear():Void {
 		numBounded = 0;
 		numUnbounded = 0;
 	}
 
-	@:extern
-	public inline function pushBounded(idx:Int, sign:Int):Void {
+	extern public inline function pushBounded(idx:Int, sign:Int):Void {
 		iBounded[numBounded] = idx;
 		signs[numBounded] = sign;
 		numBounded++;
 	}
 
-	@:extern
-	public inline function pushUnbounded(idx:Int):Void {
+	extern public inline function pushUnbounded(idx:Int):Void {
 		iUnbounded[numUnbounded] = idx;
 		numUnbounded++;
 	}
 
-	@:extern
-	public inline function popBounded():Void {
+	extern public inline function popBounded():Void {
 		numBounded--;
 	}
 
-	@:extern
-	public inline function popUnbounded():Void {
+	extern public inline function popUnbounded():Void {
 		numUnbounded--;
 	}
 

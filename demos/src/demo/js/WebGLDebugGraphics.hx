@@ -1,13 +1,12 @@
 package demo.js;
 import demo.js.minilib.*;
-import js.html.Float32Array;
+import js.lib.Float32Array;
 import js.html.webgl.GL;
 import oimo.dynamics.common.DebugDraw;
 import oimo.common.Mat4;
 import oimo.common.Vec3;
 import oimo.physics.debugdraw.*;
 import demo.common.IDemoGraphics;
-
 
 /**
  * Debug graphics for WebGL.
@@ -374,23 +373,19 @@ class WebGLDebugGraphics extends DebugDraw implements IDemoGraphics {
 		setFloat1("shininess", 1);
 	}
 
-	@:extern
-	inline function setMat4(name:String, matrix:Mat4):Void {
+	extern inline function setMat4(name:String, matrix:Mat4):Void {
 		gl.uniformMatrix4fv(shader.getUniformLocation(name), false, matrix.toArray(true));
 	}
 
-	@:extern
-	inline function setFloat3(name:String, x:Float, y:Float, z:Float):Void {
+	extern inline function setFloat3(name:String, x:Float, y:Float, z:Float):Void {
 		gl.uniform3f(shader.getUniformLocation(name), x, y, z);
 	}
 
-	@:extern
-	inline function setVec3(name:String, v:Vec3):Void {
+	extern inline function setVec3(name:String, v:Vec3):Void {
 		gl.uniform3f(shader.getUniformLocation(name), v.x, v.y, v.z);
 	}
 
-	@:extern
-	inline function setFloat1(name:String, x:Float):Void {
+	extern inline function setFloat1(name:String, x:Float):Void {
 		gl.uniform1f(shader.getUniformLocation(name), x);
 	}
 

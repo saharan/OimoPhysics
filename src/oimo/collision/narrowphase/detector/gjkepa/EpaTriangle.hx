@@ -48,8 +48,7 @@ class EpaTriangle {
 		_nextIndex[2] = 0;
 	}
 
-	@:extern
-	public inline function checkVisible(id:Int, from:Vec3):Bool {
+	extern public inline function checkVisible(id:Int, from:Vec3):Bool {
 		// if (id == _tmpDfsId) return _tmpDfsVisible;
 		tmp.copyFrom(from).subEq(_vertices[0].v);
 		_tmpDfsVisible = tmp.dot(_normal) > 0;

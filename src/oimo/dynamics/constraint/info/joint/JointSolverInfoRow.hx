@@ -44,8 +44,7 @@ class JointSolverInfoRow {
 		impulse = null;
 	}
 
-	@:extern
-	public inline function clear():Void {
+	extern public inline function clear():Void {
 		jacobian.clear();
 		rhs = 0;
 		cfm = 0;
@@ -56,16 +55,14 @@ class JointSolverInfoRow {
 		impulse = null;
 	}
 
-	@:extern
-	public inline function equalLimit(rhs:Float, cfm:Float):Void {
+	extern public inline function equalLimit(rhs:Float, cfm:Float):Void {
 		this.rhs = rhs;
 		this.cfm = cfm;
 		minImpulse = MathUtil.NEGATIVE_INFINITY;
 		maxImpulse = MathUtil.POSITIVE_INFINITY;
 	}
 
-	@:extern
-	public inline function motor(speed:Float, maxImpulse:Float):Void {
+	extern public inline function motor(speed:Float, maxImpulse:Float):Void {
 		motorSpeed = speed;
 		motorMaxImpulse = maxImpulse;
 	}

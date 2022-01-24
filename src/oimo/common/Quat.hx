@@ -44,8 +44,7 @@ class Quat {
 		numCreations++;
 	}
 
-	@:extern
-	inline function initi(x:Float, y:Float, z:Float, w:Float):Quat {
+	extern inline function initi(x:Float, y:Float, z:Float, w:Float):Quat {
 		var tx:Float = x;
 		var ty:Float = y;
 		var tz:Float = z;

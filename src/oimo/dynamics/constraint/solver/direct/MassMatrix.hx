@@ -235,8 +235,7 @@ class MassMatrix {
 		clearCache();
 	}
 
-	@:extern
-	public inline function getSubmatrix(indices:Vector<Int>, n:Int):Vector<Vector<Float>> {
+	extern public inline function getSubmatrix(indices:Vector<Int>, n:Int):Vector<Vector<Float>> {
 		var id:Int = 0;
 		for (i in 0...n) {
 			id |= 1 << indices[i];
@@ -251,15 +250,13 @@ class MassMatrix {
 		return _cachedSubmatrices[id];
 	}
 
-	@:extern
-	public inline function clearCache():Void {
+	extern public inline function clearCache():Void {
 		for (i in 0..._maxSubmatrixId) {
 			_cacheComputed[i] = false;
 		}
 	}
 
-	@:extern
-	public function dump():Void {
+	extern public inline function dump():Void {
 		trace("inverse mass matrix:");
 		dumpMatrix(_invMass);
 		for (i in 0..._maxSubmatrixId) {
@@ -277,8 +274,7 @@ class MassMatrix {
 		}
 	}
 
-	@:extern
-	public function dumpMatrix(data:Vector<Vector<Float>>):Void {
+	extern public inline function dumpMatrix(data:Vector<Vector<Float>>):Void {
 		if (data.length == 0) {
 			trace("| |");
 			return;

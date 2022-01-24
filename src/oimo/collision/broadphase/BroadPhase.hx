@@ -60,16 +60,14 @@ class BroadPhase {
 
 	// --- private ---
 
-	@:extern
-	inline function pickAndPushProxyPair(p1:Proxy, p2:Proxy):Void {
+	extern inline function pickAndPushProxyPair(p1:Proxy, p2:Proxy):Void {
 		var pp:ProxyPair = M.singleList_pick(_proxyPairPool, _next, new ProxyPair());
 		M.singleList_addFirst(_proxyPairList, _next, pp);
 		pp._p1 = p1;
 		pp._p2 = p2;
 	}
 
-	@:extern
-	inline function poolProxyPairs():Void {
+	extern inline function poolProxyPairs():Void {
 		var p:ProxyPair = _proxyPairList;
 		if (p != null) {
 			do {
@@ -83,20 +81,17 @@ class BroadPhase {
 		}
 	}
 
-	@:extern
-	inline function addProxy(p:Proxy):Void {
+	extern inline function addProxy(p:Proxy):Void {
 		_numProxies++;
 		M.list_push(_proxyList, _proxyListLast, _prev, _next, p);
 	}
 
-	@:extern
-	inline function removeProxy(p:Proxy):Void {
+	extern inline function removeProxy(p:Proxy):Void {
 		_numProxies--;
 		M.list_remove(_proxyList, _proxyListLast, _prev, _next, p);
 	}
 
-	@:extern
-	inline function aabbSegmentTest(aabbMin:IVec3, aabbMax:IVec3, begin:IVec3, end:IVec3):Bool {
+	extern inline function aabbSegmentTest(aabbMin:IVec3, aabbMax:IVec3, begin:IVec3, end:IVec3):Bool {
 		inline function abs(x:Float):Float {
 			return x < 0 ? -x : x;
 		}
@@ -167,8 +162,7 @@ class BroadPhase {
 		return true;
 	}
 
-	@:extern
-	inline function aabbConvexSweepTest(aabbMin:IVec3, aabbMax:IVec3, convex:ConvexGeometry, begin:Transform, translation:Vec3):Bool {
+	extern inline function aabbConvexSweepTest(aabbMin:IVec3, aabbMax:IVec3, convex:ConvexGeometry, begin:Transform, translation:Vec3):Bool {
 		M.vec3_toVec3(_aabb.min, aabbMin);
 		M.vec3_toVec3(_aabb.max, aabbMax);
 		_convexSweep.init(convex, begin, translation);
