@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -18,46 +18,47 @@
  */
 package com.element.oimo.physics.collision.shape {
 	/**
-	 * 球体を表す形状です。
+	 * A sphere shape.
 	 * @author saharan
 	 */
 	public class SphereShape extends Shape {
 		/**
-		 * 球体の半径です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The radius of the shape.
 		 */
 		public var radius:Number;
 		
-		/**
-		 * 新しく SphereShape オブジェクトを作成します。
-		 * @param	radius 球体の半径
-		 * @param	config 形状の設定
-		 */
-		public function SphereShape(radius:Number, config:ShapeConfig) {
+		public function SphereShape(config:ShapeConfig, radius:Number) {
+			super(config);
 			this.radius = radius;
-			position.copy(config.position);
-			rotation.copy(config.rotation);
-			friction = config.friction;
-			restitution = config.restitution;
-			mass = 4 / 3 * Math.PI * radius * radius * radius * config.density;
-			var inertia:Number = 2 / 5 * radius * radius * mass;
-			localInertia.init(
-				inertia, 0, 0,
-				0, inertia, 0,
-				0, 0, inertia
-			);
 			type = SHAPE_SPHERE;
 		}
 		
 		/**
 		 * @inheritDoc
 		 */
-		override public function updateProxy():void {
-			proxy.init(
-				position.x - radius, position.x + radius,
-				position.y - radius, position.y + radius,
-				position.z - radius, position.z + radius
+		override public function calculateMassInfo(out:MassInfo):void {
+			var mass:Number = 4 / 3 * Math.PI * radius * radius * radius * density;
+			out.mass = mass;
+			var inertia:Number = mass * radius * radius * 2 / 5;
+			out.inertia.init(
+				inertia, 0, 0,
+				0, inertia, 0,
+				0, 0, inertia
 			);
+		}
+		
+		/**
+		 * @inheritDoc
+		 */
+		override public function updateProxy():void {
+			aabb.init(
+				position.x - radius - 0.005, position.x + radius + 0.005,
+				position.y - radius - 0.005, position.y + radius + 0.005,
+				position.z - radius - 0.005, position.z + radius + 0.005
+			);
+			if (proxy != null) {
+				proxy.update();
+			}
 		}
 		
 	}

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -26,6 +26,10 @@ package com.element.oimo.glmini {
 	import flash.display3D.VertexBuffer3D;
 	import flash.utils.ByteArray;
 	
+	/**
+	 * A simple 3d engine.
+	 * @author saharan
+	 */
 	public class OimoGLMini {
 		private static const VERTEX_POISITION_INDEX:uint = 0;
 		private static const VERTEX_NORMAL_INDEX:uint = 1;

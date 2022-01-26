@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -20,72 +20,55 @@ package com.element.oimo.physics.constraint {
 	import com.element.oimo.physics.dynamics.RigidBody;
 	import com.element.oimo.physics.dynamics.World;
 	/**
-	 * 剛体の拘束を扱うクラスです。
-	 * 剛体間の接触やジョイントは全て拘束として処理されます。
+	 * The base class of all type of the constraints.
 	 * @author saharan
 	 */
 	public class Constraint {
 		/**
-		 * この拘束の親となるワールドです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The parent world of the constraint.
 		 */
 		public var parent:World;
 		
 		/**
-		 * 拘束の対象となる剛体1です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The first body of the constraint.
 		 */
 		public var body1:RigidBody;
 		
 		/**
-		 * 拘束の対象となる剛体2です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The second body of the constraint.
 		 */
 		public var body2:RigidBody;
 		
 		/**
-		 * この拘束がシミュレーションアイランドに追加されたかどうかを示します。
-		 * この変数は内部でのみ使用されます。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * Internal
 		 */
 		public var addedToIsland:Boolean;
 		
-		/**
-		 * この拘束がスリープ状態かどうかを示します。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
-		public var sleeping:Boolean;
-		
-		/**
-		 * 新しく Constraint オブジェクトを作成します。
-		 * <strong>このコンストラクタは外部から呼び出さないでください。</strong>
-		 */
 		public function Constraint() {
 		}
 		
 		/**
-		 * 拘束処理の前に一度だけ呼び出すべきメソッドです。
-		 * @param	timeStep 時間刻み幅
-		 * @param	invTimeStep 時間刻み幅の逆数
+		 * Prepare for solving the constraint.
+		 * @param	timeStep
+		 * @param	invTimeStep
 		 */
 		public function preSolve(timeStep:Number, invTimeStep:Number):void {
-			throw new Error("preSolve メソッドが継承されていません");
+			throw new Error("Inheritance error.");
 		}
 		
 		/**
-		 * この拘束を処理します。
-		 * 通常このメソッドは繰り返し呼び出され、
-		 * 拘束の精度は繰り返し回数に左右されます。
+		 * Solve the constraint.
+		 * This is usually called iteratively.
 		 */
 		public function solve():void {
-			throw new Error("solve メソッドが継承されていません");
+			throw new Error("Inheritance error.");
 		}
 		
 		/**
-		 * 拘束処理の後に一度だけ呼び出すべきメソッドです。
+		 * Do the post-processing.
 		 */
 		public function postSolve():void {
-			throw new Error("postSolve メソッドが継承されていません");
+			throw new Error("Inheritance error.");
 		}
 		
 	}

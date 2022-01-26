@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 EL-EMENT saharan
+/* Copyright (c) 2012-2013 EL-EMENT saharan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation  * files (the "Software"), to deal in the Software
@@ -19,155 +19,87 @@
 package com.element.oimo.physics.collision.shape {
 	import com.element.oimo.math.Vec3;
 	/**
-	 * 箱を表す形状です。
+	 * A box shape.
 	 * @author saharan
 	 */
 	public class BoxShape extends Shape {
 		/**
-		 * 箱の幅です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The width of the box.
 		 */
 		public var width:Number;
 		
 		/**
-		 * 箱の幅の半分です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The half-width of the box.
 		 */
 		public var halfWidth:Number;
 		
 		/**
-		 * 箱の高さです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The height of the box.
 		 */
 		public var height:Number;
 		
 		/**
-		 * 箱の高さの半分です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The half-height of the box.
 		 */
 		public var halfHeight:Number;
 		
 		/**
-		 * 箱の奥行きです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The depth of the box.
 		 */
 		public var depth:Number;
 		
 		/**
-		 * 箱の奥行きの半分です。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The half-depth of the box.
 		 */
 		public var halfDepth:Number;
 		
 		/**
-		 * ワールド座標系での幅の向きを示す単位ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The normalized direction vector of the width.
 		 */
 		public var normalDirectionWidth:Vec3;
 		
 		/**
-		 * ワールド座標系での高さの向きを示す単位ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The normalized direction vector of the height.
 		 */
 		public var normalDirectionHeight:Vec3;
 		
 		/**
-		 * ワールド座標系での奥行きの向きを示す単位ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The normalized direction vector of the depth.
 		 */
 		public var normalDirectionDepth:Vec3;
 		
 		/**
-		 * ワールド座標系での幅の向きを示す幅の半分の長さのベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The direction vector of the half-width.
 		 */
 		public var halfDirectionWidth:Vec3;
 		
 		/**
-		 * ワールド座標系での高さの向きを示す高さの半分の長さのベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The direction vector of the half-height.
 		 */
 		public var halfDirectionHeight:Vec3;
 		
 		/**
-		 * ワールド座標系での奥行きの向きを示す奥行きの半分の長さのベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
+		 * The direction vector of the half-depth.
 		 */
 		public var halfDirectionDepth:Vec3;
 		
-		/**
-		 * ワールド座標系での頂点の一つの位置ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
 		public var vertex1:Vec3;
-		
-		/**
-		 * ワールド座標系での頂点の一つの位置ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
 		public var vertex2:Vec3;
-		
-		/**
-		 * ワールド座標系での頂点の一つの位置ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
 		public var vertex3:Vec3;
-		
-		/**
-		 * ワールド座標系での頂点の一つの位置ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
 		public var vertex4:Vec3;
-		
-		/**
-		 * ワールド座標系での頂点の一つの位置ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
 		public var vertex5:Vec3;
-		
-		/**
-		 * ワールド座標系での頂点の一つの位置ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
 		public var vertex6:Vec3;
-		
-		/**
-		 * ワールド座標系での頂点の一つの位置ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
 		public var vertex7:Vec3;
-		
-		/**
-		 * ワールド座標系での頂点の一つの位置ベクトルです。
-		 * <strong>この変数は外部から変更しないでください。</strong>
-		 */
 		public var vertex8:Vec3;
 		
-		/**
-		 * 新しく BoxShape オブジェクトを作成します。
-		 * @param	width 箱の幅
-		 * @param	height 箱の高さ
-		 * @param	depth 箱の奥行き
-		 * @param	config 形状の設定
-		 */
-		public function BoxShape(width:Number, height:Number, depth:Number, config:ShapeConfig) {
+		public function BoxShape(config:ShapeConfig, width:Number, height:Number, depth:Number) {
+			super(config);
 			this.width = width;
 			halfWidth = width * 0.5;
 			this.height = height;
 			halfHeight = height * 0.5;
 			this.depth = depth;
 			halfDepth = depth * 0.5;
-			position.copy(config.position);
-			rotation.copy(config.rotation);
-			friction = config.friction;
-			restitution = config.restitution;
-			mass = width * height * depth * config.density;
-			var inertia:Number = mass / 12;
-			localInertia.init(
-				inertia * (height * height + depth * depth), 0, 0,
-				0, inertia * (width * width + depth * depth), 0,
-				0, 0, inertia * (width * width + height * height)
-			);
 			normalDirectionWidth = new Vec3();
 			normalDirectionHeight = new Vec3();
 			normalDirectionDepth = new Vec3();
@@ -183,6 +115,19 @@ package com.element.oimo.physics.collision.shape {
 			vertex7 = new Vec3();
 			vertex8 = new Vec3();
 			type = SHAPE_BOX;
+		}
+		
+		/**
+		 * @inheritDoc
+		 */
+		override public function calculateMassInfo(out:MassInfo):void {
+			var mass:Number = width * height * depth * density;
+			out.mass = mass;
+			out.inertia.init(
+				mass * (height * height + depth * depth) / 12, 0, 0,
+				0, mass * (width * width + depth * depth) / 12, 0,
+				0, 0, mass * (width * width + height * height) / 12
+			);
 		}
 		
 		/**
@@ -291,11 +236,14 @@ package com.element.oimo.physics.collision.shape {
 			} else {
 				d += halfDirectionDepth.z;
 			}
-			proxy.init(
-				position.x - w, position.x + w,
-				position.y - h, position.y + h,
-				position.z - d, position.z + d
+			aabb.init(
+				position.x - w - 0.005, position.x + w + 0.005,
+				position.y - h - 0.005, position.y + h + 0.005,
+				position.z - d - 0.005, position.z + d + 0.005
 			);
+			if (proxy != null) {
+				proxy.update();
+			}
 		}
 		
 	}
