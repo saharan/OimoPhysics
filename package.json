@@ -2,6 +2,7 @@
   "name": "oimophysics",
   "version": "1.2.2",
   "description": "A lightweight 3D physics engine.",
+  "type": "module",
   "main": "./bin/js_modules/OimoPhysics.js",
   "typings": "./bin/js_modules/OimoPhysics.d.ts",
   "scripts": {
