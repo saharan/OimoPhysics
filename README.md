@@ -1,4 +1,4 @@
-OimoPhysics 1.2.2
+OimoPhysics 1.2.4
 ---
 
 A lightweight 3D physics engine.

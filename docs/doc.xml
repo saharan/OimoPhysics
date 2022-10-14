@@ -2441,7 +2441,10 @@
 	<class path="export.Export" params="" file="exports/src/export/Export.hx">
 		<main set="method" line="126" static="1">
 			<f a=""><x path="Void"/></f>
-			<meta><m n=":keep"/></meta>
+			<meta>
+				<m n=":keep"/>
+				<m n=":keep"/>
+			</meta>
 		</main>
 		<haxe_doc>* this class just imports all the classes in the library</haxe_doc>
 	</class>
@@ -3137,17 +3140,6 @@
 	@see https://haxe.org/manual/std-vector.html</haxe_doc>
 		<impl><class path="haxe.ds._Vector.Vector_Impl_" params="" file="C:\HaxeToolkit\haxe\std/haxe/ds/Vector.hx" private="1" module="haxe.ds.Vector" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
-	<enum path="haxe.io.Error" params="" file="C:\HaxeToolkit\haxe\std/haxe/io/Error.hx">
-		<Blocked><haxe_doc>The IO is set into nonblocking mode and some data cannot be read or written</haxe_doc></Blocked>
-		<Overflow><haxe_doc>An integer value is outside its allowed range</haxe_doc></Overflow>
-		<OutsideBounds><haxe_doc>An operation on Bytes is outside of its valid range</haxe_doc></OutsideBounds>
-		<Custom a="e">
-			<d/>
-			<haxe_doc>Other errors</haxe_doc>
-		</Custom>
-		<haxe_doc>The possible IO errors that can occur</haxe_doc>
-		<meta><m n=":keep"/></meta>
-	</enum>
 	<class path="haxe.io.Bytes" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/io/Bytes.hx" extern="1">
 		<alloc public="1" set="method" static="1"><f a="length">
 	<x path="Int"/>
@@ -3320,6 +3312,17 @@
 		<impl><class path="haxe.io._BytesData.NativeBytesDataAbstract_Impl_" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/io/BytesData.hx" private="1" module="haxe.io.BytesData" final="1"><meta><m n=":keep"/></meta></class></impl>
 	</abstract>
 	<typedef path="haxe.io.BytesData" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/haxe/io/BytesData.hx"><x path="haxe.io._BytesData.NativeBytesDataAbstract"/></typedef>
+	<enum path="haxe.io.Error" params="" file="C:\HaxeToolkit\haxe\std/haxe/io/Error.hx">
+		<Blocked><haxe_doc>The IO is set into nonblocking mode and some data cannot be read or written</haxe_doc></Blocked>
+		<Overflow><haxe_doc>An integer value is outside its allowed range</haxe_doc></Overflow>
+		<OutsideBounds><haxe_doc>An operation on Bytes is outside of its valid range</haxe_doc></OutsideBounds>
+		<Custom a="e">
+			<d/>
+			<haxe_doc>Other errors</haxe_doc>
+		</Custom>
+		<haxe_doc>The possible IO errors that can occur</haxe_doc>
+		<meta><m n=":keep"/></meta>
+	</enum>
 	<class path="haxe.io.Input" params="" file="C:\HaxeToolkit\haxe\std/haxe/io/Input.hx">
 		<haxe_doc>An Input is an abstract reader. See other classes in the `haxe.io` package
 	for several possible implementations.
@@ -14642,14 +14645,6 @@
 	<class path="oimo.m.M" params="" file="src/oimo/m/M.hx"><haxe_doc>* Expression Macro</haxe_doc></class>
 	<class path="sys.io.FileInput" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/io/FileInput.hx">
 		<extends path="haxe.io.Input"/>
-		<close public="1" set="method"><f a=""><x path="Void"/></f></close>
-		<readByte public="1" set="method"><f a=""><x path="Int"/></f></readByte>
-		<readBytes public="1" set="method"><f a="bytes:pos:len">
-	<c path="haxe.io.Bytes"/>
-	<x path="Int"/>
-	<x path="Int"/>
-	<x path="Int"/>
-</f></readBytes>
 		<haxe_doc>Use `sys.io.File.read` to create a `FileInput`.</haxe_doc>
 		<meta>
 			<m n=":keep"/>
@@ -14658,18 +14653,6 @@
 	</class>
 	<class path="sys.io.FileOutput" params="" file="C:\HaxeToolkit\haxe\std/eval/_std/sys/io/FileOutput.hx">
 		<extends path="haxe.io.Output"/>
-		<close public="1" set="method"><f a=""><x path="Void"/></f></close>
-		<flush public="1" set="method"><f a=""><x path="Void"/></f></flush>
-		<writeByte public="1" set="method"><f a="c">
-	<x path="Int"/>
-	<x path="Void"/>
-</f></writeByte>
-		<writeBytes public="1" set="method"><f a="bytes:pos:len">
-	<c path="haxe.io.Bytes"/>
-	<x path="Int"/>
-	<x path="Int"/>
-	<x path="Int"/>
-</f></writeBytes>
 		<haxe_doc>Use `sys.io.File.write` to create a `FileOutput`.</haxe_doc>
 		<meta>
 			<m n=":keep"/>
