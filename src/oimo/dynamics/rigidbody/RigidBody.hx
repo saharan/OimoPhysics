@@ -997,15 +997,15 @@ class RigidBody {
 	 * Removes the shape from the rigid body.
 	 */
 	public function removeShape(shape:Shape):Void {
-		// first, remove the shape from the linked list so that it will be ignored
-		M.list_remove(_shapeList, _shapeListLast, _prev, _next, shape);
-		_numShapes--;
-		shape._rigidBody = null;
-
-		// then remove the shape from the world
+		// first remove the shape from the world
 		if (_world != null) {
 			_world._removeShape(shape);
 		}
+		
+		// then, remove the shape from the linked list so that it will be ignored
+		M.list_remove(_shapeList, _shapeListLast, _prev, _next, shape);
+		_numShapes--;
+		shape._rigidBody = null;
 
 		_shapeModified();
 	}
