@@ -185,7 +185,9 @@ class B {
 							type: macro:Float,
 							expr: null,
 							meta: null,
-							isFinal: false
+							isFinal: false,
+							isStatic: null,
+							namePos: null
 						};
 					}));
 				}
