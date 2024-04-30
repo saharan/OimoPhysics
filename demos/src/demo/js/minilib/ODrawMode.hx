@@ -1,7 +1,7 @@
 package demo.js.minilib;
 import js.html.webgl.*;
 
-@:enum
+enum
 abstract ODrawMode(Int) to Int {
 	var Points = GL.POINTS;
 	var Lines = GL.LINES;
