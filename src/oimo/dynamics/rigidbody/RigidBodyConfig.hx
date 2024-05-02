@@ -34,12 +34,6 @@ class RigidBodyConfig {
 	public var type:Int;
 
 	/**
-	 * Whether to automatically sleep the rigid body when it stops moving
-	 * for a certain period of time, namely `Setting.sleepingTimeThreshold`.
-	 */
-	public var autoSleep:Bool;
-
-	/**
 	 * The damping coefficient of the linear velocity. Set positive values to
 	 * gradually reduce the linear velocity.
 	 */
@@ -52,6 +46,22 @@ class RigidBodyConfig {
 	public var angularDamping:Float;
 
 	/**
+	 * Whether to automatically sleep the rigid body when it stops moving
+	 * for a certain period of time, namely `Setting.sleepingTimeThreshold`.
+	 */
+	public var autoSleep:Bool;
+
+	/**
+	 * The linear velocity threshold to sleep the rigid body.
+	 */
+	public var sleepingVelocityThreshold:Float;
+
+	/**
+	 * The angular velocity threshold to sleep the rigid body.
+	 */
+	public var sleepingAngularVelocityThreshold:Float;
+
+	/**
 	 * Default constructor.
 	 */
 	public function new() {
@@ -60,8 +70,10 @@ class RigidBodyConfig {
 		linearVelocity = new Vec3();
 		angularVelocity = new Vec3();
 		type = RigidBodyType._DYNAMIC;
-		autoSleep = true;
 		linearDamping = 0;
 		angularDamping = 0;
+		autoSleep = true;
+		sleepingVelocityThreshold = 0.2;
+		sleepingAngularVelocityThreshold = 0.5;
 	}
 }
