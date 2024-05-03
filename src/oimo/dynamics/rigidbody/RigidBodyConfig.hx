@@ -47,7 +47,7 @@ class RigidBodyConfig {
 
 	/**
 	 * Whether to automatically sleep the rigid body when it stops moving
-	 * for a certain period of time, namely `Setting.sleepingTimeThreshold`.
+	 * for a certain period of time, namely `sleepingTimeThreshold`.
 	 */
 	public var autoSleep:Bool;
 
@@ -60,6 +60,11 @@ class RigidBodyConfig {
 	 * The angular velocity threshold to sleep the rigid body.
 	 */
 	public var sleepingAngularVelocityThreshold:Float;
+
+	/**
+	 * The time threshold to sleep the rigid body.
+	 */
+	 public var sleepingTimeThreshold:Float;
 
 	/**
 	 * Default constructor.
@@ -75,5 +80,6 @@ class RigidBodyConfig {
 		autoSleep = true;
 		sleepingVelocityThreshold = 0.2;
 		sleepingAngularVelocityThreshold = 0.5;
+		sleepingTimeThreshold = 1.0;
 	}
 }
