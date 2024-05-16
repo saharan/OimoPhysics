@@ -40,6 +40,9 @@ class RigidBody {
 	public var _sleepTime:Float;
 	public var _sleeping:Bool;
 	public var _autoSleep:Bool;
+	public var _sleepingVelocityThreshold:Float;
+	public var _sleepingAngularVelocityThreshold:Float;
+	public var _sleepingTimeThreshold:Float;
 
 	public var _mass:Float;
 	public var _invMass:Float;
@@ -112,6 +115,9 @@ class RigidBody {
 		_sleepTime = 0;
 		_sleeping = false;
 		_autoSleep = config.autoSleep;
+		_sleepingVelocityThreshold = config.sleepingVelocityThreshold;
+		_sleepingAngularVelocityThreshold = config.sleepingAngularVelocityThreshold;
+		_sleepingTimeThreshold = config.sleepingTimeThreshold;
 
 		_mass = 0;
 		_invMass = 0;
@@ -209,8 +215,8 @@ class RigidBody {
 
 	extern public inline function _isSleepy():Bool {
 		return _autoSleep
-			&& M.vec3_dot(_vel, _vel) < Setting.sleepingVelocityThreshold * Setting.sleepingVelocityThreshold
-			&& M.vec3_dot(_angVel, _angVel) < Setting.sleepingAngularVelocityThreshold * Setting.sleepingAngularVelocityThreshold;
+			&& M.vec3_dot(_vel, _vel) < _sleepingVelocityThreshold * _sleepingVelocityThreshold
+			&& M.vec3_dot(_angVel, _angVel) < _sleepingAngularVelocityThreshold * _sleepingAngularVelocityThreshold;
 	}
 
 	extern public inline function _isAlone():Bool {

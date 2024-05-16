@@ -64,7 +64,7 @@ class Setting {
 	public static var islandInitialRigidBodyArraySize:Int = 128;
 	public static var islandInitialConstraintArraySize:Int = 128;
 
-	// sleeping
+	// sleeping, some are just default values and can be changed through RigidBodyConfig
 	public static var sleepingVelocityThreshold:Float = 0.2;
 	public static var sleepingAngularVelocityThreshold:Float = 0.5;
 	public static var sleepingTimeThreshold:Float = 1.0;

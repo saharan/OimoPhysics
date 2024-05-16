@@ -1,6 +1,7 @@
 package demo.js.minilib;
 import js.html.*;
 import js.html.webgl.*;
+import js.lib.Float32Array;
 
 class OVertexBuffer {
 	public var numVertices(default, null):Int;

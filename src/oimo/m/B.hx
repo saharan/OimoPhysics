@@ -12,6 +12,7 @@ using Lambda;
 /**
  * Build Macro
  */
+@:haxe.warning("-WDeprecated") // for using @:extern
 @:extern
 class B {
 

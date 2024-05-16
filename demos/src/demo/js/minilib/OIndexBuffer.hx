@@ -1,6 +1,7 @@
 package demo.js.minilib;
 import js.html.*;
 import js.html.webgl.*;
+import js.lib.Int16Array;
 
 class OIndexBuffer {
 	var gl:GL;

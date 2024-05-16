@@ -112,7 +112,7 @@ class Island {
 		// update sleep time
 		if (rb._isSleepy()) {
 			rb._sleepTime += dt;
-			if (rb._sleepTime > Setting.sleepingTimeThreshold) {
+			if (rb._sleepTime >= rb._sleepingTimeThreshold) {
 				rb.sleep();
 			}
 		} else {
@@ -172,7 +172,7 @@ class Island {
 			}
 
 			// check if the rigid body is awaken
-			if (rb._sleepTime < Setting.sleepingTimeThreshold) {
+			if (rb._sleepTime < rb._sleepingTimeThreshold) {
 				// awaken the whole island
 				sleepIsland = false;
 			}
