@@ -1,3 +1,8 @@
+class HxOverrides {
+	static now() {
+		return Date.now();
+	}
+}
 var oimo = oimo || {};
 if(!oimo.collision) oimo.collision = {};
 if(!oimo.collision.broadphase) oimo.collision.broadphase = {};

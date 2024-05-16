@@ -17,6 +17,7 @@
 #
 # After build you will need to edit generated JS file:
 # Remove all lines before `var oimo = oimo || {};`
+# - But just keep `HxOverrides` class!
 # Replace last two lines `export.ts.Export.main();
 #                         var Export = $hx_exports["Export"];`
 # with next: `export {oimo};`

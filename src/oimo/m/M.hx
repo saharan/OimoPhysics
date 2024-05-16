@@ -18,17 +18,9 @@ class M {
 
 	public static macro function profile(main:Expr) {
 		return macro {
-			#if js
-				var st:Float = js.Browser.window.performance.now() / 1000;
-			#else
-				var st:Float = haxe.Timer.stamp();
-			#end
+			var st:Float = haxe.Timer.stamp();
 			$main;
-			#if js
-				var en:Float = js.Browser.window.performance.now() / 1000;
-			#else
-				var en:Float = haxe.Timer.stamp();
-			#end
+			var en:Float = haxe.Timer.stamp();
 			(en - st) * 1000; // in ms
 		};
 	}
