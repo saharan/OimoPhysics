@@ -2541,11 +2541,6 @@ export namespace oimo.dynamics.rigidbody {
 		 */
 		type: number;
 		/**
-		 * Whether to automatically sleep the rigid body when it stops moving
-		 * for a certain period of time, namely `Setting.sleepingTimeThreshold`.
-		 */
-		autoSleep: boolean;
-		/**
 		 * The damping coefficient of the linear velocity. Set positive values to
 		 * gradually reduce the linear velocity.
 		 */
@@ -2555,6 +2550,23 @@ export namespace oimo.dynamics.rigidbody {
 		 * gradually reduce the angular velocity.
 		 */
 		angularDamping: number;
+		/**
+		 * Whether to automatically sleep the rigid body when it stops moving
+		 * for a certain period of time, namely `sleepingTimeThreshold`.
+		 */
+		autoSleep: boolean;
+		/**
+		 * The linear velocity threshold to sleep the rigid body.
+		 */
+		sleepingVelocityThreshold: number;
+		/**
+		 * The angular velocity threshold to sleep the rigid body.
+		 */
+		sleepingAngularVelocityThreshold: number;
+		/**
+		 * The time threshold to sleep the rigid body.
+		 */
+		sleepingTimeThreshold: number;
 	}
 }
 
@@ -3542,6 +3554,9 @@ export namespace oimo.dynamics.rigidbody {
 		_sleepTime: number;
 		_sleeping: boolean;
 		_autoSleep: boolean;
+		_sleepingVelocityThreshold: number;
+		_sleepingAngularVelocityThreshold: number;
+		_sleepingTimeThreshold: number;
 		_mass: number;
 		_invMass: number;
 		_localInertia00: number;

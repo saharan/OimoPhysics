@@ -349,14 +349,11 @@ oimo.collision.broadphase.bruteforce.BruteForceBroadPhase = class oimo_collision
 	collectPairs() {
 		let p = this._proxyPairList;
 		if(p != null) {
-			while(true) {
+			do {
 				p._p1 = null;
 				p._p2 = null;
 				p = p._next;
-				if(!(p != null)) {
-					break;
-				}
-			}
+			} while(p != null);
 			this._proxyPairList._next = this._proxyPairPool;
 			this._proxyPairPool = this._proxyPairList;
 			this._proxyPairList = null;
@@ -1230,14 +1227,11 @@ oimo.collision.broadphase.bvh.BvhBroadPhase = class oimo_collision_broadphase_bv
 	collectPairs() {
 		let p = this._proxyPairList;
 		if(p != null) {
-			while(true) {
+			do {
 				p._p1 = null;
 				p._p2 = null;
 				p = p._next;
-				if(!(p != null)) {
-					break;
-				}
-			}
+			} while(p != null);
 			this._proxyPairList._next = this._proxyPairPool;
 			this._proxyPairPool = this._proxyPairList;
 			this._proxyPairList = null;
@@ -2739,7 +2733,6 @@ oimo.collision.geometry.CapsuleGeometry = class oimo_collision_geometry_CapsuleG
 				return false;
 			}
 			tminxz = 0;
-			tmaxxz = 1;
 		}
 		let crossY = beginY + (endY - beginY) * tminxz;
 		let min;
@@ -4662,27 +4655,15 @@ oimo.collision.narrowphase.detector.BoxBoxDetector = class oimo_collision_narrow
 			c12X = -c12X;
 			c12Y = -c12Y;
 			c12Z = -c12Z;
-			let tmp = b1;
-			b1 = b2;
-			b2 = tmp;
-			let tmp1 = w1;
 			w1 = w2;
-			w2 = tmp1;
-			let tmp2 = h1;
 			h1 = h2;
-			h2 = tmp2;
-			let tmp3 = d1;
 			d1 = d2;
-			d2 = tmp3;
 			tmpX = c1X;
 			tmpY = c1Y;
 			tmpZ = c1Z;
 			c1X = c2X;
 			c1Y = c2Y;
 			c1Z = c2Z;
-			c2X = tmpX;
-			c2Y = tmpY;
-			c2Z = tmpZ;
 			tmpX = x1X;
 			tmpY = x1Y;
 			tmpZ = x1Z;
@@ -4854,7 +4835,6 @@ oimo.collision.narrowphase.detector.BoxBoxDetector = class oimo_collision_narrow
 			incId = 4;
 		}
 		if(-incDot < minIncDot) {
-			minIncDot = -incDot;
 			incId = 5;
 		}
 		let incV1X;
@@ -6375,7 +6355,7 @@ oimo.collision.narrowphase.detector.gjkepa.EpaPolyhedron = class oimo_collision_
 		let v = v1;
 		let prevT = null;
 		let firstT = null;
-		while(true) {
+		do {
 			if(v._tmpEdgeLoopNext == null) {
 				this._dumpAsObjModel();
 				this._status = 4;
@@ -6421,10 +6401,7 @@ oimo.collision.narrowphase.detector.gjkepa.EpaPolyhedron = class oimo_collision_
 			}
 			prevT = t;
 			v = v._tmpEdgeLoopNext;
-			if(!(v != v1)) {
-				break;
-			}
-		}
+		} while(v != v1);
 		if(!prevT.setAdjacentTriangle(firstT)) {
 			this._status = 1;
 		}
@@ -11506,7 +11483,7 @@ oimo.collision.narrowphase.detector.gjkepa.GjkEpa = class oimo_collision_narrowp
 		oldDirX = v.x;
 		oldDirY = v.y;
 		oldDirZ = v.z;
-		while(true) {
+		do {
 			let s0X;
 			let s0Y;
 			let s0Z;
@@ -11586,8 +11563,7 @@ oimo.collision.narrowphase.detector.gjkepa.GjkEpa = class oimo_collision_narrowp
 				break;
 			}
 			this.simplexSize--;
-			break;
-		}
+		} while(false);
 		let v1 = this.dir;
 		v1.x = oldDirX;
 		v1.y = oldDirY;
@@ -15232,7 +15208,7 @@ oimo.dynamics.ContactManager = class oimo_dynamics_ContactManager {
 		let pp = this._broadPhase._proxyPairList;
 		while(pp != null) {
 			let n = pp._next;
-			while(true) {
+			do {
 				let s1;
 				let s2;
 				if(pp._p1._id < pp._p2._id) {
@@ -15321,8 +15297,7 @@ oimo.dynamics.ContactManager = class oimo_dynamics_ContactManager {
 					_this._tf2 = _this._b2._transform;
 					this._numContacts++;
 				}
-				break;
-			}
+			} while(false);
 			pp = n;
 		}
 	}
@@ -15331,7 +15306,7 @@ oimo.dynamics.ContactManager = class oimo_dynamics_ContactManager {
 		let c = this._contactList;
 		while(c != null) {
 			let n = c._next;
-			while(true) {
+			do {
 				if(c._latest) {
 					c._latest = false;
 					c._shouldBeSkipped = false;
@@ -15526,8 +15501,7 @@ oimo.dynamics.ContactManager = class oimo_dynamics_ContactManager {
 					break;
 				}
 				c._shouldBeSkipped = !(aabb1._minX < aabb2._maxX && aabb1._maxX > aabb2._minX && aabb1._minY < aabb2._maxY && aabb1._maxY > aabb2._minY && aabb1._minZ < aabb2._maxZ && aabb1._maxZ > aabb2._minZ);
-				break;
-			}
+			} while(false);
 			c = n;
 		}
 	}
@@ -15679,9 +15653,9 @@ oimo.dynamics.Island = class oimo_dynamics_Island {
 		rb._angularContactImpulseX = 0;
 		rb._angularContactImpulseY = 0;
 		rb._angularContactImpulseZ = 0;
-		if(rb._autoSleep && rb._velX * rb._velX + rb._velY * rb._velY + rb._velZ * rb._velZ < oimo.common.Setting.sleepingVelocityThreshold * oimo.common.Setting.sleepingVelocityThreshold && rb._angVelX * rb._angVelX + rb._angVelY * rb._angVelY + rb._angVelZ * rb._angVelZ < oimo.common.Setting.sleepingAngularVelocityThreshold * oimo.common.Setting.sleepingAngularVelocityThreshold) {
+		if(rb._autoSleep && rb._velX * rb._velX + rb._velY * rb._velY + rb._velZ * rb._velZ < rb._sleepingVelocityThreshold * rb._sleepingVelocityThreshold && rb._angVelX * rb._angVelX + rb._angVelY * rb._angVelY + rb._angVelZ * rb._angVelZ < rb._sleepingAngularVelocityThreshold * rb._sleepingAngularVelocityThreshold) {
 			rb._sleepTime += dt;
-			if(rb._sleepTime > oimo.common.Setting.sleepingTimeThreshold) {
+			if(rb._sleepTime >= rb._sleepingTimeThreshold) {
 				rb._sleeping = true;
 				rb._sleepTime = 0;
 			}
@@ -15883,12 +15857,12 @@ oimo.dynamics.Island = class oimo_dynamics_Island {
 			rb._angularContactImpulseY = 0;
 			rb._angularContactImpulseZ = 0;
 			rb._sleeping = false;
-			if(rb._autoSleep && rb._velX * rb._velX + rb._velY * rb._velY + rb._velZ * rb._velZ < oimo.common.Setting.sleepingVelocityThreshold * oimo.common.Setting.sleepingVelocityThreshold && rb._angVelX * rb._angVelX + rb._angVelY * rb._angVelY + rb._angVelZ * rb._angVelZ < oimo.common.Setting.sleepingAngularVelocityThreshold * oimo.common.Setting.sleepingAngularVelocityThreshold) {
+			if(rb._autoSleep && rb._velX * rb._velX + rb._velY * rb._velY + rb._velZ * rb._velZ < rb._sleepingVelocityThreshold * rb._sleepingVelocityThreshold && rb._angVelX * rb._angVelX + rb._angVelY * rb._angVelY + rb._angVelZ * rb._angVelZ < rb._sleepingAngularVelocityThreshold * rb._sleepingAngularVelocityThreshold) {
 				rb._sleepTime += dt;
 			} else {
 				rb._sleepTime = 0;
 			}
-			if(rb._sleepTime < oimo.common.Setting.sleepingTimeThreshold) {
+			if(rb._sleepTime < rb._sleepingTimeThreshold) {
 				sleepIsland = false;
 			}
 			if(rb._type == 0) {
@@ -19075,8 +19049,7 @@ oimo.dynamics.common.DebugDraw = class oimo_dynamics_common_DebugDraw {
 				let i = _g1++;
 				let v2 = this.tmpCircleVerts2[i];
 				let v3 = this.tmpCircleVerts2[(i + 1) % 8];
-				let n1 = this.tmpCircleVerts1[i];
-				this.triangle(_this7,v2,v3,n1,this.tmpCircleNorms[i],this.tmpCircleNorms[(i + 1) % 8],color);
+				this.triangle(_this7,v2,v3,this.tmpCircleVerts1[i],this.tmpCircleNorms[i],this.tmpCircleNorms[(i + 1) % 8],color);
 				v2 = this.tmpCircleVerts2[(i + 1) % 8];
 				v3 = this.tmpCircleVerts2[i];
 				let _this = this.p;
@@ -19088,7 +19061,6 @@ oimo.dynamics.common.DebugDraw = class oimo_dynamics_common_DebugDraw {
 				_this2.x = -_this2.x;
 				_this2.y = -_this2.y;
 				_this2.z = -_this2.z;
-				n1 = _this2;
 				this.triangle(_this10,v2,v3,_this2,_this2,_this2,color);
 				let _this3 = this.p;
 				if(_this2 != null) {
@@ -21653,7 +21625,6 @@ oimo.dynamics.constraint.contact.ManifoldUpdater = class oimo_dynamics_constrain
 			maxDepthIndex = 2;
 		}
 		if(p4._depth > maxDepth) {
-			maxDepth = p4._depth;
 			maxDepthIndex = 3;
 		}
 		let rp1X;
@@ -21932,7 +21903,6 @@ oimo.dynamics.constraint.contact.ManifoldUpdater = class oimo_dynamics_constrain
 		let a13 = cross1X3 * cross1X3 + cross1Y3 * cross1Y3 + cross1Z3 * cross1Z3;
 		let a24 = cross2X3 * cross2X3 + cross2Y3 * cross2Y3 + cross2Z3 * cross2Z3;
 		let a34 = cross3X3 * cross3X3 + cross3Y3 * cross3Y3 + cross3Z3 * cross3Z3;
-		let a4 = a13 > a24 ? a13 > a34 ? a13 : a34 : a24 > a34 ? a24 : a34;
 		let max = a1 > a2 ? a1 > a3 ? a1 : a3 : a2 > a3 ? a2 : a3;
 		let target = 0;
 		if(a22 > max && maxDepthIndex != 1 || maxDepthIndex == 0) {
@@ -21943,8 +21913,7 @@ oimo.dynamics.constraint.contact.ManifoldUpdater = class oimo_dynamics_constrain
 			max = a33;
 			target = 2;
 		}
-		if(a4 > max && maxDepthIndex != 3) {
-			max = a4;
+		if((a13 > a24 ? a13 > a34 ? a13 : a34 : a24 > a34 ? a24 : a34) > max && maxDepthIndex != 3) {
 			target = 3;
 		}
 		return target;
@@ -26447,13 +26416,10 @@ oimo.dynamics.constraint.joint.RagdollJoint = class oimo_dynamics_constraint_joi
 		swingVX *= invLen * this._swingAngle;
 		swingVY *= invLen * this._swingAngle;
 		swingVZ *= invLen * this._swingAngle;
-		let __tmp__X1;
 		let __tmp__Y1;
 		let __tmp__Z1;
-		__tmp__X1 = basis1Mat00 * swingVX + basis1Mat10 * swingVY + basis1Mat20 * swingVZ;
 		__tmp__Y1 = basis1Mat01 * swingVX + basis1Mat11 * swingVY + basis1Mat21 * swingVZ;
 		__tmp__Z1 = basis1Mat02 * swingVX + basis1Mat12 * swingVY + basis1Mat22 * swingVZ;
-		swingVX = __tmp__X1;
 		swingVY = __tmp__Y1;
 		swingVZ = __tmp__Z1;
 		let x1 = swingVY;
@@ -32686,6 +32652,9 @@ oimo.dynamics.rigidbody.RigidBody = class oimo_dynamics_rigidbody_RigidBody {
 		this._sleepTime = 0;
 		this._sleeping = false;
 		this._autoSleep = config.autoSleep;
+		this._sleepingVelocityThreshold = config.sleepingVelocityThreshold;
+		this._sleepingAngularVelocityThreshold = config.sleepingAngularVelocityThreshold;
+		this._sleepingTimeThreshold = config.sleepingTimeThreshold;
 		this._mass = 0;
 		this._invMass = 0;
 		this._localInertia00 = 0;
@@ -36477,9 +36446,12 @@ oimo.dynamics.rigidbody.RigidBodyConfig = class oimo_dynamics_rigidbody_RigidBod
 		this.linearVelocity = new oimo.common.Vec3();
 		this.angularVelocity = new oimo.common.Vec3();
 		this.type = 0;
-		this.autoSleep = true;
 		this.linearDamping = 0;
 		this.angularDamping = 0;
+		this.autoSleep = true;
+		this.sleepingVelocityThreshold = oimo.common.Setting.sleepingVelocityThreshold;
+		this.sleepingAngularVelocityThreshold = oimo.common.Setting.sleepingAngularVelocityThreshold;
+		this.sleepingTimeThreshold = oimo.common.Setting.sleepingTimeThreshold;
 	}
 }
 oimo.dynamics.rigidbody.RigidBodyType = class oimo_dynamics_rigidbody_RigidBodyType {
