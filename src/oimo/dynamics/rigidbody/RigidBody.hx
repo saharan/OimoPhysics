@@ -42,6 +42,7 @@ class RigidBody {
 	public var _autoSleep:Bool;
 	public var _sleepingVelocityThreshold:Float;
 	public var _sleepingAngularVelocityThreshold:Float;
+	public var _sleepingTimeThreshold:Float;
 
 	public var _mass:Float;
 	public var _invMass:Float;
@@ -116,6 +117,7 @@ class RigidBody {
 		_autoSleep = config.autoSleep;
 		_sleepingVelocityThreshold = config.sleepingVelocityThreshold;
 		_sleepingAngularVelocityThreshold = config.sleepingAngularVelocityThreshold;
+		_sleepingTimeThreshold = config.sleepingTimeThreshold;
 
 		_mass = 0;
 		_invMass = 0;

@@ -1,4 +1,6 @@
 package oimo.dynamics.rigidbody;
+
+import oimo.common.Setting;
 import oimo.common.Mat3;
 import oimo.common.Vec3;
 
@@ -64,7 +66,7 @@ class RigidBodyConfig {
 	/**
 	 * The time threshold to sleep the rigid body.
 	 */
-	 public var sleepingTimeThreshold:Float;
+	public var sleepingTimeThreshold:Float;
 
 	/**
 	 * Default constructor.
@@ -78,8 +80,9 @@ class RigidBodyConfig {
 		linearDamping = 0;
 		angularDamping = 0;
 		autoSleep = true;
-		sleepingVelocityThreshold = 0.2;
-		sleepingAngularVelocityThreshold = 0.5;
-		sleepingTimeThreshold = 1.0;
+		// inherit default value in Setting
+		sleepingVelocityThreshold = Setting.sleepingVelocityThreshold;
+		sleepingAngularVelocityThreshold = Setting.sleepingAngularVelocityThreshold;
+		sleepingTimeThreshold = Setting.sleepingTimeThreshold;
 	}
 }
