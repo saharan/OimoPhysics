@@ -12,7 +12,7 @@ using Lambda;
 /**
  * Build Macro
  */
-@:haxe.warning("-WDeprecated") // for using @:extern
+@:haxe.warning("-WDeprecated") // for using @:extern but this doesn't seem to be working...
 @:extern
 class B {
 

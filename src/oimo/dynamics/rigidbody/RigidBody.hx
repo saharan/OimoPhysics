@@ -342,9 +342,11 @@ class RigidBody {
 			M.mat3_zero(_invLocalInertia);
 			M.mat3_zero(_invLocalInertiaWithoutRotFactor);
 
-			// force static
+			// ensure minimum mass so as not to diverge into NaN immediately
 			if (_type == RigidBodyType._DYNAMIC) {
-				_type = RigidBodyType._STATIC;
+				_invMass = 1e-9;
+				M.mat3_diagonal(_invLocalInertiaWithoutRotFactor, 1e-9, 1e-9, 1e-9);
+				M.mat3_scaleRows(_invLocalInertia, _invLocalInertiaWithoutRotFactor, _rotFactor.x, _rotFactor.y, _rotFactor.z);
 			}
 		}
 		updateInvInertia();

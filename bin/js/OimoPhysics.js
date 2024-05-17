@@ -34019,7 +34019,25 @@ class oimo_dynamics_rigidbody_RigidBody {
 			this._invLocalInertiaWithoutRotFactor21 = 0;
 			this._invLocalInertiaWithoutRotFactor22 = 0;
 			if(this._type == 0) {
-				this._type = 1;
+				this._invMass = 1e-9;
+				this._invLocalInertiaWithoutRotFactor00 = 1e-9;
+				this._invLocalInertiaWithoutRotFactor01 = 0;
+				this._invLocalInertiaWithoutRotFactor02 = 0;
+				this._invLocalInertiaWithoutRotFactor10 = 0;
+				this._invLocalInertiaWithoutRotFactor11 = 1e-9;
+				this._invLocalInertiaWithoutRotFactor12 = 0;
+				this._invLocalInertiaWithoutRotFactor20 = 0;
+				this._invLocalInertiaWithoutRotFactor21 = 0;
+				this._invLocalInertiaWithoutRotFactor22 = 1e-9;
+				this._invLocalInertia00 = this._invLocalInertiaWithoutRotFactor00 * this._rotFactor.x;
+				this._invLocalInertia01 = this._invLocalInertiaWithoutRotFactor01 * this._rotFactor.x;
+				this._invLocalInertia02 = this._invLocalInertiaWithoutRotFactor02 * this._rotFactor.x;
+				this._invLocalInertia10 = this._invLocalInertiaWithoutRotFactor10 * this._rotFactor.y;
+				this._invLocalInertia11 = this._invLocalInertiaWithoutRotFactor11 * this._rotFactor.y;
+				this._invLocalInertia12 = this._invLocalInertiaWithoutRotFactor12 * this._rotFactor.y;
+				this._invLocalInertia20 = this._invLocalInertiaWithoutRotFactor20 * this._rotFactor.z;
+				this._invLocalInertia21 = this._invLocalInertiaWithoutRotFactor21 * this._rotFactor.z;
+				this._invLocalInertia22 = this._invLocalInertiaWithoutRotFactor22 * this._rotFactor.z;
 			}
 		}
 		let __tmp__00;
@@ -36075,7 +36093,25 @@ class oimo_dynamics_rigidbody_RigidBody {
 			this._invLocalInertiaWithoutRotFactor21 = 0;
 			this._invLocalInertiaWithoutRotFactor22 = 0;
 			if(this._type == 0) {
-				this._type = 1;
+				this._invMass = 1e-9;
+				this._invLocalInertiaWithoutRotFactor00 = 1e-9;
+				this._invLocalInertiaWithoutRotFactor01 = 0;
+				this._invLocalInertiaWithoutRotFactor02 = 0;
+				this._invLocalInertiaWithoutRotFactor10 = 0;
+				this._invLocalInertiaWithoutRotFactor11 = 1e-9;
+				this._invLocalInertiaWithoutRotFactor12 = 0;
+				this._invLocalInertiaWithoutRotFactor20 = 0;
+				this._invLocalInertiaWithoutRotFactor21 = 0;
+				this._invLocalInertiaWithoutRotFactor22 = 1e-9;
+				this._invLocalInertia00 = this._invLocalInertiaWithoutRotFactor00 * this._rotFactor.x;
+				this._invLocalInertia01 = this._invLocalInertiaWithoutRotFactor01 * this._rotFactor.x;
+				this._invLocalInertia02 = this._invLocalInertiaWithoutRotFactor02 * this._rotFactor.x;
+				this._invLocalInertia10 = this._invLocalInertiaWithoutRotFactor10 * this._rotFactor.y;
+				this._invLocalInertia11 = this._invLocalInertiaWithoutRotFactor11 * this._rotFactor.y;
+				this._invLocalInertia12 = this._invLocalInertiaWithoutRotFactor12 * this._rotFactor.y;
+				this._invLocalInertia20 = this._invLocalInertiaWithoutRotFactor20 * this._rotFactor.z;
+				this._invLocalInertia21 = this._invLocalInertiaWithoutRotFactor21 * this._rotFactor.z;
+				this._invLocalInertia22 = this._invLocalInertiaWithoutRotFactor22 * this._rotFactor.z;
 			}
 		}
 		let __tmp__00;
