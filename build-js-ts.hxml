@@ -8,8 +8,8 @@
 -D hxtsdgen_types_ts
 -js bin/js_modules/OimoPhysics.js
 -D js-es=6
--D js_unflatten
--D js_classic
+-D js-unflatten
+-D js-classic
 -D shallow-expose
 
 #
@@ -17,8 +17,8 @@
 #
 # After build you will need to edit generated JS file:
 # Remove all lines before `var oimo = oimo || {};`
-# - But just keep `HxOverrides` class!
-# Replace last two lines `export.ts.Export.main();
+# - Except the `HxOverrides` class!
+# Replace the last two lines `export.ts.Export.main();
 #                         var Export = $hx_exports["Export"];`
 # with next: `export {oimo};`
 # Remove Export class from OimoPhysics.d.ts
