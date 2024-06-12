@@ -1,7 +1,7 @@
-/js_externs.txt
-/js_exports.txt
-/js_imports.txt
-/compiler.jar
+compiler.jar
+js_exports.txt
+js_externs.txt
+js_imports.txt
 
 .DS_Store
 *.swp

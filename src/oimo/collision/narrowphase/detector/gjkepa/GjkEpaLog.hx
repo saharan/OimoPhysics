@@ -1,8 +1,8 @@
 package oimo.collision.narrowphase.detector.gjkepa;
 import haxe.macro.Expr;
 
-@:extern
 @:dox(hide)
+@:extern
 class GjkEpaLog {
 	public static macro function log(text:Expr):Expr {
 		#if OIMO_GJK_EPA_DEBUG
