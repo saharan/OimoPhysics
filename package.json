@@ -4,7 +4,8 @@
   "description": "A lightweight 3D physics engine.",
   "type": "module",
   "main": "./bin/js_modules/OimoPhysics.js",
-  "typings": "./bin/js_modules/OimoPhysics.d.ts",
+  "types": "./bin/js_modules/OimoPhysics.d.ts",
+  "sideEffects": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
