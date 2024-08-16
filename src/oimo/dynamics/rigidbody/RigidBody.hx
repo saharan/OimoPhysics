@@ -74,6 +74,8 @@ class RigidBody {
 	public var _addedToIsland:Bool;
 	public var _gravityScale:Float;
 
+	public var _isTrigger:Bool;
+
 	/**
 	 * Extra field that users can use for their own purposes.
 	 */
@@ -840,6 +842,13 @@ class RigidBody {
 	public inline function setGravityScale(gravityScale:Float):Void {
 		_gravityScale = gravityScale;
 		wakeUp();
+	}
+
+	/**
+	 * Sets if the body is a trigger or not.
+	 */
+	public inline function setIsTrigger(isTrigger:Bool) {
+		_isTrigger = isTrigger;
 	}
 
 	/**

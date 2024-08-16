@@ -41,6 +41,7 @@ class Contact {
 	public var _updater:ManifoldUpdater;
 	public var _contactConstraint:ContactConstraint;
 	public var _touching:Bool;
+	public var _triggering:Bool;
 
 	@:dox(hide)
 	public function new() {
@@ -112,6 +113,26 @@ class Contact {
 		if (cc2 != null) cc2.endContact(this);
 	}
 
+	extern inline function sendBeginTriggerContact():Void {
+		var cc1:ContactCallback = _s1._contactCallback;
+		var cc2:ContactCallback = _s2._contactCallback;
+		if (cc1 == cc2) {
+			cc2 = null; // avoid calling twice
+		}
+		if (cc1 != null) cc1.beginTriggerContact(this);
+		if (cc2 != null) cc2.beginTriggerContact(this);
+	}
+
+	extern inline function sendEndTriggerContact():Void {
+		var cc1:ContactCallback = _s1._contactCallback;
+		var cc2:ContactCallback = _s2._contactCallback;
+		if (cc1 == cc2) {
+			cc2 = null; // avoid calling twice
+		}
+		if (cc1 != null) cc1.endTriggerContact(this);
+		if (cc2 != null) cc2.endTriggerContact(this);
+	}
+
 	extern inline function sendPreSolve():Void {
 		var cc1:ContactCallback = _s1._contactCallback;
 		var cc2:ContactCallback = _s2._contactCallback;
@@ -153,6 +174,11 @@ class Contact {
 			sendEndContact();
 		}
 
+		if (_triggering) {
+			// triggering in the last frame
+			sendEndTriggerContact();
+		}
+
 		detachLinks();
 		_s1 = null;
 		_s2 = null;
@@ -172,12 +198,14 @@ class Contact {
 		if (_detector == null) return;
 
 		var ptouching:Bool = _touching;
+		var pTriggering:Bool = _triggering;
 
 		var result:DetectorResult = _detectorResult;
 		_detector.detect(result, _s1._geom, _s2._geom, _s1._transform, _s2._transform, _cachedDetectorData);
 
 		var num:Int = result.numPoints;
 		_touching = num > 0;
+		if (!_touching && _triggering) _triggering = false;
 
 		if (_touching) {
 			// update manifold basis
@@ -200,6 +228,8 @@ class Contact {
 				// one-shot manifold
 				_updater.totalUpdate(result, _b1._transform, _b2._transform);
 			}
+
+			if (_s1._rigidBody._isTrigger || _s2._rigidBody._isTrigger) _triggering = true;
 		} else {
 			_manifold._clear();
 		}
@@ -209,6 +239,12 @@ class Contact {
 		}
 		if (!_touching && ptouching) {
 			sendEndContact();
+		}
+		if (_triggering && !pTriggering) {
+			sendBeginTriggerContact();
+		}
+		if (!_triggering && pTriggering) {
+			sendEndTriggerContact();
 		}
 		if (_touching) {
 			sendPreSolve();
@@ -241,6 +277,13 @@ class Contact {
 	 */
 	public inline function isTouching():Bool {
 		return _touching;
+	}
+
+	/**
+	 * Returns whether the shapes are triggering.
+	 */
+	public inline function isTriggering():Bool {
+		return _triggering;
 	}
 
 	/**
