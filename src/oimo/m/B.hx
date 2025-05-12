@@ -12,8 +12,6 @@ using Lambda;
 /**
  * Build Macro
  */
-@:haxe.warning("-WDeprecated") // for using @:extern but this doesn't seem to be working...
-@:extern
 class B {
 
 #if macro
@@ -30,7 +28,7 @@ class B {
 
 	static var onGenerateAdded:Bool = false;
 
-	public static function bu() {
+	macro static function bu():Array<Field> {
 		if (!onGenerateAdded) {
 			Context.onGenerate(onGenerate);
 			onGenerateAdded = true;
@@ -91,7 +89,7 @@ class B {
 		}
 	}
 
-	public static function filter() {
+	public static function filter():Array<Field> {
 		var fs:Array<Field> = Context.getBuildFields();
 		var fs2:Array<Field> = [];
 		log("filtering... " + fs);
@@ -121,10 +119,8 @@ class B {
 							pos: U.pos()
 						}], field.access);
 
-						field.meta.push({
-							name: ":extern",
-							pos: U.pos()
-						});
+						Context.getLocalClass().get().isExtern = true;
+
 						fs2.push(field); // keep it for type inference
 					} else {
 						fs2.push(field);
