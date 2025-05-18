@@ -1,0 +1,15 @@
+.vscode
+demos
+docs
+exports
+old
+src
+build-doc.hxml
+build-js-demos.hxml
+build-js-ts.hxml
+build-js.hxml
+compiler.jar
+js_exports.txt
+js_externs.txt
+js_imports.txt
+minify-js.sh
