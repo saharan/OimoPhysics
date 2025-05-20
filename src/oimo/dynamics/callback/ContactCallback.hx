@@ -1,4 +1,7 @@
 package oimo.dynamics.callback;
+
+import oimo.dynamics.constraint.contact.Manifold;
+import oimo.collision.narrowphase.DetectorResult;
 import oimo.dynamics.Contact;
 
 /**
@@ -46,5 +49,17 @@ class ContactCallback {
 	 * the two shapes.
 	 */
 	public function endContact(c:Contact):Void {
+	}
+
+	/**
+	 * Trigger event started.
+	 */
+	public function beginTriggerContact(c:Contact):Void {
+	}
+
+	/**
+	 * Trigger event ended.
+	 */
+	public function endTriggerContact(c:Contact):Void {
 	}
 }

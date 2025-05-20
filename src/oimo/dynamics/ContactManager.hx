@@ -142,7 +142,7 @@ class ContactManager {
 			return false;
 		}
 
-		if (r1._type != RigidBodyType._DYNAMIC && r2._type != RigidBodyType._DYNAMIC) {
+		if (r1._type != RigidBodyType._DYNAMIC && r2._type != RigidBodyType._DYNAMIC && (!s1._rigidBody._isTrigger && !s2._rigidBody._isTrigger)) {
 			// none of the two bodies are dynamic
 			return false;
 		}

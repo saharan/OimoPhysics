@@ -204,7 +204,7 @@ class World {
 				// ignore if not touching
 				var cc:ContactConstraint = cl._contact._contactConstraint;
 				var ccs:ConstraintSolver = cl._contact._contactConstraint._solver;
-				if (cc.isTouching() && !ccs._addedToIsland) {
+				if (!cl._contact._triggering && cc.isTouching() && !ccs._addedToIsland) {
 
 					// add to constraint array (to clear island flag later)
 					if (_solversInIslands.length == _numSolversInIslands) {
@@ -795,6 +795,7 @@ class World {
 
 		Performance.totalTime = M.profile({
 			_updateContacts();
+			// FEHM - here the manifolds of triggers must be cleared? Detached etc.
 			_solveIslands();
 		});
 	}
